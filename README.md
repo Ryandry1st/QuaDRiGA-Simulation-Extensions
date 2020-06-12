@@ -1,5 +1,5 @@
 # FB_Quadriga
-  Code repository for working on Quadriga simulations
+  Code repository for working on Quadriga simulations. The average time to run a simulation is usually around 30 minutes to 1 hour, so plan accordingly.
   </br></br></br>
 
 ## Goals
