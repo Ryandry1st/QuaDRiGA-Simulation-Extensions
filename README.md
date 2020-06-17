@@ -8,8 +8,7 @@
 
 ## Current Issues I am working on
 <ul>
-  <li> The sectored antennas seem to be showing different radiation power depending on direction. See sector 1 in image below. </li>
-  <img src="figs/difference_in_sectors.png">
+  <li> <s>The sectored antennas seem to be showing different radiation power depending on direction. See sector 1 in figs/difference_in_sectors.png.</s> This was fixed by changing the Rx antenna to dipole antenna. </li>
   <li> Determine how to randomly place Rx_tracks while maintaining spacial consistency. </li>
   <li> Create system for generating many small powermaps with different scenarios, concatenating, and smoothing them. </li>
 </ul>

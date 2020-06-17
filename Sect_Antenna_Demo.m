@@ -11,14 +11,14 @@ MAX_XY = 400;                             % Maximum for the X and Y plotting
 TRACK_LENGTHS = 50;                       % Distance receivers will travel
 
 AZI_BEAMWIDTH = 120;                      % Azimuth beamwidth for sector antenna
-ELE_BEAMWIDTH = 15;                      % Elevation beamwidth for sector antenna
+ELE_BEAMWIDTH = 15;                       % Elevation beamwidth for sector antenna
 FB_RATIO_DB = -28;                        % Front to back ratio in dB
 FB_ratio = 10^(FB_RATIO_DB/10);           % Front to back ratio in linear scale
 ANTENNA_ELEMENTS = 4;                     % Number of antenna elements in a sector
 FC = 2.4e9;                               % Carrier frequency
-DOWNTILT = 10;                             % Downtilt value, may not be manipulated in real system
+DOWNTILT = 10;                            % Downtilt value, may not be manipulated in real system
 
-SAMPLE_DISTANCE = 5;                     % Distance per power-grid measurement
+SAMPLE_DISTANCE = 5;                      % Distance per power-grid measurement
 USE_LOS = 1;                              % Select 1 to use LOS or 0 for NLOS 
 ABSOLUTE_CMAP = 0;                        % Select 1 to use absolute cmap color
 PLOT_SECTORS = 0;
@@ -30,9 +30,11 @@ Tx_P_dBm = 10*log10(TX_P)+30;             % TX power in [dBm]
 if USE_LOS == 1
     Rx_threshold_dBm = -45;               % Threshold for determining valuable links
     scen = 'FB_UMa_LOS';
+    title_postend = 'LOS';
 else
     Rx_threshold_dBm = -80;
     scen = 'FB_UMa_NLOS';
+    title_postend = 'NLOS';
 end
 
 if FC<6e9                                 % Determine if this is mmWave or not
@@ -57,7 +59,8 @@ s.use_absolute_delays=1;
 a = qd_arrayant('3gpp-macro', AZI_BEAMWIDTH, ELE_BEAMWIDTH, -FB_RATIO_DB, DOWNTILT);
 a.center_frequency = FC;
 
-b = qd_arrayant('vehicular', 2, below_mmWave, 2); % Vehicular antenna receivers
+% b = qd_arrayant('vehicular', 2, below_mmWave, 2); % Vehicular antenna receivers
+b = qd_arrayant('dipole');
 b.center_frequency = FC;
 
 % a.visualize(1); % take a look at the radiation pattern, should be sector antenna
@@ -66,15 +69,16 @@ b.center_frequency = FC;
 
 %% Define BS and UEs
 l = qd_layout(s);
-l.no_tx = 7;
+l.no_tx = 1;
 
 % generate base stations in a ring
 l = qd_layout.generate('regular', l.no_tx, BS_DIST, a.copy());  
 l.simpar = s.copy();                               % Apply simulation params
 
-l.no_rx = 4;
+l.no_rx = 1;
 l.rx_array(:) = b.copy();
 l.randomize_rx_positions(250, UE_HEIGHT, UE_HEIGHT, TRACK_LENGTHS);
+interpolate_positions(l.rx_track, s.samples_per_meter);
 calc_orientation(l.rx_track);
 
 % apply scenario to the tracks, this could be used to change which tracks
@@ -92,18 +96,18 @@ tx_powers = ones(1, l.no_tx)*Tx_P_dBm;
 [pairs, powers] = l.set_pairing('power', Rx_threshold_dBm, tx_powers);
 
 % tic
-p = l.init_builder;                               % Create channel builders
-gen_parameters( p );                              % Generate small-scale fading
-c = get_channels( p );                            % Generate channel coefficients
-cn = merge( c );
+% p = l.init_builder;                               % Create channel builders
+% gen_parameters( p );                              % Generate small-scale fading
+% c = get_channels( p );                            % Generate channel coefficients
+% cn = merge( c );
 % toc
 
 %% Make power map
 % Make the power map
 if USE_LOS == 1
-    [ map,x_coords,y_coords] = l.power_map(scen, 'detailed', SAMPLE_DISTANCE, -MAX_XY,MAX_XY,-MAX_XY,MAX_XY,UE_HEIGHT, tx_powers);
+    [ map,x_coords,y_coords] = l.power_map(scen, 'quick', SAMPLE_DISTANCE, -MAX_XY,MAX_XY,-MAX_XY,MAX_XY,UE_HEIGHT, tx_powers);
 else
-    [ map,x_coords,y_coords] = l.power_map(scen, 'detailed', SAMPLE_DISTANCE, -MAX_XY,MAX_XY,-MAX_XY,MAX_XY,UE_HEIGHT, tx_powers);
+    [ map,x_coords,y_coords] = l.power_map(scen, 'quick', SAMPLE_DISTANCE, -MAX_XY,MAX_XY,-MAX_XY,MAX_XY,UE_HEIGHT, tx_powers);
 end
 
 % map contains data as {no_Tx} [y, x, rx_element, tx_sector]
@@ -133,6 +137,7 @@ colormap( colmap);
 c = colorbar;
 c.Label.String = "Receive Power [dBm]";
 set(gca,'layer','top')
+title("Total Power Map " +title_postend);
 
 
 %% Individual Sectors
