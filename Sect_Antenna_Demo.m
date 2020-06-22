@@ -4,24 +4,28 @@ close all;
 
 %% User definitions
 UE_HEIGHT = 1.5;                          % UE receiver height
-TX_P = 100;                               % TX power in [W]
+TX_P = 250;                               % TX power in [W]
 BS_DIST = 300;                            % UE receiver height 
 
 MAX_XY = 400;                             % Maximum for the X and Y plotting
 TRACK_LENGTHS = 50;                       % Distance receivers will travel
 
-AZI_BEAMWIDTH = 120;                      % Azimuth beamwidth for sector antenna
-ELE_BEAMWIDTH = 15;                       % Elevation beamwidth for sector antenna
-FB_RATIO_DB = -28;                        % Front to back ratio in dB
+AZI_BEAMWIDTH = 66;                      % Azimuth beamwidth for sector antenna
+ELE_BEAMWIDTH = 7;                       % Elevation beamwidth for sector antenna
+FB_RATIO_DB = -30;                        % Front to back ratio in dB
 FB_ratio = 10^(FB_RATIO_DB/10);           % Front to back ratio in linear scale
 ANTENNA_ELEMENTS = 4;                     % Number of antenna elements in a sector
 FC = 2.4e9;                               % Carrier frequency
-DOWNTILT = 10;                            % Downtilt value, may not be manipulated in real system
+DOWNTILT = 5;                            % Downtilt value, may not be manipulated in real system
+ISOLATION_DB = 30;
+coupling = 10^(-ISOLATION_DB/10);
 
 SAMPLE_DISTANCE = 5;                      % Distance per power-grid measurement
 USE_LOS = 1;                              % Select 1 to use LOS or 0 for NLOS 
 ABSOLUTE_CMAP = 0;                        % Select 1 to use absolute cmap color
 PLOT_SECTORS = 0;
+
+N_SECTORS = 3;
 
 
 %% Parameters updates
@@ -58,6 +62,15 @@ s.use_absolute_delays=1;
 
 a = qd_arrayant('3gpp-macro', AZI_BEAMWIDTH, ELE_BEAMWIDTH, -FB_RATIO_DB, DOWNTILT);
 a.center_frequency = FC;
+Tx_ant = a.copy();
+
+for i=1:N_SECTORS-1
+    a2 = a.copy();
+    a2.rotate_pattern(360/N_SECTORS*i, 'z');
+    Tx_ant.append_array(a2);
+end
+
+calc_gain(Tx_ant)
 
 % b = qd_arrayant('vehicular', 2, below_mmWave, 2); % Vehicular antenna receivers
 b = qd_arrayant('dipole');
@@ -69,10 +82,11 @@ b.center_frequency = FC;
 
 %% Define BS and UEs
 l = qd_layout(s);
+l.tx_array = Tx_ant;
 l.no_tx = 1;
 
 % generate base stations in a ring
-l = qd_layout.generate('regular', l.no_tx, BS_DIST, a.copy());  
+% l = qd_layout.generate('regular', l.no_tx, BS_DIST, a.copy());  
 l.simpar = s.copy();                               % Apply simulation params
 
 l.no_rx = 1;
@@ -87,7 +101,7 @@ for i=1:l.no_rx
     l.rx_track(i).set_scenario(scen);
 end
 
-l.tx_array(1).visualize(1:3);           % Visualize the 3 sectors
+% l.tx_array(1).visualize(1:3);           % Visualize the 3 sectors
 
 %% Setup Channels
 % Set the transmit powers and determine which pairings are above the

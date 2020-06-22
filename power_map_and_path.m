@@ -23,6 +23,7 @@
 % frequencies, location of transmitters, step size, number of paths etc
 close all
 clear all
+
 initialize_sim;
 set(0,'defaultTextFontSize', 18)                        % Default Font Size
 set(0,'defaultAxesFontSize', 18)                        % Default Font Size
@@ -30,6 +31,7 @@ set(0,'defaultAxesFontName','Times')                    % Default Font Type
 set(0,'defaultTextFontName','Times')                    % Default Font Type
 set(0,'defaultFigurePaperPositionMode','auto')          % Default Plot position
 set(0,'DefaultFigurePaperType','<custom>')              % Default Paper Type
+tic;
 %% process paths if this is configure in the initialize.sim file
 if process_paths == 1
     generate_street_tracks(l,track_length,samp_per_meter,40,70,30,200,scen); % generate the tracks along which channels will be computed
@@ -39,6 +41,9 @@ if process_paths == 1
     % Now we create the channel coefficients. The fixing the random seed (check) guarantees repeatable results
     % (i.e. the taps will be at the same positions for both runs). Also note the significantly longer
     % computing time when drifting is enabled.
+    
+% 	[pairs, powers] = l.set_pairing('power', Rx_threshold_dBm, tx_powers);
+
     disp('Drifting enabled:');
     p = l.init_builder;                                       % Create channel builders
     gen_parameters( p );                                      % Generate small-scale fading
@@ -56,17 +61,20 @@ if process_paths == 1
 end
 %% process power map if this is configured in the initialize.sim file
 if process_powermap == 1
+
     [ map,x_coords,y_coords] = l.power_map(scen{2},'detailed',grid_resolution,-max_xy,max_xy,-max_xy,max_xy,ue_height );
     % scenario FB_UMa_NLOS, type 'quick', sample distance, x,y min/max, rx
     % height; type can be 'quick', 'sf', 'detailed', 'phase'
+
     % P = 10*log10(sum( abs( cat(3,map{:}) ).^2 ,3));         % Total received power
-    P = 10*log10(sum(cat(3,map{:}) ,3))+30;                   % Simplified Total received power; Assumed W and converted to dBm
+    P = 10*log10(sum(abs(cat(3, map{:})).^2, 3:4))+30;        % Simplified Total received power; Assumed W and converted to dBm
+   
     % create a struct where powers over the x,y grid are available for each tx on an x,y grid
     powermatrix.x = x_coords;
     powermatrix.y = y_coords;
     powermatrix.z = ue_height;
     for i = 1:l.no_tx
-        powermatrix.(append('Tx',int2str(i),'pwr')) = 10*log10(map{i})+30; % Assumed W and converted to dBm
+        powermatrix.(append('Tx',int2str(i),'pwr')) = 10*log10(squeeze(map{i}))+30; % Assumed W and converted to dBm
         powermatrix.(append('Tx',int2str(i),'loc')) = l.tx_position(:,i);
     end
     % write out json object to file
@@ -76,19 +84,26 @@ if process_powermap == 1
     fwrite(fid, jsonStr, 'char');
     fclose(fid);
     % if configured, plot power map
+    hold off;
     if show_plot ==1
-        imagesc( x_coords, y_coords, powermatrix.Tx1pwr + powermatrix.Tx2pwr + powermatrix.Tx3pwr + powermatrix.Tx4pwr );          % Plot the received power
+        l.visualize([],[],0);  
+        hold on;
+        imagesc( x_coords, y_coords, P);          % Plot the received power
         axis([-max_xy max_xy -max_xy max_xy])                               % Plot size
-        % caxis( max(powermatrix.Tx1pwr,[],'all') + [-20 0] )                  % Color range
-        % colmap = colormap;
+        %caxis( max(powermatrix.Tx1pwr,[],'all') + [-20 0] )                  % Color range
+        % caxis( max(P(:)) + [-30 -5] )
+        caxis([-75, -40]);
+        colmap = colormap;
+        c = colorbar;
+        c.Label.String = "Receive Power [dBm]";
         % colormap( colmap*0.5 + 0.5 );                           % Adjust colors to be "lighter"
         set(gca,'layer','top')                                    % Show grid on top of the map
-        if process_paths == 0
-            set(0,'DefaultFigurePaperSize',[14.5 7.3])                % Adjust paper size for plot
-            l.visualize([],[],0);                                     % Show BS and MT positions on the map
-        end
+        hold on;
+        set(0,'DefaultFigurePaperSize',[14.5 7.3])                % Adjust paper size for plot                                  % Show BS and MT positions on the map
     end
     if save_work ==1
         save(append(track_directory,'workspace_map',datestr(now,'yy-mm-dd-HH-MM')),'map','x_coords','y_coords','-v7.3') % this is in here in case we want to examine the data.
     end
 end
+
+toc
