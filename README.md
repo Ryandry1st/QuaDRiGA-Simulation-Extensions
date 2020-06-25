@@ -1,5 +1,7 @@
 # FB_Quadriga
-  Code repository for working on Quadriga simulations. The average time to run a simulation is usually around 30 minutes to 1 hour, so plan accordingly.
+  This is a code repository for working on Quadriga simulations. To run the provided code, please ensure that you have Quadriga setup and MATLAB is able to find the Quadriga code. You can download Quadriga  <a href="https://quadriga-channel-model.de/">here</a>.
+  
+  The average time to run a simulation is usually around 30 minutes to 24 hours depending on your resolution, so plan accordingly.
   </br></br></br>
 
 ## Goals
@@ -9,7 +11,8 @@
 ## Current Issues I am working on
 <ul>
   <li> <s>The sectored antennas seem to be showing different radiation power depending on direction. See sector 1 in figs/difference_in_sectors.png.</s> This was fixed by changing the Rx antenna to dipole antenna. </li>
-  <li> Determine how to randomly place Rx_tracks while maintaining spacial consistency. </li>
+  <li> <s>Determine how to randomly place Rx_tracks while maintaining spacial consistency.</s> This was fixed by addining the randomize_UEs.m function, which uses a grid to assign scenarios to segments. </li>
+  <li> Develop a compact data generation and distribution setup. </li>
   <li> Create system for generating many small powermaps with different scenarios, concatenating, and smoothing them. </li>
 </ul>
 
