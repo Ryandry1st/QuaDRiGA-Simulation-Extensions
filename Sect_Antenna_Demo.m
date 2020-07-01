@@ -62,6 +62,13 @@ s.use_absolute_delays=1;
 
 a = qd_arrayant('3gpp-macro', AZI_BEAMWIDTH, ELE_BEAMWIDTH, -FB_RATIO_DB, DOWNTILT);
 a.center_frequency = FC;
+a.rotate_pattern(45, 'x', 1, 2);
+a.append_array(a.copy());
+a.coupling = [1, 1; 0, 0];
+b = a.copy();  
+b.rotate_pattern(-90, 'x', 1:2, 2);
+a.append_array(b);
+% a.combine_pattern();
 Tx_ant = a.copy();
 
 for i=1:N_SECTORS-1
@@ -70,13 +77,13 @@ for i=1:N_SECTORS-1
     Tx_ant.append_array(a2);
 end
 
-calc_gain(Tx_ant)
+no_antennas = size(calc_gain(Tx_ant));
 
 % b = qd_arrayant('vehicular', 2, below_mmWave, 2); % Vehicular antenna receivers
 b = qd_arrayant('dipole');
 b.center_frequency = FC;
 
-% a.visualize(1); % take a look at the radiation pattern, should be sector antenna
+% a.visualize(1:4); % take a look at the radiation pattern, should be sector antenna
 % b.visualize(1); % Primarily upward radiation pattern
 
 

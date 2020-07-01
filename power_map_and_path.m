@@ -49,20 +49,20 @@ if process_paths == 1
     gen_parameters( p );                                      % Generate small-scale fading
     c = get_channels( p );                                    % Generate channel coefficients
     cn = merge( c );
-    write_track_data(cn, l.no_rx, num_interf, track_directory); % write out csv files, one per track, in track_directory
+    write_track_data(cn, l.no_rx, N_SECTORS, num_interf, track_directory); % write out csv files, one per track, in track_directory
     set(0,'DefaultFigurePaperSize',[14.5 7.3])                % Adjust paper size for plot
     l.visualize([],[],0);                                     % Show BS and MT positions on the map
     if show_plot == 1
         plot_power;
     end
     if save_work ==1
-        save(append(track_directory,'workspace_paths',datestr(now,'yy-mm-dd-HH-MM')),'p','cn','l','-v7.3') % this is in here in case we want to examine the data.
+        save(append(track_directory,'workspace_paths'),'p','cn','l','-v7.3') % this is in here in case we want to examine the data.
     end
 end
 %% process power map if this is configured in the initialize.sim file
 if process_powermap == 1
 
-    [ map,x_coords,y_coords] = l.power_map(scen{2},'detailed',grid_resolution,-max_xy,max_xy,-max_xy,max_xy,ue_height );
+    [ map,x_coords,y_coords] = l.power_map(scen{2},'detailed',grid_resolution,-max_xy,max_xy,-max_xy,max_xy,ue_height, tx_powers);
     % scenario FB_UMa_NLOS, type 'quick', sample distance, x,y min/max, rx
     % height; type can be 'quick', 'sf', 'detailed', 'phase'
 
@@ -73,26 +73,29 @@ if process_powermap == 1
     powermatrix.x = x_coords;
     powermatrix.y = y_coords;
     powermatrix.z = ue_height;
+    powermatrix.ptx = TX_P; % power in watts
     for i = 1:l.no_tx
-        powermatrix.(append('Tx',int2str(i),'pwr')) = 10*log10(squeeze(map{i}))+30; % Assumed W and converted to dBm
+        powermatrix.(append('Tx',int2str(i),'pwr')) = 10*log10(squeeze(map{i}).^2)+30; % Assumed W and converted to dBm
         powermatrix.(append('Tx',int2str(i),'loc')) = l.tx_position(:,i);
     end
     % write out json object to file
-    jsonStr = jsonencode(powermatrix);
-    fid = fopen(append(track_directory,'powermatrix',datestr(now,'yy-mm-dd-HH-MM')), 'w');
-    if fid == -1, error('Cannot create JSON file'); end
-    fwrite(fid, jsonStr, 'char');
-    fclose(fid);
+    if save_work == 1
+        jsonStr = jsonencode(powermatrix);
+        fid = fopen(append(track_directory,'powermatrix.json'), 'w');
+        if fid == -1, error('Cannot create JSON file'); end
+        fwrite(fid, jsonStr, 'char');
+        fclose(fid);
+    end
     % if configured, plot power map
-    hold off;
+
     if show_plot ==1
         l.visualize([],[],0);  
         hold on;
         imagesc( x_coords, y_coords, P);          % Plot the received power
         axis([-max_xy max_xy -max_xy max_xy])                               % Plot size
         %caxis( max(powermatrix.Tx1pwr,[],'all') + [-20 0] )                  % Color range
-        % caxis( max(P(:)) + [-30 -5] )
-        caxis([-75, -40]);
+        caxis( max(P(:)) + [-30 -5] )
+        % caxis([-75, -40]);
         colmap = colormap;
         c = colorbar;
         c.Label.String = "Receive Power [dBm]";
@@ -102,7 +105,7 @@ if process_powermap == 1
         set(0,'DefaultFigurePaperSize',[14.5 7.3])                % Adjust paper size for plot                                  % Show BS and MT positions on the map
     end
     if save_work ==1
-        save(append(track_directory,'workspace_map',datestr(now,'yy-mm-dd-HH-MM')),'map','x_coords','y_coords','-v7.3') % this is in here in case we want to examine the data.
+        save(append(track_directory,'workspace_map'),'map','x_coords','y_coords','-v7.3') % this is in here in case we want to examine the data.
     end
 end
 
