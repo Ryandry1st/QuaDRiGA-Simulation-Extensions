@@ -10,7 +10,18 @@
   <li> utm </li>
   </ul>
   
-  The average time to run a simulation is usually around 30 minutes to 24 hours depending on your resolution, so plan accordingly.
+ ## To use
+  After you have installed the dependencies, open the initialize_sim.m file and make parameter selections for downtilt and transmit power. Then
+  save it and open power_map_and_path.m in Matlab and run it to generate the simulation data.
+
+
+  The average time to run a simulation is usually around 1-24 hours depending on your resolution, so plan accordingly. See the table for some estimate times.
+  
+  |   Block Size  | Grid Resolution | Number of UEs | Track Length | Runtime |
+|:-------------:|:---------------:|:-------------:|:------------:|:-------:|
+| 1.2km x 1.2km |        5m       |       1       |     500m     |   1.5hrs  |
+|  1.4km x 1.4km|         5m      |       2       |     500m     |   2.5hrs  |
+
   </br></br></br>
 
 ## Goals
