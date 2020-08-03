@@ -1,5 +1,5 @@
 %% directives to the simulator
-process_paths = 1;                                      % set to 1 to calculate channels along tracks
+process_paths = 0;                                      % set to 1 to calculate channels along tracks
 process_powermap = 1;                                   % set to 1 to calculate map of powers
 show_plot = 1;                                          % set to 1 to show plots of channels
 save_work = 1;                                          % set to 1 if you want to save the workspace
@@ -9,8 +9,8 @@ save_work = 1;                                          % set to 1 if you want t
 % set downtilt to -1 to use the csv downtilts, otherwise specify it as a
 % scalar to be applied to all or a vector of #no_tx, no_sectors of values
 
-downtilt = -1;                                          % Downtilt value, can be independently set for each sector
-TX_P = 10;                                             % TX power in [W]
+downtilt = 5;                                           % Downtilt value, can be independently set for each sector
+TX_P = 40;                                              % TX power in [W]
 Tx_P_dBm = 10*log10(TX_P)+30;                           % TX power in [dBm]
 
 sim_definitions;

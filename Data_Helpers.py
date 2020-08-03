@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import json
 import re
+import os
 
 
 # -------------------------- Helper functions ----------------------------- #
@@ -37,7 +38,7 @@ def plot_power(power, x_coordinates, y_coordinates, tx_locs):
         plt.title("Power map over all transmitters and sectors")
 
     plt.imshow(power, extent=[np.min(x_coordinates), np.max(x_coordinates), np.min(y_coordinates), np.max(y_coordinates)], origin='lower')
-    plt.clim(np.max(power)-30, np.max(power) -5)
+    plt.clim(np.max(power) - 35, np.max(power) - 5)
     c = plt.colorbar()
     plt.grid()
     c.set_label("Received Power [dBm]")
@@ -52,7 +53,7 @@ def get_powermatrix(file_path):
     Returns the important data from the file at the location given. This is only for the powermatrix information.
     Specifically it returns the x and y coordinates, the transmitter power, the tx locations, and the power at each location
     """
-    with open(file_path) as f:
+    with open(file_path+'powermatrix.json') as f:
         data = json.load(f)
 
     # get the x and y coordinates
@@ -129,8 +130,7 @@ def get_tx_sector_orientations(filepath):
 
 # -------------------------- Example of the functions ----------------------------- #
 # Simulation Parameters
-dir = 'tracks/DT-1/07-01-14-57/'
-filename = 'powermatrix.json'
+dir = 'tracks/DT-1/10W/07-01-16-37/'
 
 # print(res := get_tx_loc_from_csv('Mavenir_locs.csv'))
 
@@ -139,5 +139,5 @@ filename = 'powermatrix.json'
 
 # print(get_tx_sector_orientations('Mavenir_locs.csv'))
 
-# x_cord, y_cord, P_tx, rx_pows, tx_locations = get_powermatrix(dir+filename)
+# x_cord, y_cord, P_tx, rx_pows, tx_locations = get_powermatrix(dir)
 # plot_power(rx_pows[:, :, :, :], x_cord, y_cord, tx_locations)

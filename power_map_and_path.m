@@ -62,7 +62,7 @@ end
 %% process power map if this is configured in the initialize.sim file
 if process_powermap == 1
 
-    [ map,x_coords,y_coords] = l.power_map(scen{2},'detailed',grid_resolution,-max_xy,max_xy,-max_xy,max_xy,ue_height, tx_powers);
+    [ map,x_coords,y_coords, p_builder] = power_map_const(l, scen{2},'detailed',grid_resolution,-max_xy,max_xy,-max_xy,max_xy,ue_height, tx_powers);
     % scenario FB_UMa_NLOS, type 'quick', sample distance, x,y min/max, rx
     % height; type can be 'quick', 'sf', 'detailed', 'phase'
 
@@ -74,6 +74,7 @@ if process_powermap == 1
     powermatrix.y = y_coords;
     powermatrix.z = ue_height;
     powermatrix.ptx = TX_P; % power in watts
+    powermatrix.downtilt = squeeze(orientations(:, 2));
     for i = 1:l.no_tx
         powermatrix.(append('Tx',int2str(i),'pwr')) = 10*log10(squeeze(map{i}).^2)+30; % Assumed W and converted to dBm
         powermatrix.(append('Tx',int2str(i),'loc')) = l.tx_position(:,i);

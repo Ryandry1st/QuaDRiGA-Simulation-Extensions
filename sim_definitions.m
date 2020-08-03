@@ -69,13 +69,18 @@ if downtilt == -1
 else
     % Use the same downtilt for all sectors
     if isscalar(downtilt)
-        l.tx_array = qd_arrayant('3gpp-macro', AZI_BEAMWIDTH, ELE_BEAMWIDTH, -FB_RATIO_DB, downtilt);
-        for i=1:N_SECTORS-1
-            a = l.tx_array.copy();
-            a.rotate_pattern(360/N_SECTORS*i, 'z');
-            l.tx_array.append_array(a);
+        for i=1:l.no_tx
+            index = 3*(i-1)+1;
+            l.tx_array(i) = qd_arrayant('3gpp-macro', AZI_BEAMWIDTH, ELE_BEAMWIDTH, -FB_RATIO_DB, downtilt);
+            l.tx_array(i).rotate_pattern(orientations(index, 1), 'z');
+            for j=1:N_SECTORS-1
+                a = qd_arrayant('3gpp-macro', AZI_BEAMWIDTH, ELE_BEAMWIDTH, -FB_RATIO_DB, downtilt);
+                a.rotate_pattern(orientations(index+j, 1), 'z');
+                l.tx_array(i).append_array(a);
+            end
+            l.tx_array(i).center_frequency = FC;
         end
-        
+        orientations(:, 2) = downtilt;
     % Use vector defined downtilt for each sector
     else
         l.tx_array
