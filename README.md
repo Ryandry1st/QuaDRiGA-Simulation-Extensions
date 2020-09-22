@@ -1,5 +1,5 @@
 # FB_Quadriga
-  This is a code repository for working on Quadriga simulations. To run the provided code, please ensure that you have Quadriga setup and MATLAB is able to find the Quadriga code. You can download Quadriga  <a href="https://quadriga-channel-model.de/">here</a>.
+  This is a code repository for working on Quadriga simulations. To run the provided code, please ensure that you have Quadriga setup and MATLAB is able to find the Quadriga code. You can download Quadriga  <a href="https://quadriga-channel-model.de/">here</a>. <b> You need to replace quadriga_src/@qd_layout/power_map.m with the power_map.m in this repository.</b> This is simply returning the buidler object, but it is critical for statistical consistency.
   
   Additionally, the following python requirements are necessary:
   <ul>
