@@ -1,5 +1,5 @@
 # FB_Quadriga
-  This is a code repository for working on Quadriga simulations. To run the provided code, please ensure that you have Quadriga setup and MATLAB is able to find the Quadriga code. You can download Quadriga  <a href="https://quadriga-channel-model.de/">here</a>. <b> You need to replace quadriga_src/@qd_layout/power_map.m with the power_map.m in this repository.</b> This is simply returning the buidler object, but it is critical for statistical consistency.
+  This is a code repository for working on Quadriga simulations. To run the provided code, please ensure that you have Quadriga setup and MATLAB is able to find the Quadriga code. You can download Quadriga  <a href="https://quadriga-channel-model.de/">here</a>. <b> You need to replace quadriga_src/@qd_layout/power_map.m with the power_map.m in this repository.</b> This is simply returning the builder object, but it is critical for statistical consistency.
   
   Additionally, the following python requirements are necessary:
   <ul>
@@ -31,7 +31,7 @@
 ## Current Issues I am working on
 <ul>
   <li> <s>The sectored antennas seem to be showing different radiation power depending on direction. See sector 1 in figs/difference_in_sectors.png.</s> This was fixed by changing the Rx antenna to dipole antenna. </li>
-  <li> <s>Determine how to randomly place Rx_tracks while maintaining spacial consistency.</s> This was fixed by addining the randomize_UEs.m function, which uses a grid to assign scenarios to segments. </li>
+  <li> <s>Determine how to randomly place Rx_tracks while maintaining spacial consistency.</s> This was fixed by adding the randomize_UEs.m function, which uses a grid to assign scenarios to segments. </li>
   <li> Develop a compact data generation and distribution setup. </li>
   <li> Create system for generating powermaps with different scenarios, concatenating, and smoothing them. </li>
 </ul>
