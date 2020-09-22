@@ -10,7 +10,7 @@ N_SECTORS = 3;
 
 % Path definitions
 if save_work == 1
-    if downtilt == -1
+    if downtilt == 4
         track_directory = ['tracks\DT',num2str(round(downtilt)),'\',num2str(TX_P),'W\',datestr(now,'mm-dd-HH-MM'),'\'];
     else
         track_directory = ['tracks\DT',num2str(round(downtilt)),'\',datestr(now,'mm-dd-HH-MM'),'\'];
