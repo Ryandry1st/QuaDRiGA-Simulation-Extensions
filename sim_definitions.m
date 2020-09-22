@@ -8,8 +8,9 @@ FC = 1.8e9;                               % Carrier frequency
 N_SECTORS = 3;
 
 if ismac
-    if(python_path== 'python')
-        disp("You are using a Mac, please set your python path in initialize_sim"); 
+    if strcmp(python_path, 'python')
+        disp("You are using a Mac, please remember to set your python path in initialize_sim");
+        python_path = input("Please input the python path here:", 's');
     end
 end
 % Path definitions
@@ -38,9 +39,9 @@ s.use_3GPP_baseline = 0;
 % Read the csv file for BS locations and sector orientations using the python helper functions
 commandStr = strcat(python_path, ' Tx_Information_from_csv.py "Mavenir_locs.csv"');
 [status, output] = system(commandStr);
-try
-    locs = str2num(output);
-catch
+
+locs = str2num(output);
+if(size(locs) < 1)
     disp("There was a problem with your python, traceback:");
     error(output)
 end
@@ -48,9 +49,9 @@ end
 commandStr = strcat(python_path, ' Tx_Sector_Information_from_csv.py "Mavenir_locs.csv"');
 [status, output] = system(commandStr);
 
-try
-    orientations = str2num(output);
-catch
+orientations = str2num(output);
+
+if(size(orientations) < 1)
     disp("There was a problem with your python, traceback:");
     error(output)
 end
