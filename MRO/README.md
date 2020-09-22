@@ -1,1 +1,1 @@
-Separate environment for the MRO problem. Not yet in active development
+This folder contains a different working environment for managing the code to work on the MRO problem. Solutions are not complete and we are moving towards active development in the future.
