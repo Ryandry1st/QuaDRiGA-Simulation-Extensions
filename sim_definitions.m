@@ -7,13 +7,17 @@ ANTENNA_ELEMENTS = 4;                     % Number of antenna elements in a sect
 FC = 1.8e9;                               % Carrier frequency
 N_SECTORS = 3;
 
-
+if ismac
+    if(python_path== 'python')
+        disp("You are using a Mac, please set your python path in initialize_sim"); 
+    end
+end
 % Path definitions
 if save_work == 1
     if downtilt == 4
-        track_directory = ['tracks\DT',num2str(round(downtilt)),'\',num2str(TX_P),'W\',datestr(now,'mm-dd-HH-MM'),'\'];
+        track_directory = ['tracks/DT',num2str(round(downtilt)),'/',num2str(TX_P),'W/',datestr(now,'mm-dd-HH-MM'),'/'];
     else
-        track_directory = ['tracks\DT',num2str(round(downtilt)),'\',datestr(now,'mm-dd-HH-MM'),'\'];
+        track_directory = ['tracks/DT',num2str(round(downtilt)),'/',datestr(now,'mm-dd-HH-MM'),'/'];
     end
     mkdir(track_directory);
 else
@@ -32,13 +36,24 @@ s.use_3GPP_baseline = 0;
 
 %% Layout of transmitters & specification of antenna types
 % Read the csv file for BS locations and sector orientations using the python helper functions
-commandStr = 'python Tx_Information_from_csv.py "Mavenir_locs.csv"';
+commandStr = strcat(python_path, ' Tx_Information_from_csv.py "Mavenir_locs.csv"');
 [status, output] = system(commandStr);
-locs = str2num(output);
+try
+    locs = str2num(output);
+catch
+    disp("There was a problem with your python, traceback:");
+    error(output)
+end
+    
+commandStr = strcat(python_path, ' Tx_Sector_Information_from_csv.py "Mavenir_locs.csv"');
+[status, output] = system(commandStr);
 
-commandStr = 'python Tx_Sector_Information_from_csv.py "Mavenir_locs.csv"';
-[status, output] = system(commandStr);
-orientations = str2num(output);
+try
+    orientations = str2num(output);
+catch
+    disp("There was a problem with your python, traceback:");
+    error(output)
+end
 
 l = qd_layout(s);                          % Create new QuaDRiGa layout
 [l.no_tx, ~] = size(locs);                 
@@ -83,7 +98,7 @@ else
         orientations(:, 2) = downtilt;
     % Use vector defined downtilt for each sector
     else
-        l.tx_array
+        error("Vectored downtilts are not prepared to be used yet, stop the simulation and change the downtilt.")
     end
     
 end
