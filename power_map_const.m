@@ -143,7 +143,8 @@ try
     disp('Loaded builder object');
 catch
     disp("Could not find a builder object at tracks/builder_obj.mat, initializing a new builder.")
-    [map, x_coords, y_coords, p_builder] = l.power_map(scenario, usage, sample_distance, x_min, x_max, y_min, y_max, rx_height, tx_power, i_freq);
+    [map, x_coords, y_coords, p_builder] = h_layout.power_map(scenario, usage, sample_distance, x_min, x_max, y_min, y_max, rx_height, tx_power, i_freq);
+    save('tracks/builder_obj.mat', '-v7.3', 'p_builder');
     return
 end
 
