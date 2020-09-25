@@ -1,3 +1,4 @@
+function power_map_and_path_tilt(tilt)
 %% Calculate channels along tracks, power map over cell and generate outputs to explore AI/ML solutions
 %Edit initialize.sim file to set simulation parameters, layouts etc.
 %Requires MATLAB and QuaDriGA libraries as well as setup of RF scenarios
@@ -21,11 +22,14 @@
 %% Simulation parameter and layout set up done by editing the intialize_sim.m file
 % edit initiatialize.sim file to set simulation parameters, layouts,
 % frequencies, location of transmitters, step size, number of paths etc
-close all
-clear all
-clc
+
 
 init_params;
+
+if nargin>0
+    downtilt = tilt;
+end
+
 initialize_sim;
 
 set(0,'defaultTextFontSize', 18)                        % Default Font Size
@@ -99,14 +103,23 @@ if process_powermap == 1
     % if configured, plot power map
     
     if save_opt == 1
-        file_name = append('opt_data/json/powermatrixDT', num2str(round(downtilt)));
+        if ~exist([pwd,'/opt_data/json'], 'dir')
+            mkdir([pwd,'/opt_data/json']);
+        end
+        if ~exist([pwd,'/opt_data/npz'], 'dir')
+            mkdir([pwd,'/opt_data/npz']);
+        end
+        file_name = append('powermatrixDT', num2str(round(downtilt)));
         jsonStr = jsonencode(powermatrix);
-        fid = fopen([file_name,'.json'], 'w');
+        fid = fopen(['opt_data/json/', file_name,'.json'], 'w');
         if fid == -1, error('Cannot create JSON file'); end
         fwrite(fid, jsonStr, 'char');
         fclose(fid);
         commandStr = strcat(python_path, [' make_npz_from_json.py ', file_name]);
-        [status, output] = system(commandStr);
+        fprintf('\t Attempting to create NPZ file...')
+        status = system(commandStr);
+        if ~(status==0), error('Cannot create NPZ file'); end
+        fprintf('Success. \n')
     end
     
     
@@ -131,4 +144,6 @@ if process_powermap == 1
     end
 end
 
-toc
+fprintf('\t Sim time = %1.1f sec.\n',toc)
+
+return

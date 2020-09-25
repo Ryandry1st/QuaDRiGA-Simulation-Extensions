@@ -1,28 +1,30 @@
 %% directives to the simulator
-process_paths = 0;                                      % set to 1 to calculate channels along tracks
-process_powermap = 1;                                   % set to 1 to calculate map of powers
-show_plot = 1;                                          % set to 1 to show plots of channels
-save_work = 1;                                          % set to 1 if you want to save the workspace
-
-python_path = 'python';
+% process_paths = 0;                                      % set to 1 to calculate channels along tracks
+% process_powermap = 1;                                   % set to 1 to calculate map of powers
+% show_plot = 1;                                          % set to 1 to show plots of channels
+% save_work = 1;                                          % set to 1 if you want to save the workspace
+% save_opt = 1;
+% save_npz = 1;
+% 
+%python_path = '/Users/ayp/opt/anaconda3/bin/python';
 % fill with something like '/opt/anaconda3/bin/python3'
 %% simulation parameters
 % These are options to select/change
 % set downtilt to -1 to use the csv downtilts, otherwise specify it as a
 % scalar to be applied to all or a vector of #no_tx, no_sectors of values
 
-downtilt = 10;                                           % Downtilt value, can be independently set for each sector
-TX_P = 40;                                              % TX power in [W]
+%downtilt = 21;                                           % Downtilt value, can be independently set for each sector
+%TX_P = 40;                                              % TX power in [W]
 Tx_P_dBm = 10*log10(TX_P)+30;                           % TX power in [dBm]
 
 sim_definitions;
 
 tx_powers = ones(1, l.no_tx)*Tx_P_dBm;                  % assumes same power for all tx, can be changed
 
-max_xy =600;                                            % max x and y extent for power map (change to 300)
-ue_height = 1.5;                                        % height at which to create power map
+%max_xy =600;                                            % max x and y extent for power map (change to 300)
+%ue_height = 1.5;                                        % height at which to create power map
 
-grid_resolution = 5;                                    % resolution of grid in meters for power map
+%grid_resolution = 5;                                    % resolution of grid in meters for power map
 
 %% Report out
 % fprintf('Simulation starting,with process_paths = %d, process_powermap = %d, show_plot = %d and save_work = %d \n',process_paths,process_powermap,show_plot,save_work)
@@ -36,6 +38,7 @@ grid_resolution = 5;                                    % resolution of grid in 
 %% number of receiver & specification of antenna type; length and resolution of UE track
 l.no_rx = 1;                                              % Number of UEs and tracks - one track per UE
 l.rx_array = qd_arrayant('dipole');                       % Dipole antennas at Rx
+l.rx_array.center_frequency = FC;
 samp_per_meter = 0.25;                                    % samples per meter for track interpolation
 track_length = 500;                                       % track length in meters; currently same for all l.no_rx UEs
 % if process_paths ==1
@@ -44,4 +47,6 @@ track_length = 500;                                       % track length in mete
 
 %% RF environments
 % scen = {'FB_UMa_LOS','FB_UMa_NLOS'};                     % LOS and NLOS scenario name
-scen = {'FB_UMa_NLOS','FB_UMa_NLOS'};                      % Temporarily fixing scenario for the whole path
+%scen = {'FB_UMa_NLOS','FB_UMa_NLOS'};                      % Temporarily fixing scenario for the whole path
+
+%scen = {'Freespace','Freespace'};                      % Temporarily fixing scenario for the whole path
