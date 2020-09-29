@@ -67,7 +67,7 @@ function [ map, x_coords, y_coords, p_builder] = power_map_const( h_layout, scen
 %   y_coords
 %   Vector with the y-coordinates of the map in [m]
 %
-% 
+%
 % QuaDRiGa Copyright (C) 2011-2019
 % Fraunhofer-Gesellschaft zur Foerderung der angewandten Forschung e.V. acting on behalf of its
 % Fraunhofer Heinrich Hertz Institute, Einsteinufer 37, 10587 Berlin, Germany
@@ -81,12 +81,12 @@ function [ map, x_coords, y_coords, p_builder] = power_map_const( h_layout, scen
 % contributors "AS IS" and WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES, including but not limited to
 % the implied warranties of merchantability and fitness for a particular purpose.
 %
-% You can redistribute it and/or modify QuaDRiGa under the terms of the Software License for 
+% You can redistribute it and/or modify QuaDRiGa under the terms of the Software License for
 % The QuaDRiGa Channel Model. You should have received a copy of the Software License for The
-% QuaDRiGa Channel Model along with QuaDRiGa. If not, see <http://quadriga-channel-model.de/>. 
+% QuaDRiGa Channel Model along with QuaDRiGa. If not, see <http://quadriga-channel-model.de/>.
 
-if numel( h_layout ) > 1 
-   error('QuaDRiGa:qd_layout:power_map','power_map not definded for object arrays.');
+if numel( h_layout ) > 1
+    error('QuaDRiGa:qd_layout:power_map','power_map not definded for object arrays.');
 else
     h_layout = h_layout(1,1); % workaround for octave
 end
@@ -107,7 +107,7 @@ end
 
 if ~exist( 'sample_distance' , 'var' ) || isempty( sample_distance )
     sample_distance = 10;
-end 
+end
 
 % Check if tx-power is given
 if ~exist( 'tx_power','var' ) || isempty( tx_power )
@@ -134,22 +134,22 @@ if ~exist( 'i_freq' , 'var' ) || isempty( i_freq )
 end
 
 try
-    disp('Attempting to load a builder object...');
+    fprintf('\t Attempting to load a builder object...');
     if ismac
         load('tracks/builder_obj.mat');
     else
         load('tracks\builder_obj.mat');
     end
-    disp('Loaded builder object');
+    fprintf('Success.\n');
 catch
-    disp("Could not find a builder object at tracks/builder_obj.mat, initializing a new builder.")
+    fprintf('Could not find a builder object at tracks/builder_obj.mat, initializing a new builder.\n')
     [map, x_coords, y_coords, p_builder] = h_layout.power_map(scenario, usage, sample_distance, x_min, x_max, y_min, y_max, rx_height, tx_power, i_freq);
     save('tracks/builder_obj.mat', '-v7.3', 'p_builder');
     return
 end
 
 if nargin <= 4
-    x_min = min( h_layout.tx_position(1,:)); 
+    x_min = min( h_layout.tx_position(1,:));
     y_max = max( h_layout.tx_position(2,:));
     x_max = max( h_layout.tx_position(1,:));
     y_min = min( h_layout.tx_position(2,:));
@@ -179,7 +179,7 @@ end
 
 
 if strcmp( usage , 'sf' )
-	% Calculate parameter maps
+    % Calculate parameter maps
     init_sos( p_builder );
     usage = 'quick';
 end
@@ -206,7 +206,7 @@ switch usage
     case 'phase'
         for i_bs = 1:n_bs
             coeff = get_los_channels( p_builder(1,i_bs), 'single','coeff');
-
+            
             cf = permute( coeff , [3,1,2] );
             cf = reshape( cf , n_x_coords , n_y_coords , size( coeff, 1 ), size( coeff, 2 ) );
             cf = permute(cf,[2,1,3,4]);
@@ -217,7 +217,7 @@ switch usage
             map{i_bs} = cf;
         end
         
-    case 'detailed'    
+    case 'detailed'
         % Calculate the maps
         for i_bs = 1 : n_bs
             % Calculate channels
