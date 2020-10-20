@@ -17,7 +17,11 @@
 %TX_P = 40;                                              % TX power in [W]
 Tx_P_dBm = 10*log10(TX_P)+30;                           % TX power in [dBm]
 
-sim_definitions;
+if no_BS <= 5
+    sim_definitions;
+else
+    random_cell_sites;
+end
 
 tx_powers = ones(1, l.no_tx)*Tx_P_dBm;                  % assumes same power for all tx, can be changed
 
