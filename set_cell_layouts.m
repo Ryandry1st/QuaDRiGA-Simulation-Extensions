@@ -30,71 +30,92 @@ s.show_progress_bars = 1;                 % Enable progress bars; set to 0 to di
 s.use_3GPP_baseline = 0;
 
 %% grid packing
-switch BS_drop
+if strcmp(BS_drop,'fixed_cvs_file')
     
+    fprintf('\tLoading CVS file...')
+    % Read the csv file for BS locations and sector orientations using the python helper functions
+    commandStr = sprintf('%s python_helpers/Tx_Information_from_csv.py %s',python_path,fixed_cvs_file);
+    [status output] = system(commandStr);
     
-    case "random_grid"
-        
-        locs_xy = zeros(no_BS, 2);
-        
-        xy_inc = 1.9*(max_xy-OFFSET(1))/floor(sqrt(no_BS));
-        if sqrt(2*xy_inc^2) < MIN_BS_SEP
-            error("Your average separation is only %f but you requested at least %i", sqrt(2*xy_inc^2), MIN_BS_SEP);
-        end
-        no_per_x_line = floor(sqrt(no_BS));
-        no_per_y_line = ceil(sqrt(no_BS)); % the last column may be undefilled
-        xlocs = [0:no_per_x_line-1].*(2*(max_xy-OFFSET(1, 1))/(no_per_x_line-1)) - max_xy+OFFSET(1, 1);
-        ylocs = [0:no_per_y_line-1].*(2*(max_xy-OFFSET(1, 2))/(no_per_y_line-1)) - max_xy+OFFSET(1, 2);
-        for i=0:no_BS-1
-            j = floor(i/no_per_x_line)+1;
-            k = mod(i, no_per_x_line)+1;
-            locs_xy(i+1, :) = [xlocs(k), ylocs(j)] + sqrt(BS_LOC_VAR)*randn(1, 2);
-        end
-        
-        locs_z = MIN_HEIGHT + (MAX_HEIGHT-MIN_HEIGHT) .* rand(no_BS, 1);
-        
-    case "random_unconstrained"
-        
-        max_xy = 0.9*max_xy;
-        locs_xy = -max_xy+2*max_xy*rand(no_BS,2);
-        locs_z = MIN_HEIGHT + (MAX_HEIGHT-MIN_HEIGHT) .* rand(no_BS, 1);
-        
-    case "random_constrained"
-        
-        
-        fprintf('\t Dropping random BS location:')
-        boundary_xy = 0.9*max_xy;
-
-        locs_xy = zeros(no_BS, 2);
-        locs_xy(1,:) = -boundary_xy+2*boundary_xy*rand(1,2);
-        counter = 1;
-        while counter<no_BS
-            
-            candidate_point = -boundary_xy+2*boundary_xy*rand(1,2);
-            d = sqrt((locs_xy(1:counter,1)-candidate_point(1)).^2+(locs_xy(1:counter,2)-candidate_point(2)).^2);
-            if d > MIN_BS_SEP
-                fprintf('%i/',counter)
-                counter = counter + 1;
-                locs_xy(counter,:) = candidate_point;
-                %plot(locs_xy(counter,1), locs_xy(counter,2), 'r+');hold on;grid on
-            end
-        end
-        locs_z = MIN_HEIGHT + (MAX_HEIGHT-MIN_HEIGHT) .* rand(no_BS, 1);
-        fprintf('Done. \n')
-        
-end
-
-locs = [locs_xy, locs_z];
-
-% orientations should be [no_bs*no_sectors_per_bs, 2] (2 = [azimuth, downtilt])
-%ori_azi = 360 .* rand(no_BS*N_SECTORS, 1);
-ori_azi = -180 + 360 * rand(no_BS*N_SECTORS, 1);
-if downtilt == -1
-    ori_dt = MIN_DT + (MAX_DT-MIN_DT) .* rand(no_BS*N_SECTORS, 1);
+    locs = str2num(output);
+    if(size(locs) < 1)
+        disp("There was a problem with your python, traceback:");
+        error(output)
+    end
+    
+    commandStr = sprintf('%s python_helpers/Tx_Sector_Information_from_csv.py %s',python_path,fixed_cvs_file);
+    [status, output] = system(commandStr);
+    
+    if status==0
+        fprintf('success.\n')
+    end
+    orientations = str2num(output);
+    
 else
-    ori_dt = ones(no_BS*N_SECTORS, 1);
+    
+    switch BS_drop
+        
+        case "random_grid"
+            
+            locs_xy = zeros(no_BS, 2);
+            
+            xy_inc = 1.9*(max_xy-OFFSET(1))/floor(sqrt(no_BS));
+            if sqrt(2*xy_inc^2) < MIN_BS_SEP
+                error("Your average separation is only %f but you requested at least %i", sqrt(2*xy_inc^2), MIN_BS_SEP);
+            end
+            no_per_x_line = floor(sqrt(no_BS));
+            no_per_y_line = ceil(sqrt(no_BS)); % the last column may be undefilled
+            xlocs = [0:no_per_x_line-1].*(2*(max_xy-OFFSET(1, 1))/(no_per_x_line-1)) - max_xy+OFFSET(1, 1);
+            ylocs = [0:no_per_y_line-1].*(2*(max_xy-OFFSET(1, 2))/(no_per_y_line-1)) - max_xy+OFFSET(1, 2);
+            for i=0:no_BS-1
+                j = floor(i/no_per_x_line)+1;
+                k = mod(i, no_per_x_line)+1;
+                locs_xy(i+1, :) = [xlocs(k), ylocs(j)] + sqrt(BS_LOC_VAR)*randn(1, 2);
+            end
+            
+            locs_z = MIN_HEIGHT + (MAX_HEIGHT-MIN_HEIGHT) .* rand(no_BS, 1);
+            
+        case "random_unconstrained"
+            
+            max_xy = 0.9*max_xy;
+            locs_xy = -max_xy+2*max_xy*rand(no_BS,2);
+            locs_z = MIN_HEIGHT + (MAX_HEIGHT-MIN_HEIGHT) .* rand(no_BS, 1);
+            
+        case "random_constrained"
+            
+            fprintf('\tDropping random BS location: ')
+            boundary_xy = 0.9*max_xy;
+            
+            locs_xy = zeros(no_BS, 2);
+            locs_xy(1,:) = -boundary_xy+2*boundary_xy*rand(1,2);
+            counter = 1;
+            while counter<no_BS
+                candidate_point = -boundary_xy+2*boundary_xy*rand(1,2);
+                d = sqrt((locs_xy(1:counter,1)-candidate_point(1)).^2+(locs_xy(1:counter,2)-candidate_point(2)).^2);
+                if d > MIN_BS_SEP
+                    fprintf('%i/',counter)
+                    counter = counter + 1;
+                    locs_xy(counter,:) = candidate_point;
+                    %plot(locs_xy(counter,1), locs_xy(counter,2), 'r+');hold on;grid on
+                end
+            end
+            locs_z = MIN_HEIGHT + (MAX_HEIGHT-MIN_HEIGHT) .* rand(no_BS, 1);
+            fprintf('...success.\n')
+            
+    end
+    
+    locs = [locs_xy, locs_z];
+    
+    % orientations should be [no_bs*no_sectors_per_bs, 2] (2 = [azimuth, downtilt])
+    ori_azi = -180 + 360 * rand(no_BS*N_SECTORS, 1);
+    if downtilt == -1
+        ori_dt = MIN_DT + (MAX_DT-MIN_DT) .* rand(no_BS*N_SECTORS, 1);
+    else
+        ori_dt = ones(no_BS*N_SECTORS, 1);
+    end
+    orientations = [ori_azi, ori_dt];
+    
 end
-orientations = [ori_azi, ori_dt];
 
 l = qd_layout(s);                          % Create new QuaDRiGa layout
 [l.no_tx, ~] = size(locs);

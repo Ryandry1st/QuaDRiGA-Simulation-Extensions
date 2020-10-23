@@ -134,7 +134,7 @@ if ~exist( 'i_freq' , 'var' ) || isempty( i_freq )
 end
 
 try
-    fprintf('\t Attempting to load a builder object...');
+    fprintf('\tLoading old builder object...');
     if ismac
         load('tracks/builder_obj.mat');
     else
@@ -142,9 +142,10 @@ try
     end
     fprintf('Success.\n');
 catch
-    fprintf('Could not find a builder object at tracks/builder_obj.mat, initializing a new builder.\n')
+    fprintf('Could not find a builder object at tracks/builder_obj.mat, making a new builder...')
     [map, x_coords, y_coords, p_builder] = h_layout.power_map(scenario, usage, sample_distance, x_min, x_max, y_min, y_max, rx_height, tx_power, i_freq);
     save('tracks/builder_obj.mat', '-v7.3', 'p_builder');
+    fprintf('success.\n')
     return
 end
 

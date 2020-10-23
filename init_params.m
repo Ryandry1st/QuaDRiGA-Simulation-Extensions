@@ -1,7 +1,8 @@
 rng('default');
 rng(0);
 
-python_path = '/Users/rmd2758/opt/anaconda3/bin/python';
+python_path = '/Users/ayp/opt/anaconda3/bin/python';
+fixed_cvs_file = "Mavenir_locs.csv";
 
 process_paths = 0;                                      % set to 1 to calculate channels along tracks
 process_powermap = 1;                                   % set to 1 to calculate map of powers
@@ -16,23 +17,22 @@ usage = 'sf';
 downtilt = 0;                                           % Downtilt value, can be independently set for each sector (15 is 3GPP typical)
 Tx_P_dBm = 46;                                          %tx power in dBm
 
-no_BS = 50;
+nGrid = (250)^2;
+grid_resolution = 20;                                   % resolution of grid in meters for power map
+
+ue_height = 1.5; 
+
+no_BS = 10;
 % Many-BS parameters
-BS_drop = "random_constrained";                             % random_constrained,random_unconstrained,random_grid
+BS_drop = "random_constrained";                             % random_constrained,random_unconstrained,random_grid,fixed_cvs_file
+
 MIN_BS_SEP = 200;
 MIN_HEIGHT = 35;
 MAX_HEIGHT = 35;
-
 MIN_DT = 0;
 MAX_DT = 20;
 BS_LOC_VAR = 100;
 OFFSET = [100, 100];
-
-nGrid = (250)^2;
-
-ue_height = 1.5;                                        % height at which to create power map
-
-grid_resolution = 20;                                   % resolution of grid in meters for power map
 
 %3GPP_38.901_RMa_LOS,WINNER_UMa_C2_LOS, TwoRayGR, 3GPP_3D_UMa_LOS
 scen = {'3GPP_38.901_RMa_LOS','3GPP_38.901_RMa_LOS'};                       % Temporarily fixing scenario for the whole path

@@ -19,18 +19,35 @@ function power_map_and_path_tilt(tilt)
 %this term is set 100dB below rx power. This also allows for the channel
 %to switch between NLOS and LOS along the path but this feature is disabled
 
-%% Simulation parameter and layout set up done by editing the intialize_sim.m file
-% edit initiatialize.sim file to set simulation parameters, layouts,
-% frequencies, location of transmitters, step size, number of paths etc
-
-
+%% INIT
 init_params;
+
+FB_ratio = 10^(FB_RATIO_DB/10);
 
 if nargin>0
     downtilt = tilt;
 end
 
-initialize_sim;
+if del_builder
+    if exist([pwd,'/tracks/builder_obj.mat'], 'file')
+        delete([pwd,'/tracks/builder_obj.mat']);
+    end
+end
+
+max_xy = floor((grid_resolution*sqrt(nGrid)-1)/2);
+
+Tx_P = 10^(0.1*Tx_P_dBm)/1000;
+
+set_cell_layouts;
+
+tx_powers = ones(1, l.no_tx) * Tx_P_dBm;                  % assumes same power for all tx, can be changed
+
+%% number of receiver & specification of antenna type; length and resolution of UE track
+l.no_rx = 1;                                              % Number of UEs and tracks - one track per UE
+l.rx_array = qd_arrayant('omni');                         % Omni antennas at Rx
+l.rx_array.center_frequency = FC;
+samp_per_meter = 0.25;                                    % samples per meter for track interpolation
+track_length = 500;                                       % track length in meters; currently same for all l.no_rx UEs
 
 set(0,'defaultTextFontSize', 18)                        % Default Font Size
 set(0,'defaultAxesFontSize', 18)                        % Default Font Size
@@ -48,9 +65,7 @@ if process_paths == 1
     % Now we create the channel coefficients. The fixing the random seed (check) guarantees repeatable results
     % (i.e. the taps will be at the same positions for both runs). Also note the significantly longer
     % computing time when drifting is enabled.
-    
-    % 	[pairs, powers] = l.set_pairing('power', Rx_threshold_dBm, tx_powers);
-    
+
     disp('Drifting enabled:');
     p = l.init_builder;                                       % Create channel builders
     gen_parameters( p );                                      % Generate small-scale fading
@@ -69,11 +84,10 @@ end
 %% process power map if this is configured in the initialize.sim file
 if process_powermap == 1
     
-    [ map,x_coords,y_coords, p_builder] = power_map_const(l, scen{2}, usage, grid_resolution,-max_xy,max_xy,-max_xy,max_xy,ue_height, tx_powers);
+    [ map,x_coords,y_coords, ~] = power_map_const(l, scen{2}, usage, grid_resolution,-max_xy,max_xy,-max_xy,max_xy,ue_height, tx_powers);
     % scenario FB_UMa_NLOS, type 'quick', sample distance, x,y min/max, rx
     % height; type can be 'quick', 'sf', 'detailed', 'phase'
-    
-    % P = 10*log10(sum( abs( cat(3,map{:}) ).^2 ,3));         % Total received power
+   
     P = 10*log10(sum(abs(cat(3, map{:})).^2, 3:4))+30;        % Simplified Total received power; Assumed W and converted to dBm
     
     % create a struct where powers over the x,y grid are available for each tx on an x,y grid
@@ -96,11 +110,10 @@ if process_powermap == 1
         fclose(fid);
         if save_npz == 1
             commandStr = strcat(python_path, [' make_npz_from_json.py ', 'powermatrix.json']);
-            [status, output] = system(commandStr);
+            system(commandStr);
         end
         
     end
-    % if configured, plot power map
     
     if save_opt == 1
         if ~exist([pwd,'/opt_data/json'], 'dir')
@@ -126,7 +139,8 @@ if process_powermap == 1
     if show_plot ==1
         %l.visualize([],[],0);
         
-        figure(1);subplot(121)
+        figure(downtilt);clf
+        subplot(121)
         for b=1:no_BS
             plot3( l.tx_position(1,b),l.tx_position(2,b),l.tx_position(3,b),...
                 '.r','Linewidth',3,'Markersize',16 );hold on;
@@ -136,18 +150,10 @@ if process_powermap == 1
         
         imagesc('XData',x_coords,'YData',y_coords,'CData',P)
         axis([-max_xy max_xy -max_xy max_xy])                               % Plot size
-        %caxis( max(powermatrix.Tx1pwr,[],'all') + [-20 0] )                  % Color range
-        %caxis( max(P(:)) + [-30 -5] )
         caxis([-140, -45]);
-        %colmap = colormap;
         c = colorbar;
         c.Location = 'northoutside';
         c.Label.String = "DL RX PWR (dBm)";
-        %colormap(colmap*0.5 + 0.5);                           % Adjust colors to be "lighter"
-        %set(gca,'layer','top')                                    % Show grid on top of the map
-        %hold on;
-        %set(0,'DefaultFigurePaperSize',[14.5 7.3])                % Adjust paper size for plot                                  % Show BS and MT positions on the map
-        
         pwr = P(:);
         pwr_sort = sort(pwr);
         pwr_min = pwr_sort(1);
@@ -160,11 +166,13 @@ if process_powermap == 1
         subplot(122);plot(xx,100*yy/length(pwr),'-r','linewidth',3);grid on;xlabel('DL RX PWR (dBm)');ylabel('CDF (%)');axis square
         title(sprintf('[min,max,avg] = [%0.1f, %0.1f, %0.1f] (dBm)',pwr_min,pwr_max,mean(pwr)))
     end
+    
     if save_work ==1
         save(append(track_directory,'workspace_map'),'map','x_coords','y_coords','-v7.3') % this is in here in case we want to examine the data.
     end
+    
 end
 
-fprintf('\t Sim time = %1.1f sec.\n',toc)
+fprintf('\t[Sim runtime = %1.0f min]\n',toc/60)
 
 return
