@@ -3,7 +3,7 @@
 % AZI_BEAMWIDTH = 67;                       % Azimuth beamwidth for sector antenna
 % ELE_BEAMWIDTH = 7.5;                      % Elevation beamwidth for sector antenna
 % FB_RATIO_DB = -30;                        % Front to back ratio in dB
- FB_ratio = 10^(FB_RATIO_DB/10);           % Front to back ratio in linear scale
+FB_ratio = 10^(FB_RATIO_DB/10);           % Front to back ratio in linear scale
 % ANTENNA_ELEMENTS = 4;                     % Number of antenna elements in a sector
 % FC = 1.8e9;                               % Carrier frequency
 % N_SECTORS = 3;
@@ -39,7 +39,7 @@ s.use_3GPP_baseline = 0;
 %% Layout of transmitters & specification of antenna types
 % Read the csv file for BS locations and sector orientations using the python helper functions
 commandStr = strcat(python_path, ' Tx_Information_from_csv.py "Mavenir_locs.csv"');
-[status, output] = system(commandStr);
+[~, output] = system(commandStr);
 
 locs = str2num(output);
 if(size(locs) < 1)

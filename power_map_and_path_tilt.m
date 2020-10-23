@@ -69,7 +69,7 @@ end
 %% process power map if this is configured in the initialize.sim file
 if process_powermap == 1
     
-    [ map,x_coords,y_coords, p_builder] = power_map_const(l, scen{2}, 'quick',grid_resolution,-max_xy,max_xy,-max_xy,max_xy,ue_height, tx_powers);
+    [ map,x_coords,y_coords, p_builder] = power_map_const(l, scen{2}, usage, grid_resolution,-max_xy,max_xy,-max_xy,max_xy,ue_height, tx_powers);
     % scenario FB_UMa_NLOS, type 'quick', sample distance, x,y min/max, rx
     % height; type can be 'quick', 'sf', 'detailed', 'phase'
     
@@ -80,7 +80,7 @@ if process_powermap == 1
     powermatrix.x = x_coords;
     powermatrix.y = y_coords;
     powermatrix.z = ue_height;
-    powermatrix.ptx = TX_P; % power in watts
+    powermatrix.ptx = Tx_P; % power in watts
     powermatrix.downtilt = squeeze(orientations(:, 2));
     for i = 1:l.no_tx
         powermatrix.(append('Tx',int2str(i),'pwr')) = 10*log10(squeeze(map{i}).^2)+30; % Assumed W and converted to dBm
@@ -124,20 +124,41 @@ if process_powermap == 1
     
     
     if show_plot ==1
-        l.visualize([],[],0);
-        hold on;
-        imagesc( x_coords, y_coords, P);          % Plot the received power
+        %l.visualize([],[],0);
+        
+        figure(1);subplot(121)
+        for b=1:no_BS
+            plot3( l.tx_position(1,b),l.tx_position(2,b),l.tx_position(3,b),...
+                '.r','Linewidth',3,'Markersize',16 );hold on;
+        end
+        xlabel('x (m)');ylabel('y (m)');
+        grid on;box on;view(0, 90);axis square
+        
+        imagesc('XData',x_coords,'YData',y_coords,'CData',P)
         axis([-max_xy max_xy -max_xy max_xy])                               % Plot size
         %caxis( max(powermatrix.Tx1pwr,[],'all') + [-20 0] )                  % Color range
-        caxis( max(P(:)) + [-30 -5] )
-        % caxis([-75, -40]);
-        colmap = colormap;
+        %caxis( max(P(:)) + [-30 -5] )
+        caxis([-140, -45]);
+        %colmap = colormap;
         c = colorbar;
-        c.Label.String = "Receive Power [dBm]";
-        % colormap( colmap*0.5 + 0.5 );                           % Adjust colors to be "lighter"
-        set(gca,'layer','top')                                    % Show grid on top of the map
-        hold on;
-        set(0,'DefaultFigurePaperSize',[14.5 7.3])                % Adjust paper size for plot                                  % Show BS and MT positions on the map
+        c.Location = 'northoutside';
+        c.Label.String = "DL RX PWR (dBm)";
+        %colormap(colmap*0.5 + 0.5);                           % Adjust colors to be "lighter"
+        %set(gca,'layer','top')                                    % Show grid on top of the map
+        %hold on;
+        %set(0,'DefaultFigurePaperSize',[14.5 7.3])                % Adjust paper size for plot                                  % Show BS and MT positions on the map
+        
+        pwr = P(:);
+        pwr_sort = sort(pwr);
+        pwr_min = pwr_sort(1);
+        pwr_max = pwr_sort(end);
+        
+        xx = linspace(pwr_min,pwr_max,50);
+        for i = 1:length(xx)
+            yy(i)= sum(pwr_sort<xx(i));
+        end
+        subplot(122);plot(xx,100*yy/length(pwr),'-r','linewidth',3);grid on;xlabel('DL RX PWR (dBm)');ylabel('CDF (%)');axis square
+        title(sprintf('[min,max,avg] = [%0.1f, %0.1f, %0.1f] (dBm)',pwr_min,pwr_max,mean(pwr)))
     end
     if save_work ==1
         save(append(track_directory,'workspace_map'),'map','x_coords','y_coords','-v7.3') % this is in here in case we want to examine the data.

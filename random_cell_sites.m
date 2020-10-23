@@ -30,31 +30,65 @@ s.show_progress_bars = 1;                 % Enable progress bars; set to 0 to di
 s.use_3GPP_baseline = 0;
 
 %% grid packing
-xy_inc = 1.9*(max_xy-OFFSET(1))/floor(sqrt(no_BS));
+switch BS_drop
+    
+    
+    case "random_grid"
+        
+        locs_xy = zeros(no_BS, 2);
+        
+        xy_inc = 1.9*(max_xy-OFFSET(1))/floor(sqrt(no_BS));
+        if sqrt(2*xy_inc^2) < MIN_BS_SEP
+            error("Your average separation is only %f but you requested at least %i", sqrt(2*xy_inc^2), MIN_BS_SEP);
+        end
+        no_per_x_line = floor(sqrt(no_BS));
+        no_per_y_line = ceil(sqrt(no_BS)); % the last column may be undefilled
+        xlocs = [0:no_per_x_line-1].*(2*(max_xy-OFFSET(1, 1))/(no_per_x_line-1)) - max_xy+OFFSET(1, 1);
+        ylocs = [0:no_per_y_line-1].*(2*(max_xy-OFFSET(1, 2))/(no_per_y_line-1)) - max_xy+OFFSET(1, 2);
+        for i=0:no_BS-1
+            j = floor(i/no_per_x_line)+1;
+            k = mod(i, no_per_x_line)+1;
+            locs_xy(i+1, :) = [xlocs(k), ylocs(j)] + sqrt(BS_LOC_VAR)*randn(1, 2);
+        end
+        
+        locs_z = MIN_HEIGHT + (MAX_HEIGHT-MIN_HEIGHT) .* rand(no_BS, 1);
+        
+    case "random_unconstrained"
+        
+        max_xy = 0.9*max_xy;
+        locs_xy = -max_xy+2*max_xy*rand(no_BS,2);
+        locs_z = MIN_HEIGHT + (MAX_HEIGHT-MIN_HEIGHT) .* rand(no_BS, 1);
+        
+    case "random_constrained"
+        
+        
+        fprintf('\t Dropping random BS location:')
+        boundary_xy = 0.9*max_xy;
 
-if sqrt(2*xy_inc^2) < MIN_BS_SEP
-    error("Your average separation is only %f but you requested at least %i", sqrt(2*xy_inc^2), MIN_BS_SEP);
+        locs_xy = zeros(no_BS, 2);
+        locs_xy(1,:) = -boundary_xy+2*boundary_xy*rand(1,2);
+        counter = 1;
+        while counter<no_BS
+            
+            candidate_point = -boundary_xy+2*boundary_xy*rand(1,2);
+            d = sqrt((locs_xy(1:counter,1)-candidate_point(1)).^2+(locs_xy(1:counter,2)-candidate_point(2)).^2);
+            if d > MIN_BS_SEP
+                fprintf('%i/',counter)
+                counter = counter + 1;
+                locs_xy(counter,:) = candidate_point;
+                %plot(locs_xy(counter,1), locs_xy(counter,2), 'r+');hold on;grid on
+            end
+        end
+        locs_z = MIN_HEIGHT + (MAX_HEIGHT-MIN_HEIGHT) .* rand(no_BS, 1);
+        fprintf('Done. \n')
+        
 end
-no_per_x_line = floor(sqrt(no_BS));
-no_per_y_line = ceil(sqrt(no_BS)); % the last column may be undefilled
-locs_z = MIN_HEIGHT + (MAX_HEIGHT-MIN_HEIGHT) .* rand(no_BS, 1);
-
-locs_xy = zeros(no_BS, 2);
-
-xlocs = [0:no_per_x_line-1].*(2*(max_xy-OFFSET(1, 1))/(no_per_x_line-1)) - max_xy+OFFSET(1, 1);
-ylocs = [0:no_per_y_line-1].*(2*(max_xy-OFFSET(1, 2))/(no_per_y_line-1)) - max_xy+OFFSET(1, 2);
-
-for i=0:no_BS-1
-    j = floor(i/no_per_x_line)+1;
-    k = mod(i, no_per_x_line)+1;
-    locs_xy(i+1, :) = [xlocs(k), ylocs(j)] + sqrt(BS_LOC_VAR)*randn(1, 2);
-end
-
 
 locs = [locs_xy, locs_z];
 
-% orientations should be [no_bs*no_sectors_per_bs, 2] (2 = [azimuth, downtilt]) 
-ori_azi = 360 .* rand(no_BS*N_SECTORS, 1);
+% orientations should be [no_bs*no_sectors_per_bs, 2] (2 = [azimuth, downtilt])
+%ori_azi = 360 .* rand(no_BS*N_SECTORS, 1);
+ori_azi = -180 + 360 * rand(no_BS*N_SECTORS, 1);
 if downtilt == -1
     ori_dt = MIN_DT + (MAX_DT-MIN_DT) .* rand(no_BS*N_SECTORS, 1);
 else
@@ -93,10 +127,12 @@ else
     if isscalar(downtilt)
         for i=1:l.no_tx
             index = 3*(i-1)+1;
-            l.tx_array(i) = qd_arrayant(ARRAY_TYPE, AZI_BEAMWIDTH, ELE_BEAMWIDTH, -FB_RATIO_DB, downtilt);
+            l.tx_array(i) = qd_arrayant(ARRAY_TYPE, M, N, FC, pol, downtilt, spacing, Mg, Ng, [], []);
+            %l.tx_array(i) = qd_arrayant(ARRAY_TYPE, AZI_BEAMWIDTH, ELE_BEAMWIDTH, -FB_RATIO_DB, downtilt);
             l.tx_array(i).rotate_pattern(orientations(index, 1), 'z');
             for j=1:N_SECTORS-1
-                a = qd_arrayant(ARRAY_TYPE, AZI_BEAMWIDTH, ELE_BEAMWIDTH, -FB_RATIO_DB, downtilt);
+                a = qd_arrayant(ARRAY_TYPE, M, N, FC, pol, downtilt, spacing, Mg, Ng, [], []);
+                %a = qd_arrayant(ARRAY_TYPE, AZI_BEAMWIDTH, ELE_BEAMWIDTH, -FB_RATIO_DB, downtilt);
                 a.rotate_pattern(orientations(index+j, 1), 'z');
                 l.tx_array(i).append_array(a);
             end
