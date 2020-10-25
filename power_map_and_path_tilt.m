@@ -65,7 +65,7 @@ if process_paths == 1
     % Now we create the channel coefficients. The fixing the random seed (check) guarantees repeatable results
     % (i.e. the taps will be at the same positions for both runs). Also note the significantly longer
     % computing time when drifting is enabled.
-
+    
     disp('Drifting enabled:');
     p = l.init_builder;                                       % Create channel builders
     gen_parameters( p );                                      % Generate small-scale fading
@@ -84,11 +84,20 @@ end
 %% process power map if this is configured in the initialize.sim file
 if process_powermap == 1
     
-    [ map,x_coords,y_coords, ~] = power_map_const(l, scen{2}, usage, grid_resolution,-max_xy,max_xy,-max_xy,max_xy,ue_height, tx_powers);
-    % scenario FB_UMa_NLOS, type 'quick', sample distance, x,y min/max, rx
-    % height; type can be 'quick', 'sf', 'detailed', 'phase'
-   
-    P = 10*log10(sum(abs(cat(3, map{:})).^2, 3:4))+30;        % Simplified Total received power; Assumed W and converted to dBm
+    [map, x_coords, y_coords, ~] = power_map_const(l, scen{1}, usage, grid_resolution,-max_xy,max_xy,-max_xy,max_xy,ue_height, tx_powers);
+    
+    r=[];
+    for i = 1:length(map)
+        r = cat(3,r,squeeze(mean(map{i},3)));
+    end
+    [rsrp, sector_idx] = max(r,[],3);
+    RSRP_dBm = 10*log10(rsrp);
+    
+    P = 10*log10(sum(cat(3,map{:}),3));
+    
+    %P = 10*log10(sum( abs( cat(3,map{:}) ).^2 ,3));         % Total received power
+    %P = 10*log10(sum(abs(cat(3, map{:})).^2, 3:4))+30;        % Simplified Total received power; Assumed W and converted to dBm
+    %P = 10*log10(sum(cat(3, map{:}), 3:4));
     
     % create a struct where powers over the x,y grid are available for each tx on an x,y grid
     powermatrix.x = x_coords;
@@ -97,7 +106,8 @@ if process_powermap == 1
     powermatrix.ptx = Tx_P; % power in watts
     powermatrix.downtilt = squeeze(orientations(:, 2));
     for i = 1:l.no_tx
-        powermatrix.(append('Tx',int2str(i),'pwr')) = 10*log10(squeeze(map{i}).^2)+30; % Assumed W and converted to dBm
+        %powermatrix.(append('Tx',int2str(i),'pwr')) = 10*log10(squeeze(map{i}).^2)+30; % Assumed W and converted to dBm
+        powermatrix.(append('Tx',int2str(i),'pwr')) = 10*log10(squeeze(map{i})); % dBm
         powermatrix.(append('Tx',int2str(i),'loc')) = l.tx_position(:,i);
     end
     
@@ -128,43 +138,59 @@ if process_powermap == 1
         if fid == -1, error('Cannot create JSON file'); end
         fwrite(fid, jsonStr, 'char');
         fclose(fid);
-        commandStr = strcat(python_path, [' make_npz_from_json.py ', file_name]);
-        fprintf('\t Attempting to create NPZ file...')
+        commandStr = sprintf('%s python_helpers/make_npz_from_json.py %s',python_path,file_name);
+        fprintf('\tAttempting to write to NPZ file...')
         status = system(commandStr);
-        if ~(status==0), error('Cannot create NPZ file'); end
-        fprintf('Success. \n')
+        if ~(status==0)
+            error('Cannot create NPZ file');
+        else
+            fprintf('success. \n')
+        end
     end
     
     
     if show_plot ==1
         %l.visualize([],[],0);
         
-        figure(downtilt);clf
-        subplot(121)
+        figure(downtilt+1);clf
+        subplot(131)
         for b=1:no_BS
             plot3( l.tx_position(1,b),l.tx_position(2,b),l.tx_position(3,b),...
-                '.r','Linewidth',3,'Markersize',16 );hold on;
+                '.r','Linewidth',3,'Markersize',18 );hold on;
         end
         xlabel('x (m)');ylabel('y (m)');
         grid on;box on;view(0, 90);axis square
-        
-        imagesc('XData',x_coords,'YData',y_coords,'CData',P)
+        imagesc('XData',x_coords,'YData',y_coords,'CData',RSRP_dBm)
         axis([-max_xy max_xy -max_xy max_xy])                               % Plot size
         caxis([-140, -45]);
+        %colormap(jet)
         c = colorbar;
         c.Location = 'northoutside';
-        c.Label.String = "DL RX PWR (dBm)";
-        pwr = P(:);
+        c.Label.String = "RSRP (dBm)";
+        
+        subplot(132)
+        for b=1:no_BS
+            plot3( l.tx_position(1,b),l.tx_position(2,b),l.tx_position(3,b),...
+                '.r','Linewidth',3,'Markersize',18 );hold on;
+        end
+        grid on;box on;view(0, 90);axis square
+        imagesc('XData',x_coords,'YData',y_coords,'CData',sector_idx)
+        axis([-max_xy max_xy -max_xy max_xy])                               % Plot size
+                c = colorbar;
+        c.Location = 'northoutside';
+        c.Label.String = "Cell index";
+        
+        pwr = RSRP_dBm(:);
         pwr_sort = sort(pwr);
         pwr_min = pwr_sort(1);
         pwr_max = pwr_sort(end);
-        
         xx = linspace(pwr_min,pwr_max,50);
         for i = 1:length(xx)
             yy(i)= sum(pwr_sort<xx(i));
         end
-        subplot(122);plot(xx,100*yy/length(pwr),'-r','linewidth',3);grid on;xlabel('DL RX PWR (dBm)');ylabel('CDF (%)');axis square
-        title(sprintf('[min,max,avg] = [%0.1f, %0.1f, %0.1f] (dBm)',pwr_min,pwr_max,mean(pwr)))
+        subplot(133);plot(xx,100*yy/length(pwr),'-r','linewidth',3);grid on;xlabel('RSRP (dBm)');ylabel('CDF_%');axis square
+        title(sprintf('[min,max,avg]=[%0.1f,%0.1f,%0.1f]',pwr_min,pwr_max,mean(pwr)))
+    
     end
     
     if save_work ==1
@@ -173,6 +199,6 @@ if process_powermap == 1
     
 end
 
-fprintf('\t[Sim runtime = %1.0f min]\n',toc/60)
+fprintf('\n\t[Sim runtime = %1.0f min]\n',toc/60)
 
 return
