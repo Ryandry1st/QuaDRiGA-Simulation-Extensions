@@ -25,20 +25,20 @@ Tx_P_dBm = 46;                                          %tx power in dBm
 
 nSC = 600;                                              %600 = 10MHz bandwidth
 
-nGrid = (250)^2;
+nGrid = (400)^2;
 
-grid_resolution = 10;                                   % resolution of grid in meters for power map
+grid_resolution = 5;                                   % resolution of grid in meters for power map
 
 ue_height = 1.5;
 
-no_BS = 19;
+no_BS = 50;
 
 %hex, rnd, csv
-BS_drop = "hex";
+BS_drop = "csv";
 
 MIN_BS_SEP = 500;
 
-MIN_HEIGHT = 32;
+MIN_HEIGHT = 25;
 
 MAX_HEIGHT = MIN_HEIGHT;
 
@@ -46,7 +46,7 @@ MAX_HEIGHT = MIN_HEIGHT;
 scen = {'3GPP_3D_UMa_LOS','3GPP_3D_UMa_LOS'};
 
 % Array type at bs, main options include: omni, dipole, half-wave-dipole, patch, 3gpp-macro, 3gpp-3d (more available in generate.m)
-tx_antenna_type = '3gpp-macro';
+tx_antenna_type = '3gpp-3d';
 
 %3gpp_macro:phi_3dB, theta_3dB, rear_gain, electric_tilt
 % BS height is 32m
@@ -76,7 +76,7 @@ tx_antenna_3gpp_macro.electric_tilt = 15;
 %           6. K=M, +/-45 degree polarized elements
 %      * tilt - The electric downtilt angle in [deg] for pol = 4,5,6
 %      * spacing - Element spacing in [λ], Default: 0.5
-tx_antenna_3gpp_3d.M = 8;
+tx_antenna_3gpp_3d.M = 4;
 tx_antenna_3gpp_3d.N = 1;
 tx_antenna_3gpp_3d.center_freq = FC;
 tx_antenna_3gpp_3d.pol = 4;

@@ -94,6 +94,7 @@ if process_powermap == 1
         r = cat(3,r,squeeze(mean(map{i},3)));
     end
     [rsrp, sector_idx] = max(r,[],3);
+    geometry_factor_dB = 10*log10(max(r,[],3)./(sum(r,3)-max(r,[],3)));
     RSRP_dBm = 10*log10(rsrp);
     
     %P = 10*log10(sum(cat(3,map{:}),3));
@@ -151,8 +152,8 @@ if process_powermap == 1
         %l.visualize([],[],0);
         
         
-        figure('Renderer', 'painters', 'Position', [10 10 1500 500]);clf
-        ax1=subplot(131);
+        figure('Renderer', 'painters', 'Position', [10 10 800 1400]);clf
+        ax1=subplot(321);
         for b=1:no_BS
             f11=plot3( l.tx_position(1,b),l.tx_position(2,b),l.tx_position(3,b),...
                 '.r','Linewidth',3,'Markersize',18 );hold on;
@@ -165,11 +166,45 @@ if process_powermap == 1
         c1.Location = 'northoutside';
         c1.Label.String = "RSRP (dBm)";
         caxis([-140, -45]);
-        %shading interp
-        %colormap(jet)
 
+        ax3=subplot(322);
+        y = RSRP_dBm(:);
+        y_sort = sort(y);
+        y_min = y_sort(1);
+        y_max = y_sort(end);
+        xx = linspace(y_min,y_max,50);
+        for i = 1:length(xx)
+            yy(i)= sum(y_sort<xx(i));
+        end
+        f4=plot(xx,100*yy/length(y),'-r','linewidth',3);
+        grid on;xlabel('RSRP (dBm)');ylabel('CDF(%)');axis square;title(sprintf('(min,max,avg)=(%0.0f,%0.0f,%0.0f)',y_min,y_max,mean(y)))
+  
+        subplot(323);
+        for b=1:no_BS
+            plot3( l.tx_position(1,b),l.tx_position(2,b),l.tx_position(3,b),...
+                '.r','Linewidth',3,'Markersize',18 );hold on;
+        end
+        grid on;box on;view(0, 90);axis square
+        imagesc('XData',x_coords,'YData',y_coords,'CData',geometry_factor_dB);
+        axis([-max_xy max_xy -max_xy max_xy])
+        c2 = colorbar;
+        c2.Location = 'northoutside';
+        c2.Label.String = "Geometry factor (dB)";
         
-        ax2=subplot(132);
+        subplot(324);
+        y = geometry_factor_dB(:);
+        y_sort = sort(y);
+        y_min = y_sort(1);
+        y_max = y_sort(end);
+        xx = linspace(y_min,y_max,50);
+        for i = 1:length(xx)
+            yy(i)= sum(y_sort<xx(i));
+        end
+        plot(xx,100*yy/length(y),'-r','linewidth',3);
+        grid on;xlabel('Geometry factor (dB)');ylabel('CDF(%)');axis square;title(sprintf('(min,max,avg)=(%0.0f,%0.0f,%0.0f)',y_min,y_max,mean(y)))
+  
+        
+        ax2=subplot(325);
         for b=1:no_BS
             f21=plot3( l.tx_position(1,b),l.tx_position(2,b),l.tx_position(3,b),...
                 '.r','Linewidth',3,'Markersize',18 );hold on;
@@ -182,18 +217,22 @@ if process_powermap == 1
         c2.Location = 'northoutside';
         c2.Label.String = "Cell index";
         
-        pwr = RSRP_dBm(:);
-        pwr_sort = sort(pwr);
-        pwr_min = pwr_sort(1);
-        pwr_max = pwr_sort(end);
-        xx = linspace(pwr_min,pwr_max,50);
+        subplot(326);
+        y = sector_idx(:);
+        y_sort = sort(y);
+        y_min = y_sort(1);
+        y_max = y_sort(end);
+        xx = y_min:y_max;
+        yy=zeros(1,length(xx));
         for i = 1:length(xx)
-            yy(i)= sum(pwr_sort<xx(i));
+            yy(i)= sum(y_sort<=xx(i));
         end
-        ax3=subplot(133);
-        f4=plot(xx,100*yy/length(pwr),'-r','linewidth',3);
-        grid on;xlabel('RSRP (dBm)');ylabel('CDF(%)');axis square;title(sprintf('(min,max,avg)=(%0.1f,%0.1f,%0.1f)',pwr_min,pwr_max,mean(pwr)))
+        stem(xx,100*yy/length(y),'.r','linewidth',3);
+        grid on;xlabel('Cell index');ylabel('CDF(%)');axis square;title(sprintf('(min,max,avg)=(%d,%d,%.0f)',y_min,y_max,mean(y)))
+  
         
+        
+              
     end
     
     if save_work ==1

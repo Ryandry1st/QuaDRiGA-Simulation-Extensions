@@ -78,7 +78,7 @@ if isempty(orientations)
     if random_ori_azi
         ori_azi = -180 + 360 * rand(no_BS*N_SECTORS, 1);
     else
-        ori_azi = repmat(0:floor(360/N_SECTORS):360-floor(360/N_SECTORS),1,no_BS).';
+        ori_azi = repmat(0:floor(360/N_SECTORS):360-floor(360/N_SECTORS),1,no_BS).'+0;
     end
     
     if downtilt == -1
