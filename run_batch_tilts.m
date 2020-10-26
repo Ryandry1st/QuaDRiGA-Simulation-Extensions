@@ -2,7 +2,7 @@ clc;
 clear all;
 close all;
 
-tilts = 10:1:10;
+tilts = 15:1:15;
 
 for j = 1:length(tilts)
     

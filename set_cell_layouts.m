@@ -1,5 +1,5 @@
 %% Antenna Definitions
-FB_ratio = 10^(FB_RATIO_DB/10);           % Front to back ratio in linear scale
+%FB_ratio = 10^(FB_RATIO_DB/10);           % Front to back ratio in linear scale
 
 
 if ismac
@@ -22,7 +22,7 @@ end
 
 
 %% grid packing
-fprintf('\tDropping BS location ')
+fprintf('\tDropping BS location [%d x %d](m): ',max_xy,max_xy)
 orientations = [];
 
 switch BS_drop
@@ -112,12 +112,28 @@ num_interf = l.no_tx - 1;                  % number of interfering bases station
 if downtilt == -1
     for i=1:l.no_tx
         index = N_SECTORS*(i-1)+1;
-        l.tx_array(i) = qd_arrayant(ARRAY_TYPE, AZI_BEAMWIDTH, ELE_BEAMWIDTH, -FB_RATIO_DB, orientations(index, 2));
+        switch tx_antenna_type
+            case '3gpp_macro'
+                l.tx_array(i) = qd_arrayant(tx_antenna_type, tx_antenna_3gpp_macro.phi_3dB, tx_antenna_3gpp_macro.theta_3dB, tx_antenna_3gpp_macro.rear_gain, downtilt);
+            case '3gpp_3d'
+                l.tx_array(i) = qd_arrayant(tx_antenna_type, tx_antenna_3gpp_3d.M, tx_antenna_3gpp_3d.N, tx_antenna_3gpp_3d.center_freq, tx_antenna_3gpp_3d.pol, downtilt, tx_antenna_3gpp_3d.spacing);
+        end
+        
+        
+        %l.tx_array(i) = qd_arrayant(ARRAY_TYPE, AZI_BEAMWIDTH, ELE_BEAMWIDTH, -FB_RATIO_DB, orientations(index, 2));
         l.tx_array(i).rotate_pattern(orientations(index, 1), 'z');
         % fprintf('antenna %d sector 1 with dt = %d and azi = %d \n', i, orientations(index, 2), orientations(index, 1));
         
         for j=1:N_SECTORS-1
-            a = qd_arrayant(ARRAY_TYPE, AZI_BEAMWIDTH, ELE_BEAMWIDTH, -FB_RATIO_DB, orientations(index+j, 2));
+            switch tx_antenna_type
+                case '3gpp_macro'
+                    a = qd_arrayant(tx_antenna_type, tx_antenna_3gpp_macro.phi_3dB, tx_antenna_3gpp_macro.theta_3dB, tx_antenna_3gpp_macro.rear_gain, downtilt);
+                case '3gpp_3d'
+                    a = qd_arrayant(tx_antenna_type, tx_antenna_3gpp_3d.M, tx_antenna_3gpp_3d.N, tx_antenna_3gpp_3d.center_freq, tx_antenna_3gpp_3d.pol, downtilt, tx_antenna_3gpp_3d.spacing);
+            end
+            
+            
+            %a = qd_arrayant(ARRAY_TYPE, AZI_BEAMWIDTH, ELE_BEAMWIDTH, -FB_RATIO_DB, orientations(index+j, 2));
             a.rotate_pattern(orientations(index+j, 1), 'z');
             l.tx_array(i).append_array(a);
         end
@@ -129,11 +145,26 @@ else
     if isscalar(downtilt)
         for i=1:l.no_tx
             index = 3*(i-1)+1;
-            l.tx_array(i) = qd_arrayant(ARRAY_TYPE, M, N, FC, pol, downtilt, spacing, Mg, Ng, [], []);
+            switch tx_antenna_type
+                case '3gpp-macro'
+                    l.tx_array(i) = qd_arrayant(tx_antenna_type, tx_antenna_3gpp_macro.phi_3dB, tx_antenna_3gpp_macro.theta_3dB, tx_antenna_3gpp_macro.rear_gain, downtilt);
+                case '3gpp-3d'
+                    l.tx_array(i) = qd_arrayant(tx_antenna_type, tx_antenna_3gpp_3d.M, tx_antenna_3gpp_3d.N, tx_antenna_3gpp_3d.center_freq, tx_antenna_3gpp_3d.pol, downtilt, tx_antenna_3gpp_3d.spacing);
+            end
+            
+            %l.tx_array(i) = qd_arrayant(ARRAY_TYPE, M, N, FC, pol, downtilt, spacing, Mg, Ng, [], []);
             %l.tx_array(i) = qd_arrayant(ARRAY_TYPE, AZI_BEAMWIDTH, ELE_BEAMWIDTH, -FB_RATIO_DB, downtilt);
-            l.tx_array(i).rotate_pattern(orientations(index, 1), 'z');
+            %l.tx_array(i).rotate_pattern(orientations(index, 1), 'z');
             for j=1:N_SECTORS-1
-                a = qd_arrayant(ARRAY_TYPE, M, N, FC, pol, downtilt, spacing, Mg, Ng, [], []);
+                
+                switch tx_antenna_type
+                    case '3gpp-macro'
+                        a = qd_arrayant(tx_antenna_type, tx_antenna_3gpp_macro.phi_3dB, tx_antenna_3gpp_macro.theta_3dB, tx_antenna_3gpp_macro.rear_gain, downtilt);
+                    case '3gpp-3d'
+                        a = qd_arrayant(tx_antenna_type, tx_antenna_3gpp_3d.M, tx_antenna_3gpp_3d.N, tx_antenna_3gpp_3d.center_freq, tx_antenna_3gpp_3d.pol, downtilt, tx_antenna_3gpp_3d.spacing);
+                end
+                
+                %a = qd_arrayant(ARRAY_TYPE, M, N, FC, pol, downtilt, spacing, Mg, Ng, [], []);
                 %a = qd_arrayant(ARRAY_TYPE, AZI_BEAMWIDTH, ELE_BEAMWIDTH, -FB_RATIO_DB, downtilt);
                 a.rotate_pattern(orientations(index+j, 1), 'z');
                 l.tx_array(i).append_array(a);

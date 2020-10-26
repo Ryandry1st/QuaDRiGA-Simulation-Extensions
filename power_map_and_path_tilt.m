@@ -22,7 +22,7 @@ function power_map_and_path_tilt(tilt)
 %% INIT
 init_params;
 
-FB_ratio = 10^(FB_RATIO_DB/10);
+%FB_ratio = 10^(FB_RATIO_DB/10);
 
 if nargin>0
     downtilt = tilt;
@@ -35,6 +35,8 @@ if del_builder
 end
 
 max_xy = floor((grid_resolution*sqrt(nGrid)-1)/2);
+
+Tx_P_dBm = Tx_P_dBm-10*log10(nSC); %convert to EPRE (energy per resource element) for correct RSRP calc.
 
 Tx_P = 10^(0.1*Tx_P_dBm)/1000;
 
@@ -86,6 +88,7 @@ if process_powermap == 1
     
     [map, x_coords, y_coords, ~] = power_map_const(l, scen{1}, usage, grid_resolution,-max_xy,max_xy,-max_xy,max_xy,ue_height, tx_powers);
     
+    %calculate RSRP
     r=[];
     for i = 1:length(map)
         r = cat(3,r,squeeze(mean(map{i},3)));
@@ -93,11 +96,7 @@ if process_powermap == 1
     [rsrp, sector_idx] = max(r,[],3);
     RSRP_dBm = 10*log10(rsrp);
     
-    P = 10*log10(sum(cat(3,map{:}),3));
-    
-    %P = 10*log10(sum( abs( cat(3,map{:}) ).^2 ,3));         % Total received power
-    %P = 10*log10(sum(abs(cat(3, map{:})).^2, 3:4))+30;        % Simplified Total received power; Assumed W and converted to dBm
-    %P = 10*log10(sum(cat(3, map{:}), 3:4));
+    %P = 10*log10(sum(cat(3,map{:}),3));
     
     % create a struct where powers over the x,y grid are available for each tx on an x,y grid
     powermatrix.x = x_coords;
@@ -106,7 +105,6 @@ if process_powermap == 1
     powermatrix.ptx = Tx_P; % power in watts
     powermatrix.downtilt = squeeze(orientations(:, 2));
     for i = 1:l.no_tx
-        %powermatrix.(append('Tx',int2str(i),'pwr')) = 10*log10(squeeze(map{i}).^2)+30; % Assumed W and converted to dBm
         powermatrix.(append('Tx',int2str(i),'pwr')) = 10*log10(squeeze(map{i})); % dBm
         powermatrix.(append('Tx',int2str(i),'loc')) = l.tx_position(:,i);
     end
@@ -152,33 +150,37 @@ if process_powermap == 1
     if show_plot ==1
         %l.visualize([],[],0);
         
-        figure(downtilt+1);clf
-        subplot(131)
+        
+        figure('Renderer', 'painters', 'Position', [10 10 1500 500]);clf
+        ax1=subplot(131);
         for b=1:no_BS
-            plot3( l.tx_position(1,b),l.tx_position(2,b),l.tx_position(3,b),...
+            f11=plot3( l.tx_position(1,b),l.tx_position(2,b),l.tx_position(3,b),...
                 '.r','Linewidth',3,'Markersize',18 );hold on;
         end
         xlabel('x (m)');ylabel('y (m)');
         grid on;box on;view(0, 90);axis square
-        imagesc('XData',x_coords,'YData',y_coords,'CData',RSRP_dBm)
-        axis([-max_xy max_xy -max_xy max_xy])                               % Plot size
+        f12=imagesc('XData',x_coords,'YData',y_coords,'CData',RSRP_dBm);
+        axis([-max_xy max_xy -max_xy max_xy])                               
+        c1 = colorbar;
+        c1.Location = 'northoutside';
+        c1.Label.String = "RSRP (dBm)";
         caxis([-140, -45]);
+        %shading interp
         %colormap(jet)
-        c = colorbar;
-        c.Location = 'northoutside';
-        c.Label.String = "RSRP (dBm)";
+
         
-        subplot(132)
+        ax2=subplot(132);
         for b=1:no_BS
-            plot3( l.tx_position(1,b),l.tx_position(2,b),l.tx_position(3,b),...
+            f21=plot3( l.tx_position(1,b),l.tx_position(2,b),l.tx_position(3,b),...
                 '.r','Linewidth',3,'Markersize',18 );hold on;
         end
         grid on;box on;view(0, 90);axis square
-        imagesc('XData',x_coords,'YData',y_coords,'CData',sector_idx)
-        axis([-max_xy max_xy -max_xy max_xy])                               % Plot size
-                c = colorbar;
-        c.Location = 'northoutside';
-        c.Label.String = "Cell index";
+        f22=imagesc('XData',x_coords,'YData',y_coords,'CData',sector_idx);
+        axis([-max_xy max_xy -max_xy max_xy])                               
+        colormap(ax2,parula(max(max(sector_idx))))
+        c2 = colorbar;
+        c2.Location = 'northoutside';
+        c2.Label.String = "Cell index";
         
         pwr = RSRP_dBm(:);
         pwr_sort = sort(pwr);
@@ -188,9 +190,10 @@ if process_powermap == 1
         for i = 1:length(xx)
             yy(i)= sum(pwr_sort<xx(i));
         end
-        subplot(133);plot(xx,100*yy/length(pwr),'-r','linewidth',3);grid on;xlabel('RSRP (dBm)');ylabel('CDF_%');axis square
-        title(sprintf('[min,max,avg]=[%0.1f,%0.1f,%0.1f]',pwr_min,pwr_max,mean(pwr)))
-    
+        ax3=subplot(133);
+        f4=plot(xx,100*yy/length(pwr),'-r','linewidth',3);
+        grid on;xlabel('RSRP (dBm)');ylabel('CDF(%)');axis square;title(sprintf('(min,max,avg)=(%0.1f,%0.1f,%0.1f)',pwr_min,pwr_max,mean(pwr)))
+        
     end
     
     if save_work ==1
