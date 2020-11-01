@@ -1,4 +1,5 @@
 function power_map_and_path_tilt(tilt)
+
 %% Calculate channels along tracks, power map over cell and generate outputs to explore AI/ML solutions
 %Edit initialize.sim file to set simulation parameters, layouts etc.
 %Requires MATLAB and QuaDriGA libraries as well as setup of RF scenarios
@@ -24,96 +25,99 @@ init_params;
 
 %FB_ratio = 10^(FB_RATIO_DB/10);
 
-if nargin>0
+if nargin > 0
     downtilt = tilt;
 end
 
 if del_builder
-    if exist([pwd,'/tracks/builder_obj.mat'], 'file')
-        delete([pwd,'/tracks/builder_obj.mat']);
+    if exist([pwd, '/tracks/builder_obj.mat'], 'file')
+        delete([pwd, '/tracks/builder_obj.mat']);
     end
 end
 
 max_xy = floor((grid_resolution*sqrt(nGrid)-1)/2);
 
-Tx_P_dBm = Tx_P_dBm-10*log10(nSC); %convert to EPRE (energy per resource element) for correct RSRP calc.
+Tx_P_dBm = Tx_P_dBm - 10 * log10(nSC); %convert to EPRE (energy per resource element) for correct RSRP calc.
 
-Tx_P = 10^(0.1*Tx_P_dBm)/1000;
+Tx_P = 10^(0.1 * Tx_P_dBm) / 1000;
 
 set_cell_layouts;
 
-tx_powers = ones(1, l.no_tx) * Tx_P_dBm;                  % assumes same power for all tx, can be changed
+tx_powers = ones(1, l.no_tx) * Tx_P_dBm; % assumes same power for all tx, can be changed
 
 %% number of receiver & specification of antenna type; length and resolution of UE track
-l.no_rx = 1;                                              % Number of UEs and tracks - one track per UE
-l.rx_array = qd_arrayant('omni');                         % Omni antennas at Rx
+l.no_rx = 1; % Number of UEs and tracks - one track per UE
+l.rx_array = qd_arrayant('omni'); % Omni antennas at Rx
 l.rx_array.center_frequency = FC;
-samp_per_meter = 0.25;                                    % samples per meter for track interpolation
-track_length = 500;                                       % track length in meters; currently same for all l.no_rx UEs
+samp_per_meter = 0.25; % samples per meter for track interpolation
+track_length = 500; % track length in meters; currently same for all l.no_rx UEs
 
-set(0,'defaultTextFontSize', 18)                        % Default Font Size
-set(0,'defaultAxesFontSize', 18)                        % Default Font Size
-set(0,'defaultAxesFontName','Times')                    % Default Font Type
-set(0,'defaultTextFontName','Times')                    % Default Font Type
-set(0,'defaultFigurePaperPositionMode','auto')          % Default Plot position
-set(0,'DefaultFigurePaperType','<custom>')              % Default Paper Type
+set(0, 'defaultTextFontSize', 18) % Default Font Size
+set(0, 'defaultAxesFontSize', 18) % Default Font Size
+set(0, 'defaultAxesFontName', 'Times') % Default Font Type
+set(0, 'defaultTextFontName', 'Times') % Default Font Type
+set(0, 'defaultFigurePaperPositionMode', 'auto') % Default Plot position
+set(0, 'DefaultFigurePaperType', '<custom>') % Default Paper Type
 tic;
+
 %% process paths if this is configure in the initialize.sim file
 if process_paths == 1
-    generate_street_tracks(l,track_length,samp_per_meter,40,70,30,200,scen); % generate the tracks along which channels will be computed
-    interpolate_positions(l.rx_track, s.samples_per_meter);   % Interpolate for simulation requirements of samples/(lambda/2)
-    calc_orientation(l.rx_track);                             % Align antenna direction with track
-    
+    generate_street_tracks(l, track_length, samp_per_meter, 40, 70, 30, 200, scen); % generate the tracks along which channels will be computed
+    interpolate_positions(l.rx_track, s.samples_per_meter); % Interpolate for simulation requirements of samples/(lambda/2)
+    calc_orientation(l.rx_track); % Align antenna direction with track
+
     % Now we create the channel coefficients. The fixing the random seed (check) guarantees repeatable results
     % (i.e. the taps will be at the same positions for both runs). Also note the significantly longer
     % computing time when drifting is enabled.
-    
+
     disp('Drifting enabled:');
-    p = l.init_builder;                                       % Create channel builders
-    gen_parameters( p );                                      % Generate small-scale fading
-    c = get_channels( p );                                    % Generate channel coefficients
-    cn = merge( c );
+    p = l.init_builder; % Create channel builders
+    gen_parameters(p); % Generate small-scale fading
+    c = get_channels(p); % Generate channel coefficients
+    cn = merge(c);
     write_track_data(cn, l.no_rx, N_SECTORS, num_interf, track_directory); % write out csv files, one per track, in track_directory
-    set(0,'DefaultFigurePaperSize',[14.5 7.3])                % Adjust paper size for plot
-    l.visualize([],[],0);                                     % Show BS and MT positions on the map
+    set(0, 'DefaultFigurePaperSize', [14.5, 7.3]) % Adjust paper size for plot
+    l.visualize([], [], 0); % Show BS and MT positions on the map
     if show_plot == 1
         plot_power;
     end
-    if save_work ==1
-        save(append(track_directory,'workspace_paths'),'p','cn','l','-v7.3') % this is in here in case we want to examine the data.
+    if save_work == 1
+        save(append(track_directory, 'workspace_paths'), 'p', 'cn', 'l', '-v7.3') % this is in here in case we want to examine the data.
     end
 end
+
 %% process power map if this is configured in the initialize.sim file
 if process_powermap == 1
-    
-    [map, x_coords, y_coords, ~] = power_map_const(l, scen{1}, usage, grid_resolution,-max_xy,max_xy,-max_xy,max_xy,ue_height, tx_powers);
-    
+
+    [map, x_coords, y_coords, ~] = power_map_const(l, scen{1}, usage, grid_resolution, -max_xy, max_xy, -max_xy, max_xy, ue_height, tx_powers);
+
     %calculate RSRP
-    r=[];
+    r = [];
     for i = 1:length(map)
-        r = cat(3,r,squeeze(mean(map{i},3)));
+        r = cat(3, r, squeeze(mean(map{i}, 3)));
     end
-    [rsrp, sector_idx] = max(r,[],3);
-    geometry_factor_dB = 10*log10(max(r,[],3)./(sum(r,3)-max(r,[],3)));
-    RSRP_dBm = 10*log10(rsrp);
-    
+    [rsrp, sector_idx] = max(r, [], 3);
+    geometry_factor_dB = 10 * log10(max(r, [], 3)./(sum(r, 3) - max(r, [], 3)));
+    RSRP_dBm = 10 * log10(rsrp);
+
     %P = 10*log10(sum(cat(3,map{:}),3));
-    
+
     % create a struct where powers over the x,y grid are available for each tx on an x,y grid
     powermatrix.x = x_coords;
     powermatrix.y = y_coords;
     powermatrix.z = ue_height;
     powermatrix.ptx = Tx_P; % power in watts
     powermatrix.downtilt = squeeze(orientations(:, 2));
+    %map is (y,x,no_rxant,no_rxant) x no_tx
     for i = 1:l.no_tx
-        powermatrix.(append('Tx',int2str(i),'pwr')) = 10*log10(squeeze(map{i})); % dBm
-        powermatrix.(append('Tx',int2str(i),'loc')) = l.tx_position(:,i);
+        powermatrix.(append('Tx', int2str(i), 'pwr')) = 10 * log10(squeeze(map{i})); % dBm
+        powermatrix.(append('Tx', int2str(i), 'loc')) = l.tx_position(:, i);
     end
-    
+
     % write out json object to file
     if save_work == 1
         jsonStr = jsonencode(powermatrix);
-        fid = fopen(append(track_directory,'powermatrix.json'), 'w');
+        fid = fopen(append(track_directory, 'powermatrix.json'), 'w');
         if fid == -1, error('Cannot create JSON file'); end
         fwrite(fid, jsonStr, 'char');
         fclose(fid);
@@ -121,126 +125,159 @@ if process_powermap == 1
             commandStr = strcat(python_path, [' make_npz_from_json.py ', 'powermatrix.json']);
             system(commandStr);
         end
-        
+
     end
-    
+
     if save_opt == 1
-        if ~exist([pwd,'/opt_data/json'], 'dir')
-            mkdir([pwd,'/opt_data/json']);
+        if ~exist([pwd, '/opt_data/json'], 'dir')
+            mkdir([pwd, '/opt_data/json']);
         end
-        if ~exist([pwd,'/opt_data/npz'], 'dir')
-            mkdir([pwd,'/opt_data/npz']);
+        if ~exist([pwd, '/opt_data/npz'], 'dir')
+            mkdir([pwd, '/opt_data/npz']);
         end
         file_name = append('powermatrixDT', num2str(round(downtilt)));
         jsonStr = jsonencode(powermatrix);
-        fid = fopen(['opt_data/json/', file_name,'.json'], 'w');
+        fid = fopen(['opt_data/json/', file_name, '.json'], 'w');
         if fid == -1, error('Cannot create JSON file'); end
         fwrite(fid, jsonStr, 'char');
         fclose(fid);
-        commandStr = sprintf('%s python_helpers/make_npz_from_json.py %s',python_path,file_name);
+        commandStr = sprintf('%s python_helpers/make_npz_from_json.py %s', python_path, file_name);
         fprintf('\tAttempting to write to NPZ file...')
         status = system(commandStr);
-        if ~(status==0)
+        if ~(status == 0)
             error('Cannot create NPZ file');
         else
             fprintf('success. \n')
         end
     end
-    
-    
-    if show_plot ==1
+
+
+    if show_plot == 1
         %l.visualize([],[],0);
-        
-        
-        figure('Renderer', 'painters', 'Position', [10 10 800 1400]);clf
-        ax1=subplot(321);
-        for b=1:no_BS
-            f11=plot3( l.tx_position(1,b),l.tx_position(2,b),l.tx_position(3,b),...
-                '.r','Linewidth',3,'Markersize',18 );hold on;
-        end
-        xlabel('x (m)');ylabel('y (m)');
-        grid on;box on;view(0, 90);axis square
-        f12=imagesc('XData',x_coords,'YData',y_coords,'CData',RSRP_dBm);
-        axis([-max_xy max_xy -max_xy max_xy])                               
+        set(0, 'defaultTextFontSize', 18) % Default Font Size
+        set(0, 'defaultAxesFontSize', 18) % Default Font Size
+        set(0, 'defaultAxesFontName', 'Helvetica') % Default Font Type
+        set(0, 'defaultTextFontName', 'Helvetica') % Default Font Type
+        set(0, 'defaultFigurePaperPositionMode', 'auto') % Default Plot position
+        set(0, 'DefaultFigurePaperType', '<custom>') % Default Paper Type
+        set(0, 'DefaultFigurePaperSize', [14.5, 6.9]) % Default Paper Size
+        set(0,'DefaultAxesTitleFontWeight','normal');
+
+        figure('Renderer', 'painters', 'Position', [1500, 10, 1000, 1000]); clf
+        ax1 = subplot(221);
+        imagesc([-max_xy, max_xy], [-max_xy, max_xy], RSRP_dBm);
         c1 = colorbar;
         c1.Location = 'northoutside';
         c1.Label.String = "RSRP (dBm)";
-        caxis([-140, -45]);
+        axis([-max_xy, max_xy, -max_xy, max_xy]);
+        axis square;
+        hold on
+        for b = 1:l.no_tx
+            plot(l.tx_position(1, b), -l.tx_position(2, b), ...
+                '.r', 'Linewidth', 3, 'Markersize', 24);
+            hold on;
+        end
+        xlabel('x (m)');
+        ylabel('y (m)');
+        grid on;
 
-        ax3=subplot(322);
+        ax3 = subplot(222);
         y = RSRP_dBm(:);
         y_sort = sort(y);
         y_min = y_sort(1);
         y_max = y_sort(end);
-        xx = linspace(y_min,y_max,50);
+        xx = linspace(y_min, y_max, 50);
         for i = 1:length(xx)
-            yy(i)= sum(y_sort<xx(i));
+            yy(i) = sum(y_sort < xx(i));
         end
-        f4=plot(xx,100*yy/length(y),'-r','linewidth',3);
-        grid on;xlabel('RSRP (dBm)');ylabel('CDF(%)');axis square;title(sprintf('(min,max,avg)=(%0.0f,%0.0f,%0.0f)',y_min,y_max,mean(y)))
-  
-        subplot(323);
-        for b=1:no_BS
-            plot3( l.tx_position(1,b),l.tx_position(2,b),l.tx_position(3,b),...
-                '.r','Linewidth',3,'Markersize',18 );hold on;
+        f4 = plot(xx, 100*yy/length(y), '-r', 'linewidth', 3);
+        grid on;
+        xlabel('RSRP (dBm)');
+        ylabel('CDF(%)');
+        axis square;
+        title(sprintf('(min,max,avg)=(%0.0f,%0.0f,%0.0f)', y_min, y_max, mean(y)))
+
+        subplot(223);
+        imagesc([-max_xy, max_xy], [-max_xy, max_xy], geometry_factor_dB);
+        caxis([-5, 20]);
+        c1 = colorbar;
+        c1.Location = 'northoutside';
+        c1.Label.String = "Geometry factor (dB)";
+        axis([-max_xy, max_xy, -max_xy, max_xy]);
+        axis square;
+        hold on
+        for b = 1:l.no_tx
+            plot(l.tx_position(1, b), -l.tx_position(2, b), ...
+                '.r', 'Linewidth', 3, 'Markersize', 24);
+            hold on;
         end
-        grid on;box on;view(0, 90);axis square
-        imagesc('XData',x_coords,'YData',y_coords,'CData',geometry_factor_dB);
-        axis([-max_xy max_xy -max_xy max_xy])
-        c2 = colorbar;
-        c2.Location = 'northoutside';
-        c2.Label.String = "Geometry factor (dB)";
-        
-        subplot(324);
+        xlabel('x (m)');
+        ylabel('y (m)');
+        grid on;
+
+        subplot(224);
         y = geometry_factor_dB(:);
         y_sort = sort(y);
         y_min = y_sort(1);
         y_max = y_sort(end);
-        xx = linspace(y_min,y_max,50);
+        xx = linspace(y_min, y_max, 50);
         for i = 1:length(xx)
-            yy(i)= sum(y_sort<xx(i));
+            yy(i) = sum(y_sort < xx(i));
         end
-        plot(xx,100*yy/length(y),'-r','linewidth',3);
-        grid on;xlabel('Geometry factor (dB)');ylabel('CDF(%)');axis square;title(sprintf('(min,max,avg)=(%0.0f,%0.0f,%0.0f)',y_min,y_max,mean(y)))
-  
-        
-        ax2=subplot(325);
-        for b=1:no_BS
-            f21=plot3( l.tx_position(1,b),l.tx_position(2,b),l.tx_position(3,b),...
-                '.r','Linewidth',3,'Markersize',18 );hold on;
-        end
-        grid on;box on;view(0, 90);axis square
-        f22=imagesc('XData',x_coords,'YData',y_coords,'CData',sector_idx);
-        axis([-max_xy max_xy -max_xy max_xy])                               
-        colormap(ax2,parula(max(max(sector_idx))))
-        c2 = colorbar;
-        c2.Location = 'northoutside';
-        c2.Label.String = "Cell index";
-        
-        subplot(326);
-        y = sector_idx(:);
-        y_sort = sort(y);
-        y_min = y_sort(1);
-        y_max = y_sort(end);
-        xx = y_min:y_max;
-        yy=zeros(1,length(xx));
-        for i = 1:length(xx)
-            yy(i)= sum(y_sort<=xx(i));
-        end
-        stem(xx,100*yy/length(y),'.r','linewidth',3);
-        grid on;xlabel('Cell index');ylabel('CDF(%)');axis square;title(sprintf('(min,max,avg)=(%d,%d,%.0f)',y_min,y_max,mean(y)))
-  
-        
-        
-              
+        plot(xx, 100*yy/length(y), '-r', 'linewidth', 3);
+        grid on;
+        xlabel('Geometry factor (dB)');
+        ylabel('CDF(%)');
+        axis square;
+        title(sprintf('(min,max,avg)=(%0.0f,%0.0f,%0.0f)', y_min, y_max, mean(y)))
+
+        %
+        %         figure();
+        %         ax2 = subplot(121);
+        %         imagesc([-max_xy, max_xy], [-max_xy, max_xy], sector_idx);
+        %         c1 = colorbar;
+        %         colormap(ax2, parula(max(max(sector_idx))))
+        %         %caxis([-120, -60]);
+        %         c1.Location = 'northoutside';
+        %         c1.Label.String = "Cell index";
+        %         axis([-max_xy, max_xy, -max_xy, max_xy]);
+        %         axis square;
+        %         hold on
+        %         for b = 1:l.no_tx
+        %             plot(l.tx_position(1, b), -l.tx_position(2, b), ...
+        %                 '.r', 'Linewidth', 3, 'Markersize', 24);
+        %             hold on;
+        %         end
+        %         xlabel('x (m)');
+        %         ylabel('y (m)');
+        %         grid on;
+        %
+        %         subplot(122);
+        %         y = sector_idx(:);
+        %         y_sort = sort(y);
+        %         y_min = y_sort(1);
+        %         y_max = y_sort(end);
+        %         xx = y_min:y_max;
+        %         yy = zeros(1, length(xx));
+        %         for i = 1:length(xx)
+        %             yy(i) = sum(y_sort <= xx(i));
+        %         end
+        %         stem(xx, 100*yy/length(y), '.r', 'linewidth', 3);
+        %         grid on;
+        %         xlabel('Cell index');
+        %         ylabel('CDF(%)');
+        %         axis square;
+        %         title(sprintf('(min,max,avg)=(%d,%d,%.0f)', y_min, y_max, mean(y)))
+
     end
-    
-    if save_work ==1
-        save(append(track_directory,'workspace_map'),'map','x_coords','y_coords','-v7.3') % this is in here in case we want to examine the data.
+
+    if save_work == 1
+        save(append(track_directory, 'workspace_map'), 'map', 'x_coords', 'y_coords', '-v7.3') % this is in here in case we want to examine the data.
     end
-    
+
 end
 
-fprintf('\n\t[Sim runtime = %1.0f min]\n',toc/60)
+fprintf('\n\t[Sim runtime: %.1f s = %1.1f min]\n',toc, toc/60)
+MBeautify.formatCurrentEditorPage()
 
 return

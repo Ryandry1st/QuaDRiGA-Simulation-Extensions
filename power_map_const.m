@@ -1,5 +1,5 @@
-function [ map, x_coords, y_coords, p_builder] = power_map_const( h_layout, scenario, usage, sample_distance, ...
-    x_min, x_max, y_min, y_max, rx_height, tx_power, i_freq )
+function [map, x_coords, y_coords, p_builder] = power_map_const(h_layout, scenario, usage, sample_distance, ...
+    x_min, x_max, y_min, y_max, rx_height, tx_power, i_freq)
 %POWER_MAP Calculates a power-map for the given layout.
 %
 % Calling object:
@@ -85,18 +85,18 @@ function [ map, x_coords, y_coords, p_builder] = power_map_const( h_layout, scen
 % The QuaDRiGa Channel Model. You should have received a copy of the Software License for The
 % QuaDRiGa Channel Model along with QuaDRiGa. If not, see <http://quadriga-channel-model.de/>.
 
-if numel( h_layout ) > 1
-    error('QuaDRiGa:qd_layout:power_map','power_map not definded for object arrays.');
+if numel(h_layout) > 1
+    error('QuaDRiGa:qd_layout:power_map', 'power_map not definded for object arrays.');
 else
-    h_layout = h_layout(1,1); % workaround for octave
+    h_layout = h_layout(1, 1); % workaround for octave
 end
 
 % Set the usage mode
-if exist( 'usage' , 'var' ) && ~isempty(  usage )
-    if strcmp( usage , 'sf' ) ||...
-            strcmp( usage , 'detailed' ) ||...
-            strcmp( usage , 'quick' ) ||...
-            strcmp( usage , 'phase' )
+if exist('usage', 'var') && ~isempty(usage)
+    if strcmp(usage, 'sf') || ...
+            strcmp(usage, 'detailed') || ...
+            strcmp(usage, 'quick') || ...
+            strcmp(usage, 'phase')
         % OK
     else
         error('Usage scenario not supported.')
@@ -105,31 +105,31 @@ else
     usage = 'quick';
 end
 
-if ~exist( 'sample_distance' , 'var' ) || isempty( sample_distance )
+if ~exist('sample_distance', 'var') || isempty(sample_distance)
     sample_distance = 10;
 end
 
 % Check if tx-power is given
-if ~exist( 'tx_power','var' ) || isempty( tx_power )
+if ~exist('tx_power', 'var') || isempty(tx_power)
     tx_power = zeros(1, h_layout.no_tx);
-elseif numel( tx_power ) == 1 && isreal( tx_power )
-    tx_power = ones( 1,h_layout.no_tx ) * tx_power;
-elseif any( size(tx_power) ~= [1 h_layout.no_tx] )
-    error(['??? Number of columns in "tx_power" must match the number',...
+elseif numel(tx_power) == 1 && isreal(tx_power)
+    tx_power = ones(1, h_layout.no_tx) * tx_power;
+elseif any(size(tx_power) ~= [1, h_layout.no_tx])
+    error(['??? Number of columns in "tx_power" must match the number', ...
         ' of transmitters in the layout.'])
-elseif isnumeric( tx_power ) && isreal( tx_power )
+elseif isnumeric(tx_power) && isreal(tx_power)
     % OK
 else
     error('??? "tx_power" has wrong format.')
 end
 
 % Check if rx_height is given
-if ~exist( 'rx_height' , 'var' ) || isempty( rx_height )
+if ~exist('rx_height', 'var') || isempty(rx_height)
     rx_height = 1.5;
 end
 
 % Check if i_freq is given
-if ~exist( 'i_freq' , 'var' ) || isempty( i_freq )
+if ~exist('i_freq', 'var') || isempty(i_freq)
     i_freq = 1;
 end
 
@@ -149,91 +149,91 @@ catch
 end
 
 if nargin <= 4
-    x_min = min( h_layout.tx_position(1,:));
-    y_max = max( h_layout.tx_position(2,:));
-    x_max = max( h_layout.tx_position(1,:));
-    y_min = min( h_layout.tx_position(2,:));
-    
-    extend = max( [ 0.33*(x_max-x_min) , 0.33*(y_max-y_min) , 200 ] );
-    
-    x_min = floor( (x_min - extend)/sample_distance )*sample_distance;
-    x_max = ceil(  (x_max + extend)/sample_distance )*sample_distance;
-    y_max = ceil(  (y_max + extend)/sample_distance )*sample_distance;
-    y_min = floor( (y_min - extend)/sample_distance )*sample_distance;
+    x_min = min(h_layout.tx_position(1, :));
+    y_max = max(h_layout.tx_position(2, :));
+    x_max = max(h_layout.tx_position(1, :));
+    y_min = min(h_layout.tx_position(2, :));
+
+    extend = max([0.33 * (x_max - x_min), 0.33 * (y_max - y_min), 200]);
+
+    x_min = floor((x_min - extend)/sample_distance) * sample_distance;
+    x_max = ceil((x_max + extend)/sample_distance) * sample_distance;
+    y_max = ceil((y_max + extend)/sample_distance) * sample_distance;
+    y_min = floor((y_min - extend)/sample_distance) * sample_distance;
 end
 
 
 % Get the sample grid in x and y direction
-x_coords = x_min : sample_distance : x_max;
-y_coords = y_min : sample_distance : y_max;
+x_coords = x_min:sample_distance:x_max;
+y_coords = y_max:-sample_distance:y_min;
 
 n_x_coords = numel(x_coords);
 n_y_coords = numel(y_coords);
-n_coords  = n_x_coords*n_y_coords;
+n_coords = n_x_coords * n_y_coords;
 
 n_bs = h_layout.no_tx;
 
-for i_bs = 1 : n_bs
-    p_builder(1, i_bs).tx_array(1, :) = h_layout.tx_array(1,i_bs);
+for i_bs = 1:n_bs
+    p_builder(1, i_bs).tx_array(1, :) = h_layout.tx_array(1, i_bs);
 end
 
 
-if strcmp( usage , 'sf' )
+if strcmp(usage, 'sf')
     % Calculate parameter maps
-    init_sos( p_builder );
+    init_sos(p_builder);
     usage = 'quick';
 end
 
-map = cell(1,n_bs);
+map = cell(1, n_bs);
 
 switch usage
     case 'quick'
-        for i_bs = 1 : n_bs
+        for i_bs = 1:n_bs
             %h_channel = channel_builder.get_los_channels(h_builder(1,i_bs));
-            coeff = get_los_channels( p_builder(1,i_bs), 'single','coeff');
-            
+            coeff = get_los_channels(p_builder(1, i_bs), 'single', 'coeff');
+
             pow = permute(abs(coeff).^2, [3, 1, 2]);
-            pow = reshape(pow, n_x_coords, n_y_coords, size( coeff, 1 ), size( coeff, 2 ));
+            pow = reshape(pow, n_x_coords, n_y_coords, size(coeff, 1), size(coeff, 2));
             pow = permute(pow, [2, 1, 3, 4]);
-            
+
             % Add tx_power
-            pow = pow .* 10.^( 0.1*tx_power( i_bs ) );
-            
+            pow = pow .* 10.^(0.1 * tx_power(i_bs));
+
             map{i_bs} = pow;
-            
+
         end
-        
+
     case 'phase'
         for i_bs = 1:n_bs
-            coeff = get_los_channels( p_builder(1,i_bs), 'single','coeff');
-            
-            cf = permute( coeff , [3,1,2] );
-            cf = reshape( cf , n_x_coords , n_y_coords , size( coeff, 1 ), size( coeff, 2 ) );
-            cf = permute(cf,[2,1,3,4]);
-            
+            coeff = get_los_channels(p_builder(1, i_bs), 'single', 'coeff');
+
+            cf = permute(coeff, [3, 1, 2]);
+            cf = reshape(cf , n_x_coords , n_y_coords , size(coeff, 1), size(coeff, 2));
+            cf = permute(cf, [2, 1, 3, 4]);
+
             % Add tx_power
-            cf = cf .* sqrt( 10.^( 0.1*tx_power( i_bs ) ) );
-            
+            cf = cf .* sqrt(10.^(0.1 * tx_power(i_bs)));
+
             map{i_bs} = cf;
         end
-        
+
     case 'detailed'
         % Calculate the maps
-        for i_bs = 1 : n_bs
+        for i_bs = 1:n_bs
             % Calculate channels
-            h_channel = get_channels( p_builder(1,i_bs) );
-            
-            pow = zeros( n_coords, h_channel(1,1).no_rxant , h_channel(1,1).no_txant );
+            h_channel = get_channels(p_builder(1, i_bs));
+
+            pow = zeros(n_coords, h_channel(1, 1).no_rxant, h_channel(1, 1).no_txant);
             for n = 1:n_coords
-                tmp = abs(h_channel(1,n).coeff(:,:,:,1)).^2;
-                pow(n,:,:) = sum(tmp,3);
+                tmp = abs(h_channel(1, n).coeff(:, :, :, 1)).^2;
+                pow(n, :, :) = sum(tmp, 3);
             end
-            pow = reshape( pow , n_x_coords , n_y_coords , h_channel(1).no_rxant , h_channel(1).no_txant );
-            pow = permute(pow,[2,1,3,4]);
-            
+            pow = reshape(pow, n_x_coords, n_y_coords, h_channel(1).no_rxant, h_channel(1).no_txant);
+            pow = permute(pow, [2, 1, 3, 4]);
+
             % Add tx_power
-            pow = pow .* 10.^( 0.1*tx_power( i_bs ) );
-            
+            pow = pow .* 10.^(0.1 * tx_power(i_bs));
+
             map{i_bs} = pow;
         end
 end

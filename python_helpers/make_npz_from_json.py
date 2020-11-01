@@ -8,8 +8,8 @@ json_file = "/"+sys.argv[1]
 #filepath=(Path(__file__).parent.absolute())
 filepath=(Path().absolute())
 
-fn_json = str(filepath)+"/opt_data/json/"+json_file+".json"
-fn_npz = str(filepath)+"/opt_data/npz/"+json_file+".npz"
+fn_json = str(filepath)+"/saved_data/json/"+json_file+".json"
+fn_npz = str(filepath)+"/saved_data/npz/"+json_file+".npz"
 
 with open(fn_json, "r") as f:
     pmap = json.load(f)
