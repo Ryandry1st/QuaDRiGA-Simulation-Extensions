@@ -1,11 +1,11 @@
-%clc;
+clc;
 clear all;
-%close all;
+close all;
 
 rng('default');
 rng(0);
 
-tilts = 5:1:5;
+tilts = 5:1:7;
 
 for j = 1:length(tilts)
 

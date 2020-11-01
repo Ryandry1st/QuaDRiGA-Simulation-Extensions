@@ -136,15 +136,18 @@ end
 try
     fprintf('\tLoading old builder object...');
     if ismac
-        load('tracks/builder_obj.mat');
+        load('savedTracks/builder_obj.mat');
     else
-        load('tracks\builder_obj.mat');
+        load('savedTracks\builder_obj.mat');
     end
     fprintf('Success.\n');
 catch
     fprintf('Could not find a builder object at tracks/builder_obj.mat -> making a new builder...\n')
     [map, x_coords, y_coords, p_builder] = h_layout.power_map(scenario, usage, sample_distance, x_min, x_max, y_min, y_max, rx_height, tx_power, i_freq);
-    save('tracks/builder_obj.mat', '-v7.3', 'p_builder');
+    if ~exist([pwd, '/savedTracks'], 'dir')
+        mkdir(pwd, '/savedTracks');
+    end
+    save('savedTracks/builder_obj.mat', '-v7.3', 'p_builder');
     return
 end
 
@@ -156,10 +159,10 @@ if nargin <= 4
 
     extend = max([0.33 * (x_max - x_min), 0.33 * (y_max - y_min), 200]);
 
-    x_min = floor((x_min - extend)/sample_distance) * sample_distance;
-    x_max = ceil((x_max + extend)/sample_distance) * sample_distance;
-    y_max = ceil((y_max + extend)/sample_distance) * sample_distance;
-    y_min = floor((y_min - extend)/sample_distance) * sample_distance;
+    x_min = floor((x_min-extend)/sample_distance) * sample_distance;
+    x_max = ceil((x_max+extend)/sample_distance) * sample_distance;
+    y_max = ceil((y_max+extend)/sample_distance) * sample_distance;
+    y_min = floor((y_min-extend)/sample_distance) * sample_distance;
 end
 
 

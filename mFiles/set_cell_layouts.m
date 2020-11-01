@@ -26,14 +26,14 @@ switch BS_drop
 
         fprintf('\tLoading CSV file...')
         % Read the csv file for BS locations and sector orientations using the python helper functions
-        commandStr = sprintf('%s python_helpers/Tx_Information_from_csv.py %s', python_path, fixed_cvs_file);
+        commandStr = sprintf('%s pyScripts/Tx_Information_from_csv.py %s', python_path, fixed_cvs_file);
         [status, output] = system(commandStr);
         locs = str2num(output);
         if (size(locs) < 1)
             disp("There was a problem with your python, traceback:");
             error(output)
         end
-        commandStr = sprintf('%s python_helpers/Tx_Sector_Information_from_csv.py %s', python_path, fixed_cvs_file);
+        commandStr = sprintf('%s pyScripts/Tx_Sector_Information_from_csv.py %s', python_path, fixed_cvs_file);
         [status, output] = system(commandStr);
         if status == 0
             fprintf('success.\n')
@@ -71,24 +71,24 @@ fprintf('\n')
 
 % if isempty(orientations)
 %     if random_ori_azi
-%         ori_azi = -180 + 360 * rand(no_BS*N_SECTORS, 1);
+%         ori_azi = -180 + 360 * rand(no_BS*no_sectors, 1);
 %     else
-%         ori_azi = repmat(0:floor(360/N_SECTORS):360-floor(360/N_SECTORS),1,no_BS).'+0;
+%         ori_azi = repmat(0:floor(360/no_sectors):360-floor(360/no_sectors),1,no_BS).'+0;
 %     end
 %
-%     ori_dt = zeros(no_BS*N_SECTORS, 1);
+%     ori_dt = zeros(no_BS*no_sectors, 1);
 %
 %     orientations = [ori_azi, ori_dt];
 % end
 
 % tx array
 if isempty(orientations)
-    ori_azi = repmat((0:floor(360 / N_SECTORS):360-floor(360 / N_SECTORS)), 1, no_BS).' + 30;
+    ori_azi = repmat((0:floor(360 / no_sectors):360-floor(360 / no_sectors)), 1, no_BS).' + 30;
     ori_azi(ori_azi > 180) = ori_azi(ori_azi > 180) - 360;
     if random_ori_azi
-        ori_azi = -180 + 360 * rand(no_BS*N_SECTORS, 1);
+        ori_azi = -180 + 360 * rand(no_BS*no_sectors, 1);
     end
-    ori_dt = downtilt * ones(no_BS*N_SECTORS, 1);
+    ori_dt = downtilt * ones(no_BS*no_sectors, 1);
     orientations = [ori_azi, ori_dt];
 end
 
@@ -114,7 +114,7 @@ num_interf = l.no_tx - 1; % number of interfering bases stations
 % Use csv defined orientations and downtilts
 if downtilt == -1
     for i = 1:l.no_tx
-        index = N_SECTORS * (i - 1) + 1;
+        index = no_sectors * (i - 1) + 1;
         switch tx_antenna_type
             case '3gpp-macro'
                 l.tx_array(i) = qd_arrayant(tx_antenna_type, tx_antenna_3gpp_macro.phi_3dB, tx_antenna_3gpp_macro.theta_3dB, tx_antenna_3gpp_macro.rear_gain, orientations(index, 2));
@@ -125,7 +125,7 @@ if downtilt == -1
         l.tx_array(i).rotate_pattern(orientations(index, 1), 'z');
         fprintf('antenna %d sector 1 with dt = %d and azi = %d \n', i, orientations(index, 2), orientations(index, 1));
 
-        for j = 1:N_SECTORS - 1
+        for j = 1:no_sectors - 1
             switch tx_antenna_type
                 case '3gpp-macro'
                     a = qd_arrayant(tx_antenna_type, tx_antenna_3gpp_macro.phi_3dB, tx_antenna_3gpp_macro.theta_3dB, tx_antenna_3gpp_macro.rear_gain, orientations(index + j, 2));
@@ -150,10 +150,10 @@ else
                 case '3gpp-3d'
                     l.tx_array(i) = qd_arrayant(tx_antenna_type, tx_antenna_3gpp_3d.M, tx_antenna_3gpp_3d.N, tx_antenna_3gpp_3d.center_freq, tx_antenna_3gpp_3d.pol, downtilt, tx_antenna_3gpp_3d.spacing);
             end
-            
+
             l.tx_array(i).rotate_pattern(orientations(index, 1), 'z');
-            
-            for j = 1:N_SECTORS - 1
+
+            for j = 1:no_sectors - 1
 
                 switch tx_antenna_type
                     case '3gpp-macro'

@@ -1,15 +1,15 @@
 import numpy as np
-from pathlib import Path
 import json
 import sys
+from pathlib import Path
 
 json_file = "/"+sys.argv[1]
 
 #filepath=(Path(__file__).parent.absolute())
 filepath=(Path().absolute())
 
-fn_json = str(filepath)+"/saved_data/json/"+json_file+".json"
-fn_npz = str(filepath)+"/saved_data/npz/"+json_file+".npz"
+fn_json = str(filepath)+"/savedResults/json/"+json_file+".json"
+fn_npz = str(filepath)+"/savedResults/npz/"+json_file+".npz"
 
 with open(fn_json, "r") as f:
     pmap = json.load(f)

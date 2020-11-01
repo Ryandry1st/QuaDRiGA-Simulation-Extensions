@@ -30,8 +30,8 @@ if nargin > 0
 end
 
 if del_builder
-    if exist([pwd, '/tracks/builder_obj.mat'], 'file')
-        delete([pwd, '/tracks/builder_obj.mat']);
+    if exist([pwd, '/savedTracks/builder_obj.mat'], 'file')
+        delete([pwd, '/savedTracks/builder_obj.mat']);
     end
 end
 
@@ -65,17 +65,17 @@ if process_paths == 1
     generate_street_tracks(l, track_length, samp_per_meter, 40, 70, 30, 200, scen); % generate the tracks along which channels will be computed
     interpolate_positions(l.rx_track, s.samples_per_meter); % Interpolate for simulation requirements of samples/(lambda/2)
     calc_orientation(l.rx_track); % Align antenna direction with track
-
+    
     % Now we create the channel coefficients. The fixing the random seed (check) guarantees repeatable results
     % (i.e. the taps will be at the same positions for both runs). Also note the significantly longer
     % computing time when drifting is enabled.
-
+    
     disp('Drifting enabled:');
     p = l.init_builder; % Create channel builders
     gen_parameters(p); % Generate small-scale fading
     c = get_channels(p); % Generate channel coefficients
     cn = merge(c);
-    write_track_data(cn, l.no_rx, N_SECTORS, num_interf, track_directory); % write out csv files, one per track, in track_directory
+    write_track_data(cn, l.no_rx, no_sectors, num_interf, track_directory); % write out csv files, one per track, in track_directory
     set(0, 'DefaultFigurePaperSize', [14.5, 7.3]) % Adjust paper size for plot
     l.visualize([], [], 0); % Show BS and MT positions on the map
     if show_plot == 1
@@ -88,9 +88,9 @@ end
 
 %% process power map if this is configured in the initialize.sim file
 if process_powermap == 1
-
+    
     [map, x_coords, y_coords, ~] = power_map_const(l, scen{1}, usage, grid_resolution, -max_xy, max_xy, -max_xy, max_xy, ue_height, tx_powers);
-
+    
     %calculate RSRP
     r = [];
     for i = 1:length(map)
@@ -99,9 +99,9 @@ if process_powermap == 1
     [rsrp, sector_idx] = max(r, [], 3);
     geometry_factor_dB = 10 * log10(max(r, [], 3)./(sum(r, 3) - max(r, [], 3)));
     RSRP_dBm = 10 * log10(rsrp);
-
+    
     %P = 10*log10(sum(cat(3,map{:}),3));
-
+    
     % create a struct where powers over the x,y grid are available for each tx on an x,y grid
     powermatrix.x = x_coords;
     powermatrix.y = y_coords;
@@ -113,45 +113,31 @@ if process_powermap == 1
         powermatrix.(append('Tx', int2str(i), 'pwr')) = 10 * log10(squeeze(map{i})); % dBm
         powermatrix.(append('Tx', int2str(i), 'loc')) = l.tx_position(:, i);
     end
-
-    % write out json object to file
-    if save_work == 1
-        jsonStr = jsonencode(powermatrix);
-        fid = fopen(append(track_directory, 'powermatrix.json'), 'w');
-        if fid == -1, error('Cannot create JSON file'); end
-        fwrite(fid, jsonStr, 'char');
-        fclose(fid);
-        if save_npz == 1
-            commandStr = strcat(python_path, [' make_npz_from_json.py ', 'powermatrix.json']);
-            system(commandStr);
-        end
-
+    
+if save_results == 1
+    if ~exist([pwd, '/savedResults/json'], 'dir')
+        mkdir([pwd, '/savedResults/json']);
     end
-
-    if save_opt == 1
-        if ~exist([pwd, '/opt_data/json'], 'dir')
-            mkdir([pwd, '/opt_data/json']);
-        end
-        if ~exist([pwd, '/opt_data/npz'], 'dir')
-            mkdir([pwd, '/opt_data/npz']);
-        end
-        file_name = append('powermatrixDT', num2str(round(downtilt)));
-        jsonStr = jsonencode(powermatrix);
-        fid = fopen(['opt_data/json/', file_name, '.json'], 'w');
-        if fid == -1, error('Cannot create JSON file'); end
-        fwrite(fid, jsonStr, 'char');
-        fclose(fid);
-        commandStr = sprintf('%s pyHelpers/make_npz_from_json.py %s', python_path, file_name);
-        fprintf('\tAttempting to write to NPZ file...')
-        status = system(commandStr);
-        if ~(status == 0)
-            error('Cannot create NPZ file');
-        else
-            fprintf('success. \n')
-        end
+    if ~exist([pwd, '/savedResults/npz'], 'dir')
+        mkdir([pwd, '/savedResults/npz']);
     end
-
-
+    file_name = append('powermatrixDT', num2str(round(downtilt)));
+    jsonStr = jsonencode(powermatrix);
+    fid = fopen(['savedResults/json/', file_name, '.json'], 'w');
+    if fid == -1, error('Cannot create JSON file'); end
+    fwrite(fid, jsonStr, 'char');
+    fclose(fid);
+    commandStr = sprintf('%s pyScripts/make_npz_from_json.py %s', python_path, file_name);
+    fprintf('\tAttempting to write to NPZ file...')
+    status = system(commandStr);
+    if ~(status == 0)
+        error('Cannot create NPZ file!');
+    else
+        fprintf('success.\n')
+    end
+end
+    
+    
     if show_plot == 1
         %l.visualize([],[],0);
         set(0, 'defaultTextFontSize', 18) % Default Font Size
@@ -161,8 +147,8 @@ if process_powermap == 1
         set(0, 'defaultFigurePaperPositionMode', 'auto') % Default Plot position
         set(0, 'DefaultFigurePaperType', '<custom>') % Default Paper Type
         set(0, 'DefaultFigurePaperSize', [14.5, 6.9]) % Default Paper Size
-        set(0,'DefaultAxesTitleFontWeight','normal');
-
+        set(0, 'DefaultAxesTitleFontWeight', 'normal');
+        
         figure('Renderer', 'painters', 'Position', [1500, 10, 1000, 1000]); clf
         ax1 = subplot(221);
         imagesc([-max_xy, max_xy], [-max_xy, max_xy], RSRP_dBm);
@@ -180,7 +166,7 @@ if process_powermap == 1
         xlabel('x (m)');
         ylabel('y (m)');
         grid on;
-
+        
         ax3 = subplot(222);
         y = RSRP_dBm(:);
         y_sort = sort(y);
@@ -196,7 +182,7 @@ if process_powermap == 1
         ylabel('CDF(%)');
         axis square;
         title(sprintf('(min,max,avg)=(%0.0f,%0.0f,%0.0f)', y_min, y_max, mean(y)))
-
+        
         subplot(223);
         imagesc([-max_xy, max_xy], [-max_xy, max_xy], geometry_factor_dB);
         caxis([-5, 20]);
@@ -214,7 +200,7 @@ if process_powermap == 1
         xlabel('x (m)');
         ylabel('y (m)');
         grid on;
-
+        
         subplot(224);
         y = geometry_factor_dB(:);
         y_sort = sort(y);
@@ -231,53 +217,54 @@ if process_powermap == 1
         axis square;
         title(sprintf('(min,max,avg)=(%0.0f,%0.0f,%0.0f)', y_min, y_max, mean(y)))
 
-        %
-        %         figure();
-        %         ax2 = subplot(121);
-        %         imagesc([-max_xy, max_xy], [-max_xy, max_xy], sector_idx);
-        %         c1 = colorbar;
-        %         colormap(ax2, parula(max(max(sector_idx))))
-        %         %caxis([-120, -60]);
-        %         c1.Location = 'northoutside';
-        %         c1.Label.String = "Cell index";
-        %         axis([-max_xy, max_xy, -max_xy, max_xy]);
-        %         axis square;
-        %         hold on
-        %         for b = 1:l.no_tx
-        %             plot(l.tx_position(1, b), -l.tx_position(2, b), ...
-        %                 '.r', 'Linewidth', 3, 'Markersize', 24);
-        %             hold on;
-        %         end
-        %         xlabel('x (m)');
-        %         ylabel('y (m)');
-        %         grid on;
-        %
-        %         subplot(122);
-        %         y = sector_idx(:);
-        %         y_sort = sort(y);
-        %         y_min = y_sort(1);
-        %         y_max = y_sort(end);
-        %         xx = y_min:y_max;
-        %         yy = zeros(1, length(xx));
-        %         for i = 1:length(xx)
-        %             yy(i) = sum(y_sort <= xx(i));
-        %         end
-        %         stem(xx, 100*yy/length(y), '.r', 'linewidth', 3);
-        %         grid on;
-        %         xlabel('Cell index');
-        %         ylabel('CDF(%)');
-        %         axis square;
-        %         title(sprintf('(min,max,avg)=(%d,%d,%.0f)', y_min, y_max, mean(y)))
-
+        figure();
+        ax2 = subplot(121);
+        imagesc([-max_xy, max_xy], [-max_xy, max_xy], sector_idx);
+        c1 = colorbar;
+        colormap(ax2, parula(max(max(sector_idx))))
+        %caxis([-120, -60]);
+        c1.Location = 'northoutside';
+        c1.Label.String = "Cell index";
+        axis([-max_xy, max_xy, -max_xy, max_xy]);
+        axis square;
+        hold on
+        for b = 1:l.no_tx
+            plot(l.tx_position(1, b), -l.tx_position(2, b), ...
+                '.r', 'Linewidth', 3, 'Markersize', 24);
+            hold on;
+        end
+        xlabel('x (m)');
+        ylabel('y (m)');
+        grid on;
+        
+        subplot(122);
+        y = sector_idx(:);
+        y_sort = sort(y);
+        y_min = y_sort(1);
+        y_max = y_sort(end);
+        xx = y_min:y_max;
+        yy = zeros(1, length(xx));
+        for i = 1:length(xx)
+            yy(i) = sum(y_sort <= xx(i));
+        end
+        stem(xx, 100*yy/length(y), '.r', 'linewidth', 3);
+        grid on;
+        xlabel('Cell index');
+        ylabel('CDF(%)');
+        axis square;
+        title(sprintf('(min,max,avg)=(%d,%d,%.0f)', y_min, y_max, mean(y)))
+        
     end
-
+    
     if save_work == 1
         save(append(track_directory, 'workspace_map'), 'map', 'x_coords', 'y_coords', '-v7.3') % this is in here in case we want to examine the data.
     end
-
+    
 end
 
-fprintf('\n\t[Sim runtime: %.1f s = %1.1f min]\n',toc, toc/60)
-MBeautify.formatCurrentEditorPage()
+fprintf('\n[Sim runtime: %.1f s = %1.1f min]\n', toc, toc/60)
+if clean_code
+    MBeautify.formatCurrentEditorPage()
+end
 
 return
