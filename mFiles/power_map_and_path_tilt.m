@@ -141,7 +141,7 @@ if process_powermap == 1
         if fid == -1, error('Cannot create JSON file'); end
         fwrite(fid, jsonStr, 'char');
         fclose(fid);
-        commandStr = sprintf('%s python_helpers/make_npz_from_json.py %s', python_path, file_name);
+        commandStr = sprintf('%s pyHelpers/make_npz_from_json.py %s', python_path, file_name);
         fprintf('\tAttempting to write to NPZ file...')
         status = system(commandStr);
         if ~(status == 0)
