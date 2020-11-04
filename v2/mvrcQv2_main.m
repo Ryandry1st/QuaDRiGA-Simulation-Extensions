@@ -31,19 +31,19 @@ s.show_progress_bars = 1; % Enable / disable status display
 s.use_absolute_delays = 1;
 
 % flags
-save_results = 1;
-save_layout = 1;
+save_results = 0;
+save_layout = 0;
 show_plot = 1;
 random_ori_azi = 0;
 clean_code = 1;
 
 % layout
 no_rx_min = 10000;
-no_tx = 4;
+no_tx = 1;
 sample_distance = 10;
-BS_drop = "csv"; %hex, rnd, csv
+BS_drop = "hex"; %hex, rnd, csv
 downtilt = 5;
-isd = 50;
+isd = 100;
 tx_pwr_dBm = 46;
 nSC = 600;
 rx_height = 1.5;
@@ -83,11 +83,14 @@ tx_antenna_type = '3gpp-3d';
 %           6. K=M, +/-45 degree polarized elements
 %      * tilt - The electric downtilt angle in [deg] for pol = 4,5,6
 %      * spacing - Element spacing in [λ], Default: 0.5
+
+downtilt = -downtilt; %Quadriga uses positive tilt to point "upward" so we have to negate to point "downward".
+
 tx_antenna_3gpp_3d.M = 2;
 tx_antenna_3gpp_3d.N = 1;
 tx_antenna_3gpp_3d.center_freq = s.center_frequency;
 tx_antenna_3gpp_3d.pol = 4;
-tx_antenna_3gpp_3d.tilt = 15;
+tx_antenna_3gpp_3d.tilt = -15;
 tx_antenna_3gpp_3d.spacing = 0.5;
 
 % BS antenna configuration
@@ -268,8 +271,7 @@ for ir = 1:l.no_rx % Extract effective PG vor each BS-MT link
     end
 end
 
-%coupling_loss = zeros(l.no_rx,1); % Calculate the coupling loss from the effective PG
-
+% Calculate the coupling loss from the effective PG
 coupling_loss = 10 * log10(max(pg_eff(:, :), [], 2));
 coupling_loss_2d = reshape(coupling_loss, n_y_coords, n_x_coords);
 
@@ -357,11 +359,24 @@ end
 
 if show_plot
 
+    %Antenna element vertical radiation pattern (dB)
+    theta = tx_array_3GPP_3d.elevation_grid.' * 180 / pi;
+    % Antenna element horizontal radiation pattern (dB)
+    phi = tx_array_3GPP_3d.azimuth_grid * 180 / pi;
+    figure(100);
+    clf;
+    meshc(phi, theta, 10*log10(abs(tx_array_3GPP_3d.Fa).^2));
+    xlabel('\phi');
+    ylabel('\theta');
+    zlabel('A(\theta,\phi) (dB)');
+    title('Antenna pattern');
+    colorbar;
+    view([45, 45])
+
+    figure('Renderer', 'painters', 'Position', [10, 10, 1000, 1500]); clf
     % Cell ID
     %Heatmap
-    figure;
-    clf;
-    subplot(121);
+    subplot(321)
     imagesc([x_min, x_max], [y_min, y_max], cell_id);
     c1 = colorbar;
     c1.Location = 'northoutside';
@@ -379,59 +394,64 @@ if show_plot
     grid on;
 
     %CDF
-    subplot(122);
-    cdf_data = cell_id(:);
-    cdf_data_min = min(cdf_data);
-    cdf_data_max = max(cdf_data);
-    cdf_data_mean = mean(cdf_data);
-    bins = cdf_data_min:1:cdf_data_max;
-    stem(bins, 100*qf.acdf(cdf_data, bins), '-r', 'Linewidth', 3);
+    subplot(322);
+    %     cdf_data = cell_id(:);
+    %     cdf_data_min = min(cdf_data);
+    %     cdf_data_max = max(cdf_data);
+    %     cdf_data_mean = mean(cdf_data);
+    %     bins = cdf_data_min:1:cdf_data_max;
+    %     stem(bins, 100*qf.acdf(cdf_data, bins), '-r', 'Linewidth', 3);
+    %     grid on;
+    %     xlabel('Cell ID');
+    %     ylabel('CDF (%)');
+    %     axis square;
+    %     title(sprintf('(min,max,avg)=(%0.0f,%0.0f,%0.0f)', cdf_data_min, cdf_data_max, cdf_data_mean));
+
+    h = histogram(cell_id, 'Normalization', 'probability', 'FaceColor', 'red', 'LineWidth', 2);
+    axis square;
     grid on;
+    ylabel('PDF');
     xlabel('Cell ID');
-    ylabel('CDF (%)');
-    axis square;
-    title(sprintf('(min,max,avg)=(%0.0f,%0.0f,%0.0f)', cdf_data_min, cdf_data_max, cdf_data_mean));
 
-    %Coupling loss
-    %Heatmap
-    figure('Renderer', 'painters', 'Position', [10, 10, 1000, 1000]);
-    clf;
-    subplot(121);
-    imagesc([x_min, x_max], [y_min, y_max], coupling_loss_2d);
-    c1 = colorbar;
-    c1.Location = 'northoutside';
-    c1.Label.String = "Coupling loss (dB)";
-    axis([x_min, x_max, y_min, y_max]);
-    axis square;
-    hold on
-    for b = 1:l.no_tx
-        plot(l.tx_position(1, b), -l.tx_position(2, b), ...
-            '.r', 'Linewidth', 3, 'Markersize', 24);
-        hold on;
-    end
-    xlabel('x (m)');
-    ylabel('y (m)');
-    grid on;
-
-    %CDF
-    subplot(122);
-    cdf_data = coupling_loss_2d(:);
-    cdf_data_min = min(cdf_data);
-    cdf_data_max = max(cdf_data);
-    cdf_data_mean = mean(cdf_data);
-    bins = cdf_data_min:0.01:cdf_data_max;
-    plot(bins, 100*qf.acdf(cdf_data, bins), '-r', 'Linewidth', 3);
-    grid on;
-    xlabel('Coupling loss (dB)');
-    ylabel('CDF (%)');
-    axis square;
-    title(sprintf('(min,max,avg)=(%0.0f,%0.0f,%0.0f)', cdf_data_min, cdf_data_max, cdf_data_mean));
-
-    figure('Renderer', 'painters', 'Position', [10, 10, 1000, 1000]); clf
+    %     %Coupling loss
+    %     %Heatmap
+    %     figure('Renderer', 'painters', 'Position', [10, 10, 1000, 1000]);
+    %     clf;
+    %     subplot(121);
+    %     imagesc([x_min, x_max], [y_min, y_max], coupling_loss_2d);
+    %     c1 = colorbar;
+    %     c1.Location = 'northoutside';
+    %     c1.Label.String = "Coupling loss (dB)";
+    %     axis([x_min, x_max, y_min, y_max]);
+    %     axis square;
+    %     hold on
+    %     for b = 1:l.no_tx
+    %         plot(l.tx_position(1, b), -l.tx_position(2, b), ...
+    %             '.r', 'Linewidth', 3, 'Markersize', 24);
+    %         hold on;
+    %     end
+    %     xlabel('x (m)');
+    %     ylabel('y (m)');
+    %     grid on;
+    %
+    %     %CDF
+    %     subplot(122);
+    %     cdf_data = coupling_loss_2d(:);
+    %     cdf_data_min = min(cdf_data);
+    %     cdf_data_max = max(cdf_data);
+    %     cdf_data_mean = mean(cdf_data);
+    %     bins = cdf_data_min:0.01:cdf_data_max;
+    %     plot(bins, 100*qf.acdf(cdf_data, bins), '-r', 'Linewidth', 3);
+    %     grid on;
+    %     xlabel('Coupling loss (dB)');
+    %     ylabel('CDF (%)');
+    %     axis square;
+    %     title(sprintf('(min,max,avg)=(%0.0f,%0.0f,%0.0f)', cdf_data_min, cdf_data_max, cdf_data_mean));
 
     % RSRP
     %Heatmap
-    subplot(221);
+    %figure('Renderer', 'painters', 'Position', [10, 10, 1000, 1000]); clf
+    subplot(323);
     imagesc([x_min, x_max], [y_min, y_max], rsrp_2d);
     c1 = colorbar;
     %caxis([-120, -60]);
@@ -450,7 +470,7 @@ if show_plot
     grid on;
 
     %CDF
-    subplot(222);
+    subplot(324);
     cdf_data = rsrp_2d(:);
     cdf_data_min = min(cdf_data);
     cdf_data_max = max(cdf_data);
@@ -467,7 +487,7 @@ if show_plot
     %Heatmap
     %figure('Renderer', 'painters', 'Position', [10, 550, 1000, 500]);
     %clf;
-    subplot(223);
+    subplot(325);
     imagesc([x_min, x_max], [y_min, y_max], sinr_2d);
     caxis([-5, 20]);
     c1 = colorbar;
@@ -486,7 +506,7 @@ if show_plot
     grid on;
 
     %CDF
-    subplot(224);
+    subplot(326);
     cdf_data = sinr_2d(:);
     cdf_data_min = min(cdf_data);
     cdf_data_max = max(cdf_data);
@@ -498,6 +518,35 @@ if show_plot
     ylabel('CDF (%)');
     axis square;
     title(sprintf('(min,max,avg)=(%0.0f,%0.0f,%0.0f)', cdf_data_min, cdf_data_max, cdf_data_mean));
+
+    for t = 1:l.no_tx
+        scen = zeros(length(l.rx_track), 1);
+        for r = 1:length(l.rx_track)
+            switch char(l.rx_track(r).scenario(t))
+                case '3GPP_3D_UMi_LOS'
+                    scen(r) = 0;
+                case '3GPP_3D_UMi_NLOS'
+                    scen(r) = 1;
+                otherwise
+                    scen(r) = nan;
+            end
+        end
+        scen_2d(:, :, t) = reshape(scen, n_y_coords, n_x_coords);
+        f = figure(200+t); clf
+        imagesc([x_min, x_max], [y_min, y_max], scen_2d(:, :, t));
+        hold on;
+        axis([x_min, x_max, y_min, y_max]);
+        axis square;
+        colormap(f, gray(2));
+        for b = 1:l.no_tx
+            plot(l.tx_position(1, b), -l.tx_position(2, b), ...
+                '.r', 'Linewidth', 3, 'Markersize', 24);
+            hold on;
+        end
+        xlabel('x (m)');
+        ylabel('y (m)');
+        grid on; title('{3GPP\_3D\_UMi}:Black=LOS,White=NLOS')
+    end
 
 end
 
