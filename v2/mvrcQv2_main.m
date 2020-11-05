@@ -38,11 +38,11 @@ random_ori_azi = 0;
 clean_code = 1;
 
 % layout
-no_rx_min = 10000;
+no_rx_min = 10010;
 no_tx = 1;
 sample_distance = 10;
 BS_drop = "hex"; %hex, rnd, csv
-downtilt = 5;
+downtilt = 25;
 isd = 100;
 tx_pwr_dBm = 46;
 nSC = 600;
@@ -84,13 +84,14 @@ tx_antenna_type = '3gpp-3d';
 %      * tilt - The electric downtilt angle in [deg] for pol = 4,5,6
 %      * spacing - Element spacing in [λ], Default: 0.5
 
-downtilt = -downtilt; %Quadriga uses positive tilt to point "upward" so we have to negate to point "downward".
+% downtilt = -downtilt; % Don't negate downtilt unless you are manually
+% rotating the antenna
 
 tx_antenna_3gpp_3d.M = 2;
 tx_antenna_3gpp_3d.N = 1;
 tx_antenna_3gpp_3d.center_freq = s.center_frequency;
 tx_antenna_3gpp_3d.pol = 4;
-tx_antenna_3gpp_3d.tilt = -15;
+tx_antenna_3gpp_3d.tilt = 15;
 tx_antenna_3gpp_3d.spacing = 0.5;
 
 % BS antenna configuration
@@ -247,7 +248,8 @@ fprintf('[Generate layout] runtime = %1.0f min\n', toc(layout_tic)/60);
 % Channels are now generated using the default QuaDRiGa method (phase 1 only used the LOS path).
 % This w1l take quite some time.
 generate_channels_tic = tic;
-cl = l.get_channels; % Generate channels
+[cl, p_builder] = l.get_channels; % Generate channels 
+
 nEl = l.tx_array(1, 1).no_elements / 3; % Number of elements per sector
 nEl = {1:nEl, nEl + 1:2 * nEl, 2 * nEl + 1:3 * nEl}; % Element indices per sector
 fprintf('\nSpliting channels to sectors...');
@@ -358,21 +360,9 @@ end
 %% PLOTS
 
 if show_plot
-
-    %Antenna element vertical radiation pattern (dB)
-    theta = tx_array_3GPP_3d.elevation_grid.' * 180 / pi;
-    % Antenna element horizontal radiation pattern (dB)
-    phi = tx_array_3GPP_3d.azimuth_grid * 180 / pi;
-    figure(100);
-    clf;
-    meshc(phi, theta, 10*log10(abs(tx_array_3GPP_3d.Fa).^2));
-    xlabel('\phi');
-    ylabel('\theta');
-    zlabel('A(\theta,\phi) (dB)');
-    title('Antenna pattern');
-    colorbar;
-    view([45, 45])
-
+    % visualize the antenna array
+    tx_array_3GPP_3d.visualize;
+    
     figure('Renderer', 'painters', 'Position', [10, 10, 1000, 1500]); clf
     % Cell ID
     %Heatmap
