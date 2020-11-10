@@ -65,11 +65,11 @@ if process_paths == 1
     generate_street_tracks(l, track_length, samp_per_meter, 40, 70, 30, 200, scen); % generate the tracks along which channels will be computed
     interpolate_positions(l.rx_track, s.samples_per_meter); % Interpolate for simulation requirements of samples/(lambda/2)
     calc_orientation(l.rx_track); % Align antenna direction with track
-    
+
     % Now we create the channel coefficients. The fixing the random seed (check) guarantees repeatable results
     % (i.e. the taps will be at the same positions for both runs). Also note the significantly longer
     % computing time when drifting is enabled.
-    
+
     disp('Drifting enabled:');
     p = l.init_builder; % Create channel builders
     gen_parameters(p); % Generate small-scale fading
@@ -88,9 +88,10 @@ end
 
 %% process power map if this is configured in the initialize.sim file
 if process_powermap == 1
-    
+
     [map, x_coords, y_coords, ~] = power_map_const(l, scen{1}, usage, grid_resolution, -max_xy, max_xy, -max_xy, max_xy, ue_height, tx_powers);
-    
+
+    %y_coords = flip(y_coords);
     %calculate RSRP
     r = [];
     for i = 1:length(map)
@@ -99,9 +100,9 @@ if process_powermap == 1
     [rsrp, sector_idx] = max(r, [], 3);
     geometry_factor_dB = 10 * log10(max(r, [], 3)./(sum(r, 3) - max(r, [], 3)));
     RSRP_dBm = 10 * log10(rsrp);
-    
+
     %P = 10*log10(sum(cat(3,map{:}),3));
-    
+
     % create a struct where powers over the x,y grid are available for each tx on an x,y grid
     powermatrix.x = x_coords;
     powermatrix.y = y_coords;
@@ -113,31 +114,31 @@ if process_powermap == 1
         powermatrix.(append('Tx', int2str(i), 'pwr')) = 10 * log10(squeeze(map{i})); % dBm
         powermatrix.(append('Tx', int2str(i), 'loc')) = l.tx_position(:, i);
     end
-    
-if save_results == 1
-    if ~exist([pwd, '/savedResults/json'], 'dir')
-        mkdir([pwd, '/savedResults/json']);
+
+    if save_results == 1
+        if ~exist([pwd, '/savedResults/json'], 'dir')
+            mkdir([pwd, '/savedResults/json']);
+        end
+        if ~exist([pwd, '/savedResults/npz'], 'dir')
+            mkdir([pwd, '/savedResults/npz']);
+        end
+        file_name = append('powermatrixDT', num2str(round(downtilt)));
+        jsonStr = jsonencode(powermatrix);
+        fid = fopen(['savedResults/json/', file_name, '.json'], 'w');
+        if fid == -1, error('Cannot create JSON file'); end
+        fwrite(fid, jsonStr, 'char');
+        fclose(fid);
+        commandStr = sprintf('%s pyScripts/make_npz_from_json.py %s', python_path, file_name);
+        fprintf('\tAttempting to write to NPZ file...')
+        status = system(commandStr);
+        if ~(status == 0)
+            error('Cannot create NPZ file!');
+        else
+            fprintf('success.\n')
+        end
     end
-    if ~exist([pwd, '/savedResults/npz'], 'dir')
-        mkdir([pwd, '/savedResults/npz']);
-    end
-    file_name = append('powermatrixDT', num2str(round(downtilt)));
-    jsonStr = jsonencode(powermatrix);
-    fid = fopen(['savedResults/json/', file_name, '.json'], 'w');
-    if fid == -1, error('Cannot create JSON file'); end
-    fwrite(fid, jsonStr, 'char');
-    fclose(fid);
-    commandStr = sprintf('%s pyScripts/make_npz_from_json.py %s', python_path, file_name);
-    fprintf('\tAttempting to write to NPZ file...')
-    status = system(commandStr);
-    if ~(status == 0)
-        error('Cannot create NPZ file!');
-    else
-        fprintf('success.\n')
-    end
-end
-    
-    
+
+
     if show_plot == 1
         %l.visualize([],[],0);
         set(0, 'defaultTextFontSize', 18) % Default Font Size
@@ -146,16 +147,20 @@ end
         set(0, 'defaultTextFontName', 'Helvetica') % Default Font Type
         set(0, 'defaultFigurePaperPositionMode', 'auto') % Default Plot position
         set(0, 'DefaultFigurePaperType', '<custom>') % Default Paper Type
-        set(0, 'DefaultFigurePaperSize', [14.5, 6.9]) % Default Paper Size
-        set(0, 'DefaultAxesTitleFontWeight', 'normal');
-        
-        figure('Renderer', 'painters', 'Position', [1500, 10, 1000, 1000]); clf
-        ax1 = subplot(221);
-        imagesc([-max_xy, max_xy], [-max_xy, max_xy], RSRP_dBm);
+
+        x_min = -max_xy;
+        x_max = -x_min;
+        y_min = x_min;
+        y_max = -y_min;
+        figure('Renderer', 'painters', 'Position', [10, 10, 1000, 1500]); clf
+        % Cell ID
+        %Heatmap
+        subplot(321)
+        imagesc([x_min, x_max], [y_min, y_max], sector_idx);
         c1 = colorbar;
         c1.Location = 'northoutside';
-        c1.Label.String = "RSRP (dBm)";
-        axis([-max_xy, max_xy, -max_xy, max_xy]);
+        c1.Label.String = "Cell ID";
+        axis([x_min, x_max, y_min, y_max]);
         axis square;
         hold on
         for b = 1:l.no_tx
@@ -166,30 +171,96 @@ end
         xlabel('x (m)');
         ylabel('y (m)');
         grid on;
-        
-        ax3 = subplot(222);
-        y = RSRP_dBm(:);
-        y_sort = sort(y);
-        y_min = y_sort(1);
-        y_max = y_sort(end);
-        xx = linspace(y_min, y_max, 50);
-        for i = 1:length(xx)
-            yy(i) = sum(y_sort < xx(i));
+
+        %CDF
+        subplot(322);
+        h = histogram(sector_idx, 'Normalization', 'probability', 'FaceColor', 'red', 'LineWidth', 2);
+        axis square;
+        grid on;
+        ylabel('PDF');
+        xlabel('Cell ID');
+
+        %     %Coupling loss
+        %     %Heatmap
+        %     figure('Renderer', 'painters', 'Position', [10, 10, 1000, 1000]);
+        %     clf;
+        %     subplot(121);
+        %     imagesc([x_min, x_max], [y_min, y_max], coupling_loss_2d);
+        %     c1 = colorbar;
+        %     c1.Location = 'northoutside';
+        %     c1.Label.String = "Coupling loss (dB)";
+        %     axis([x_min, x_max, y_min, y_max]);
+        %     axis square;
+        %     hold on
+        %     for b = 1:size(tx_locs,1)
+        %         plot(tx_locs(b,1), -tx_locs(b,2), ...
+        %             '.r','Markersize', 24);
+        %         hold on;
+        %     end
+        %          xlabel('x (m)');
+        %     ylabel('y (m)');
+        %     grid on;
+        %
+        %     %CDF
+        %     subplot(122);
+        %     cdf_data = coupling_loss_2d(:);
+        %     cdf_data_min = min(cdf_data);
+        %     cdf_data_max = max(cdf_data);
+        %     cdf_data_mean = mean(cdf_data);
+        %     bins = cdf_data_min:0.01:cdf_data_max;
+        %     plot(bins, 100*qf.acdf(cdf_data, bins), '-r', 'Linewidth', 3);
+        %     grid on;
+        %     xlabel('Coupling loss (dB)');
+        %     ylabel('CDF (%)');
+        %     axis square;
+        %     title(sprintf('(min,max,avg)=(%0.0f,%0.0f,%0.0f)', cdf_data_min, cdf_data_max, cdf_data_mean));
+
+        % RSRP
+        %Heatmap
+        %figure('Renderer', 'painters', 'Position', [10, 10, 1000, 1000]); clf
+        subplot(323);
+        imagesc([x_min, x_max], [y_min, y_max], RSRP_dBm);
+        c1 = colorbar;
+        %caxis([-120, -60]);
+        c1.Location = 'northoutside';
+        c1.Label.String = "RSRP (dBm)";
+        axis([x_min, x_max, y_min, y_max]);
+        axis square;
+        hold on
+        for b = 1:l.no_tx
+            plot(l.tx_position(1, b), -l.tx_position(2, b), ...
+                '.r', 'Linewidth', 3, 'Markersize', 24);
+            hold on;
         end
-        f4 = plot(xx, 100*yy/length(y), '-r', 'linewidth', 3);
+        xlabel('x (m)');
+        ylabel('y (m)');
+        grid on;
+
+        %CDF
+        subplot(324);
+        cdf_data = RSRP_dBm(:);
+        cdf_data_min = min(cdf_data);
+        cdf_data_max = max(cdf_data);
+        cdf_data_mean = mean(cdf_data);
+        bins = cdf_data_min:0.01:cdf_data_max;
+        plot(bins, 100*qf.acdf(cdf_data, bins), '-r', 'Linewidth', 3);
         grid on;
         xlabel('RSRP (dBm)');
-        ylabel('CDF(%)');
+        ylabel('CDF (%)');
         axis square;
-        title(sprintf('(min,max,avg)=(%0.0f,%0.0f,%0.0f)', y_min, y_max, mean(y)))
-        
-        subplot(223);
-        imagesc([-max_xy, max_xy], [-max_xy, max_xy], geometry_factor_dB);
+        title(sprintf('(min,max,avg)=(%0.0f,%0.0f,%0.0f)', cdf_data_min, cdf_data_max, cdf_data_mean));
+
+        % Geometry factor (=SINR)
+        %Heatmap
+        %figure('Renderer', 'painters', 'Position', [10, 550, 1000, 500]);
+        %clf;
+        subplot(325);
+        imagesc([x_min, x_max], [y_min, y_max], geometry_factor_dB);
         caxis([-5, 20]);
         c1 = colorbar;
         c1.Location = 'northoutside';
         c1.Label.String = "Geometry factor (dB)";
-        axis([-max_xy, max_xy, -max_xy, max_xy]);
+        axis([x_min, x_max, y_min, y_max]);
         axis square;
         hold on
         for b = 1:l.no_tx
@@ -200,66 +271,26 @@ end
         xlabel('x (m)');
         ylabel('y (m)');
         grid on;
-        
-        subplot(224);
-        y = geometry_factor_dB(:);
-        y_sort = sort(y);
-        y_min = y_sort(1);
-        y_max = y_sort(end);
-        xx = linspace(y_min, y_max, 50);
-        for i = 1:length(xx)
-            yy(i) = sum(y_sort < xx(i));
-        end
-        plot(xx, 100*yy/length(y), '-r', 'linewidth', 3);
+
+        %CDF
+        subplot(326);
+        cdf_data = geometry_factor_dB(:);
+        cdf_data_min = min(cdf_data);
+        cdf_data_max = max(cdf_data);
+        cdf_data_mean = mean(cdf_data);
+        bins = cdf_data_min:0.01:cdf_data_max;
+        plot(bins, 100*qf.acdf(cdf_data, bins), '-r', 'Linewidth', 3);
         grid on;
         xlabel('Geometry factor (dB)');
-        ylabel('CDF(%)');
+        ylabel('CDF (%)');
         axis square;
-        title(sprintf('(min,max,avg)=(%0.0f,%0.0f,%0.0f)', y_min, y_max, mean(y)))
-
-        figure();
-        ax2 = subplot(121);
-        imagesc([-max_xy, max_xy], [-max_xy, max_xy], sector_idx);
-        c1 = colorbar;
-        colormap(ax2, parula(max(max(sector_idx))))
-        %caxis([-120, -60]);
-        c1.Location = 'northoutside';
-        c1.Label.String = "Cell index";
-        axis([-max_xy, max_xy, -max_xy, max_xy]);
-        axis square;
-        hold on
-        for b = 1:l.no_tx
-            plot(l.tx_position(1, b), -l.tx_position(2, b), ...
-                '.r', 'Linewidth', 3, 'Markersize', 24);
-            hold on;
-        end
-        xlabel('x (m)');
-        ylabel('y (m)');
-        grid on;
-        
-        subplot(122);
-        y = sector_idx(:);
-        y_sort = sort(y);
-        y_min = y_sort(1);
-        y_max = y_sort(end);
-        xx = y_min:y_max;
-        yy = zeros(1, length(xx));
-        for i = 1:length(xx)
-            yy(i) = sum(y_sort <= xx(i));
-        end
-        stem(xx, 100*yy/length(y), '.r', 'linewidth', 3);
-        grid on;
-        xlabel('Cell index');
-        ylabel('CDF(%)');
-        axis square;
-        title(sprintf('(min,max,avg)=(%d,%d,%.0f)', y_min, y_max, mean(y)))
-        
+        title(sprintf('(min,max,avg)=(%0.0f,%0.0f,%0.0f)', cdf_data_min, cdf_data_max, cdf_data_mean));
     end
-    
+
     if save_work == 1
         save(append(track_directory, 'workspace_map'), 'map', 'x_coords', 'y_coords', '-v7.3') % this is in here in case we want to examine the data.
     end
-    
+
 end
 
 fprintf('\n[Sim runtime: %.1f s = %1.1f min]\n', toc, toc/60)

@@ -5,7 +5,7 @@ close all;
 rng('default');
 rng(0);
 
-tilts = 5:1:7;
+tilts = 0;
 
 for j = 1:length(tilts)
 

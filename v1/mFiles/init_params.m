@@ -1,19 +1,19 @@
 python_path = '/Users/ayp/opt/anaconda3/bin/python';
 fixed_cvs_file = "csvData/Mavenir_locs.csv";
 
-process_paths = 0;          % set to 1 to calculate channels along tracks
-process_powermap = 1;       % set to 1 to calculate map of powers
-del_builder = 1;            % set to 1 if you want to delete the builder file first
-show_plot = 1;              % set to 1 to show plots of channels
-save_results = 1;           % set to 1 to save the results to file
+process_paths = 0; % set to 1 to calculate channels along tracks
+process_powermap = 1; % set to 1 to calculate map of powers
+del_builder = 1; % set to 1 if you want to delete the builder file first
+show_plot = 1; % set to 1 to show plots of channels
+save_results = 1; % set to 1 to save the results to file
 save_work = 0;
-random_ori_azi = 0;         % set to 1 if you want to randomize the azimuth angle of the BSs.
-clean_code = 1;
+random_ori_azi = 0; % set to 1 if you want to randomize the azimuth angle of the BSs.
+clean_code = 0;
 
-nGrid = (50)^2;
-grid_resolution = 10; % resolution of grid in meters for power map
+nGrid = (224)^2;
+grid_resolution = 5; % resolution of grid in meters for power map
 %'sf','quick','detailed'
-usage = 'detailed';
+usage = 'quick';
 downtilt = 5; % Downtilt value, can be independently set for each sector (15 is 3GPP typical)
 no_BS = 4;
 %hex, rnd, csv

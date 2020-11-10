@@ -153,9 +153,10 @@ if nargin <= 4
 end
 
 
+
 % Get the sample grid in x and y direction
 x_coords = x_min : sample_distance : x_max;
-y_coords = y_min : sample_distance : y_max;
+y_coords = y_max:-sample_distance:y_min;
 
 n_x_coords = numel(x_coords);
 n_y_coords = numel(y_coords);
