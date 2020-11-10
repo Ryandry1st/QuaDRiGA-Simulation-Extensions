@@ -1,5 +1,14 @@
 function mvrcQv2_postproc(savedResultFile)
 
+set(0, 'defaultTextFontSize', 18) % Default Font Size
+set(0, 'defaultAxesFontSize', 18) % Default Font Size
+set(0, 'defaultAxesFontName', 'Helvetica') % Default Font Type
+set(0, 'defaultTextFontName', 'Helvetica') % Default Font Type
+set(0, 'defaultFigurePaperPositionMode', 'auto') % Default Plot position
+set(0, 'DefaultFigurePaperType', '<custom>') % Default Paper Type
+set(0, 'DefaultFigurePaperSize', [14.5, 6.9]) % Default Paper Size
+set(0, 'DefaultAxesTitleFontWeight', 'normal');
+
 load(savedResultFile);
 
 %% PLOTS

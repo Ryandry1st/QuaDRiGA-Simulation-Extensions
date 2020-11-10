@@ -31,7 +31,7 @@ for n = 1:length(tilts)
 end
 
 %postprocessing visualization
-file_name = 'powermatrixDT10.mat';
+file_name = 'powermatrixDT0.mat';
 savedResultFile = [pwd, '/savedResults/mat/', file_name];
 if exist(savedResultFile, 'file')
     mvrcQv2_postproc(savedResultFile);

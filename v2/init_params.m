@@ -7,15 +7,6 @@ end
 rng('default');
 rng(seed);
 
-set(0, 'defaultTextFontSize', 18) % Default Font Size
-set(0, 'defaultAxesFontSize', 18) % Default Font Size
-set(0, 'defaultAxesFontName', 'Arial') % Default Font Type
-set(0, 'defaultTextFontName', 'Arial') % Default Font Type
-set(0, 'defaultFigurePaperPositionMode', 'auto') % Default Plot position
-set(0, 'DefaultFigurePaperType', '<custom>') % Default Paper Type
-set(0, 'DefaultFigurePaperSize', [14.5, 6.9]) % Default Paper Size
-set(0, 'DefaultAxesTitleFontWeight', 'normal');
-
 python_path = '/Users/ayp/opt/anaconda3/bin/python';
 fixed_cvs_file = "csvData/Mavenir_locs.csv";
 
@@ -36,7 +27,7 @@ random_ori_azi = 0;
 clean_code = 0;
 
 % layout
-no_rx_min = 5000;
+no_rx_min = 50000;
 no_tx = 7;
 sample_distance = 5;
 BS_drop = "csv"; %hex, rnd, csv
