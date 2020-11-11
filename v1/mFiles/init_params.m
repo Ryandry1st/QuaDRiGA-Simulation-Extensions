@@ -1,4 +1,8 @@
-python_path = '/Users/ayp/opt/anaconda3/bin/python';
+if ismac
+    python_path = '/Users/ayp/opt/anaconda3/bin/python';
+elseif isunix
+    python_path = '/home/user/anaconda3/bin/python';
+end
 fixed_cvs_file = "csvData/Mavenir_locs.csv";
 
 process_paths = 0; % set to 1 to calculate channels along tracks
@@ -13,7 +17,7 @@ clean_code = 0;
 nGrid = (224)^2;
 grid_resolution = 5; % resolution of grid in meters for power map
 %'sf','quick','detailed'
-usage = 'quick';
+usage = 'detailed';
 downtilt = 5; % Downtilt value, can be independently set for each sector (15 is 3GPP typical)
 no_BS = 4;
 %hex, rnd, csv
