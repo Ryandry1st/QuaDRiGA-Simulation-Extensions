@@ -7,7 +7,12 @@ end
 rng('default');
 rng(seed);
 
-python_path = '/Users/ayp/opt/anaconda3/bin/python';
+if ismac
+    python_path = '/Users/ayp/opt/anaconda3/bin/python';
+elseif isunix
+    python_path = '/home/user/anaconda3/bin/python';
+end
+
 fixed_cvs_file = "csvData/Mavenir_locs.csv";
 
 %% QuaDRiGa Setup
@@ -27,7 +32,7 @@ random_ori_azi = 0;
 clean_code = 0;
 
 % layout
-no_rx_min = 50000;
+no_rx_min = 500;
 no_tx = 7;
 sample_distance = 5;
 BS_drop = "csv"; %hex, rnd, csv
