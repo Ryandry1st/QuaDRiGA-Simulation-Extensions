@@ -32,7 +32,7 @@ random_ori_azi = 0;
 clean_code = 0;
 
 % layout
-no_rx_min = 500;
+no_rx_min = 5000;
 no_tx = 7;
 sample_distance = 5;
 BS_drop = "csv"; %hex, rnd, csv

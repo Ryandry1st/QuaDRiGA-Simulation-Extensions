@@ -7,7 +7,7 @@ seed = 0;
 %----------------------------
 
 %initialize parameters
-params = init_params(seed);
+params = mvrcQv2_init(seed);
 %----------------------------
 
 tilts = 5;
@@ -31,9 +31,9 @@ for n = 1:length(tilts)
 end
 
 %postprocessing visualization
-file_name = 'powermatrixDT0.mat';
-savedResultFile = [pwd, '/savedResults/mat/', file_name];
-if exist(savedResultFile, 'file')
-    mvrcQv2_postproc(savedResultFile);
-end
+% file_name = 'powermatrixDT0.mat';
+% savedResultFile = [pwd, '/savedResults/mat/', file_name];
+% if exist(savedResultFile, 'file')
+%     mvrcQv2_postproc(savedResultFile);
+% end
 %----------------------------

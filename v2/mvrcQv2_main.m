@@ -1,7 +1,7 @@
 function mvrcQv2_main(params)
 
 if nargin == 0
-    params = init_params;
+    params = mvrcQv2_init;
 end
 
 big_tic = tic;
