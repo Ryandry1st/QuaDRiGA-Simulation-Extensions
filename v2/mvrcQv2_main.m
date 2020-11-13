@@ -233,7 +233,7 @@ powermatrix = struct;
 powermatrix.x = x_coords;
 powermatrix.y = -y_coords;
 powermatrix.z = params.rx_height;
-powermatrix.ptx = pwr_mW_perSC_perMIMOtx; % power in watts
+powermatrix.ptx = pwr_mW_perSC_perMIMOtx; % power in mW
 powermatrix.downtilt = squeeze(orientations(:, 2));
 %map is (y,x,no_rxant,no_rxant) x params.no_tx
 for i = 1:l.no_tx

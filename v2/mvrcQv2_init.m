@@ -1,4 +1,4 @@
-function params = init_params(seed)
+function params = mvrcQv2_init(seed)
 
 if nargin == 0
     seed = 0;
@@ -19,21 +19,20 @@ fixed_cvs_file = "csvData/Mavenir_locs.csv";
 
 s = qd_simulation_parameters; % Set general simulation parameters
 s.center_frequency = 2e9; % 2 GHz center frequency
-s.sample_density = 1.5;
-s.use_3GPP_baseline = 1; % Disable spherical waves
+s.sample_density = 2;
+s.use_3GPP_baseline = 0; % Disable spherical waves
 s.show_progress_bars = 1; % Enable / disable status display
-s.use_absolute_delays = 1;
+s.use_absolute_delays = 0;
 
 % flags
 save_results = 1;
 save_layout = 0;
-show_plot = 1;
 random_ori_azi = 0;
 clean_code = 0;
 
 % layout
-no_rx_min = 5000;
-no_tx = 7;
+no_rx_min = 50000;
+no_tx = 1;
 sample_distance = 5;
 BS_drop = "csv"; %hex, rnd, csv
 downtilt = 10;
@@ -75,7 +74,7 @@ tx_antenna_3gpp_macro.phi_3dB = 70;
 tx_antenna_3gpp_macro.theta_3dB = 10;
 tx_antenna_3gpp_macro.rear_gain = 25;
 tx_antenna_3gpp_macro.electric_tilt = 15;
-tx_array_3gpp_macro = qd_arrayant(tx_antenna_type, tx_antenna_3gpp_macro.phi_3dB, tx_antenna_3gpp_macro.theta_3dB, tx_antenna_3gpp_macro.rear_gain, tx_antenna_3gpp_macro.electric_tilt);
+tx_array_3gpp_macro = qd_arrayant('3gpp-macro', tx_antenna_3gpp_macro.phi_3dB, tx_antenna_3gpp_macro.theta_3dB, tx_antenna_3gpp_macro.rear_gain, tx_antenna_3gpp_macro.electric_tilt);
 tx_array_3gpp_macro.element_position(1, :) = 0; % Distance from pole
 tx_array_3gpp_macro.name = '3gpp-macro';
 
@@ -98,7 +97,7 @@ tx_array_3gpp_macro.name = '3gpp-macro';
 % downtilt = -downtilt; % Don't negate downtilt unless you are manually
 % rotating the antenna
 
-tx_antenna_3gpp_3d.M = 2;
+tx_antenna_3gpp_3d.M = 8;
 tx_antenna_3gpp_3d.N = 1;
 tx_antenna_3gpp_3d.center_freq = s.center_frequency;
 tx_antenna_3gpp_3d.pol = 4;
@@ -106,7 +105,7 @@ tx_antenna_3gpp_3d.tilt = 15;
 tx_antenna_3gpp_3d.spacing = 0.5;
 
 % BS antenna configuration
-tx_array_3gpp_3d = qd_arrayant(tx_antenna_type, tx_antenna_3gpp_3d.M, tx_antenna_3gpp_3d.N, tx_antenna_3gpp_3d.center_freq, tx_antenna_3gpp_3d.pol, downtilt, tx_antenna_3gpp_3d.spacing);
+tx_array_3gpp_3d = qd_arrayant('3gpp-3d', tx_antenna_3gpp_3d.M, tx_antenna_3gpp_3d.N, tx_antenna_3gpp_3d.center_freq, tx_antenna_3gpp_3d.pol, downtilt, tx_antenna_3gpp_3d.spacing);
 tx_array_3gpp_3d.element_position(1, :) = 0; % Distance from pole
 tx_array_3gpp_3d.name = '3gpp-3d';
 
