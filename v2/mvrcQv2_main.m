@@ -134,9 +134,8 @@ end
 
 % rx array
 l.rx_array = params.a_mt;
-indoor_frc = 0;
 fprintf('\tSetting layout scenarios for all users...');
-l.set_scenario(params.chn_scenario, [], [], indoor_frc);
+l.set_scenario(params.chn_scenario, [], [], params.indoor_frc, params.SC_lambda_rx, params.SC_lambda_tx);
 fprintf('done.\n');
 
 if params.save_layout
@@ -252,7 +251,7 @@ if params.save_results == 1
     end
 
     file_name = append('powermatrixDT', num2str(round(params.downtilt)));
-    save([pwd, '/savedResults/mat/', file_name], 'no_rx','tx_locs', 'n_x_coords', 'n_y_coords', 'x_min', 'x_max', 'y_min', 'y_max', 'cell_id', 'rsrp_2d', 'sinr_2d', 'params', '-v7.3');
+    save([pwd, '/savedResults/mat/', file_name], 'no_rx', 'tx_locs', 'n_x_coords', 'n_y_coords', 'x_min', 'x_max', 'y_min', 'y_max', 'cell_id', 'rsrp_2d', 'sinr_2d', 'params', '-v7.3');
 
     jsonStr = jsonencode(powermatrix);
     fid = fopen(['savedResults/json/', file_name, '.json'], 'w');
@@ -268,7 +267,6 @@ if params.save_results == 1
         fprintf('success.\n')
     end
 end
-
 
 %% END OF PROGRAM
 fprintf('[Simulation] runtime: %.1f s = %1.1f min (%.0f UE/sec.)\n', toc(big_tic), toc(big_tic)/60, no_rx/toc(big_tic));

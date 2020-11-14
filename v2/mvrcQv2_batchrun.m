@@ -3,7 +3,7 @@ clear all;
 close all;
 
 %set random seed
-seed = 0:2:10;
+seed = 0;
 %----------------------------
 
 %initialize parameters
