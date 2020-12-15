@@ -19,7 +19,7 @@ for i=1:l.no_rx
     fillers{end+1} = l.rx_track(i).initial_position;
     
     headers{end+1} = ['UE ' num2str(i) ' velocity: '];
-    fillers{end+1} = l.rx_track(i).positions(:, end)/(speed(i));
+    fillers{end+1} = l.rx_track(i).positions(:, end)/total_time;
     
     headers{end+1} = ['UE ' num2str(i) ' end position: '];
     fillers{end+1} = l.rx_track(i).initial_position + l.rx_track(i).positions(:, end);
@@ -48,8 +48,8 @@ for i=1:l.no_tx
     fillers{end+1} = l.tx_position(:, i);
     fillers{end+1} = l.tx_array(1, i).no_elements;
     if exist('orientations', 'var')
-        fillers{end+1} = orientations(i:i+2, 2);
-        fillers{end+1} = orientations(i:i+2, 1);
+        fillers{end+1} = orientations((i-1)*N_SECTORS+1:i*N_SECTORS, 2);
+        fillers{end+1} = orientations((i-1)*N_SECTORS+1:i*N_SECTORS, 1);
     else
         fillers{end+1} = -1;
         fillers{end+1} = -1;
@@ -99,7 +99,7 @@ len = length(headers);
 for i=1:len
     fprintf(file, headers{i});
     if ~isstring(fillers{i}) && ~ischar(fillers{i})
-        output_val = compose("%g ", fillers{i});
+        output_val = compose("%f ", round(fillers{i}, 6));
         for j=1:length(output_val)
             fprintf(file, output_val(j));
         end
@@ -123,5 +123,5 @@ fprintf(file, "BS Information \n\tInformation describing the base stations and i
 fprintf(file, "Simulation Paramters \n\tOverall parameters such as carrier frequency and sampling rate.\n\n");
 
 fprintf(file, "Remaining files, which begin with ULDL_Channel_Response, are the traces of the channel response between a UE and an eNB, \nspecified by the trace title. The files are created by simulation with the QuaDRiGa channel simulator and the following additional parameters:\n");
-test_str = ['UE height: ' num2str(ue_height) 'm\nUE antenna model: ' l.rx_array(1).name '\nBS Antenna Model: ' l.tx_array(1, 1).name '\nScenario: ' scen '\nTransmit power per sector: ', num2str(Tx_P_dBm) 'dBm'];
+test_str = ['UE height: ' num2str(ue_height) 'm\nUE antenna model: ' l.rx_array(1).name '\nBS Antenna Model: ' l.tx_array(1, 1).name '\nScenario: ' scen '\nTransmit power per sector: ', num2str(Tx_P_dBm) 'dBm and seed: ' num2str(seed)];
 fprintf(file, test_str);

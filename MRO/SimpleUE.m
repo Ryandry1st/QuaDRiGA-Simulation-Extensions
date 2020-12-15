@@ -4,69 +4,114 @@ close all;
 clear all;
 tic;
 init_params;
+
+sim_num = '0.4';
 %% File path information
 % save_folder = ['Output_files\',datestr(now,'mm-dd-HH-MM'),'\'];
-sim_num = '0.4';
-save_folder = ['Output_files\Scenario ', sim_num, '\'];
-mkdir(save_folder);
+if restore_config
+    save_folder = ['Output_files\Scenario ', sim_num, '\'];
+    directories = dir(save_folder);
+    num_dir = numel(directories([directories(:).isdir]))-2;
+    save_folder = [save_folder, num2str(num_dir+1), '\'];  
+    mkdir(save_folder);
+    
+    distance = speed .* total_time;
+    samples_per_meter = fs/max(speed); 
+    
+    s = qd_simulation_parameters;             % New simulation parameters
+    s.center_frequency = fc;               % 1.8 GHz carrier frequency middle of lte band 3
+    s.sample_density = 1;                     % num samples per half-wavelength
+    s.use_absolute_delays = 1;                % Include delay of the LOS path
+    s.show_progress_bars = 1;                 % Enable progress bars; set to 0 to disable progress bars
+    s.use_3GPP_baseline = 0;
+    s.samples_per_meter = samples_per_meter;
+    s.sample_density = samples_per_meter*3e8/2/s.center_frequency;
+    
+    l = qd_layout(s);
+    l.no_tx = no_tx;
+    
 
-%% Simulation Choices
-initial_loc = [100, -200, 1.5;
-               600, 400, 1.5];
+    for i=1:l.no_tx
+        l.tx_position(:, i) = tx_pos(i, :)';
+        index = N_SECTORS*(i-1)+1;
+        l.tx_array(i) = qd_arrayant(ARRAY_TYPE, AZI_BEAMWIDTH, ELE_BEAMWIDTH, -FB_RATIO_DB, orientations(index, 1));
+        l.tx_array(i).rotate_pattern(orientations(index, 2), 'z');
+        % fprintf('antenna %d sector 1 with dt = %d and azi = %d \n', i, orientations(index, 2), orientations(index, 1));
 
-heading = [3*pi/4, 3*pi/2];
-speed = [12, 25];
-total_time = 40; % 40s time frame
-fs = 1000;                               % 1ms sampling time
-
-distance = speed .* total_time;
-samples_per_meter = fs/max(speed); 
-
-%% General setup
-s = qd_simulation_parameters;             % New simulation parameters
-s.center_frequency = 28e9;               % 1.8 GHz carrier frequency middle of lte band 3
-s.sample_density = 1;                     % num samples per half-wavelength
-s.use_absolute_delays = 1;                % Include delay of the LOS path
-s.show_progress_bars = 1;                 % Enable progress bars; set to 0 to disable progress bars
-s.use_3GPP_baseline = 0;
-s.samples_per_meter = samples_per_meter;
-s.sample_density = samples_per_meter*3e8/2/s.center_frequency;
-
-
-%% Chose BS layout
-l = qd_layout(s);
-l.no_tx = 3;
-N_SECTORS = 3;
-orientations = [5, 135;
-                1, -135;
-                5, 0;
-                7, 45;
-                10, -45;
-                10, 180;
-                25, 0;
-                45, 135;
-                45, -135];
-
-l.tx_position(:, 1) = [-500, 500, 30]';
-l.tx_position(:, 2) = [-500, -500, 30]';
-l.tx_position(:, 2) = [900, -300, 20]';
-
-for i=1:l.no_tx
-    index = N_SECTORS*(i-1)+1;
-    l.tx_array(i) = qd_arrayant(ARRAY_TYPE, AZI_BEAMWIDTH, ELE_BEAMWIDTH, -FB_RATIO_DB, orientations(index, 1));
-    l.tx_array(i).rotate_pattern(orientations(index, 2), 'z');
-    % fprintf('antenna %d sector 1 with dt = %d and azi = %d \n', i, orientations(index, 2), orientations(index, 1));
-
-    for j=1:N_SECTORS-1
-        a = qd_arrayant(ARRAY_TYPE, AZI_BEAMWIDTH, ELE_BEAMWIDTH, -FB_RATIO_DB, orientations(index+j, 1));
-        a.rotate_pattern(orientations(index+j, 2), 'z');
-        l.tx_array(i).append_array(a);
+        for j=1:N_SECTORS-1
+            a = qd_arrayant(ARRAY_TYPE, AZI_BEAMWIDTH, ELE_BEAMWIDTH, -FB_RATIO_DB, orientations(index+j, 1));
+            a.rotate_pattern(orientations(index+j, 2), 'z');
+            l.tx_array(i).append_array(a);
+        end
+        l.tx_array(i).center_frequency = fc;
     end
-    l.tx_array(i).center_frequency = FC;
+
+    %% Setup UE
+    l.no_rx = no_rx;
+    
+else
+    save_folder = ['Output_files\Scenario ', sim_num, '\'];
+    mkdir(save_folder);
+
+    %% Simulation Choices
+    initial_loc = [100, -200, 1.5;
+                   600, 400, 1.5];
+
+    heading = [3*pi/4, 3*pi/2];
+    speed = [12, 25];
+    total_time = 40; % 40s time frame
+    fs = 1000;                               % 1ms sampling time
+
+    distance = speed .* total_time;
+    samples_per_meter = fs/max(speed); 
+
+    %% General setup
+    s = qd_simulation_parameters;             % New simulation parameters
+    s.center_frequency = 28e9;               % 1.8 GHz carrier frequency middle of lte band 3
+    s.sample_density = 1;                     % num samples per half-wavelength
+    s.use_absolute_delays = 1;                % Include delay of the LOS path
+    s.show_progress_bars = 1;                 % Enable progress bars; set to 0 to disable progress bars
+    s.use_3GPP_baseline = 0;
+    s.samples_per_meter = samples_per_meter;
+    s.sample_density = samples_per_meter*3e8/2/s.center_frequency;
+
+
+    %% Chose BS layout
+    l = qd_layout(s);
+    l.no_tx = 3;
+    N_SECTORS = 3;
+    orientations = [5, 135;
+                    1, -135;
+                    5, 0;
+                    7, 45;
+                    10, -45;
+                    10, 180;
+                    25, 0;
+                    45, 135;
+                    45, -135];
+
+    l.tx_position(:, 1) = [-500, 500, 30]';
+    l.tx_position(:, 2) = [-500, -500, 30]';
+    l.tx_position(:, 2) = [900, -300, 20]';
+
+    for i=1:l.no_tx
+        index = N_SECTORS*(i-1)+1;
+        l.tx_array(i) = qd_arrayant(ARRAY_TYPE, AZI_BEAMWIDTH, ELE_BEAMWIDTH, -FB_RATIO_DB, orientations(index, 1));
+        l.tx_array(i).rotate_pattern(orientations(index, 2), 'z');
+        % fprintf('antenna %d sector 1 with dt = %d and azi = %d \n', i, orientations(index, 2), orientations(index, 1));
+
+        for j=1:N_SECTORS-1
+            a = qd_arrayant(ARRAY_TYPE, AZI_BEAMWIDTH, ELE_BEAMWIDTH, -FB_RATIO_DB, orientations(index+j, 1));
+            a.rotate_pattern(orientations(index+j, 2), 'z');
+            l.tx_array(i).append_array(a);
+        end
+        l.tx_array(i).center_frequency = FC;
+    end
+
+    %% Setup UE
+    l.no_rx = 2;
 end
 
-%% Setup UE
-l.no_rx = 2;
 l.rx_array = qd_arrayant('dipole');
 
 %% UE path
@@ -92,7 +137,8 @@ gen_parameters( p );                                      % Generate small-scale
 c = get_channels( p );                                    % Generate channel coefficients
 cn = merge( c );
 
-total_time = toc;
+used_time = toc;
+fprintf("Time taken for simulation = %3.1f s", used_time); 
 l.visualize([],[],0);                                     % Show BS and MT positions on the map
 
 
@@ -107,6 +153,7 @@ gen_config;
 % config file should have tx locations, rx start, heading, speed, end, the
 % antenna descriptions, and scenario.
 
+fprintf("Total time = %3.1f s", toc);
 if process_powermap == 1
     
     [ map,x_coords,y_coords] = l.power_map('3GPP_3D_UMa_NLOS', 'quick',grid_resolution,-max_xy,max_xy,-max_xy,max_xy,ue_height, Tx_P_dBm);

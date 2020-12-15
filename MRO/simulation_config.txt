@@ -1,0 +1,50 @@
+UE Information 
+
+number of UEs: 2.000000 
+UE 1 initial position: 100.000000 -200.000000 1.500000 
+UE 1 velocity: -8.485069 8.485069 0.000000 
+UE 1 end position: -239.402770 139.402770 1.500000 
+UE 1 initial attachment: 1 
+
+UE 2 initial position: 600.000000 400.000000 1.500000 
+UE 2 velocity: -0.000000 -24.999375 0.000000 
+UE 2 end position: 600.000000 -599.975000 1.500000 
+UE 2 initial attachment: 1 
+
+BS Information 
+
+number of BS: 3 
+
+BS 1 location: -500.000000 500.000000 30.000000 
+BS 1 number of sectors: 3.000000 
+BS 1 azimuth rotations (degrees): 135.000000 -135.000000 0.000000 
+BS 1 downtilts (degrees): 5.000000 1.000000 5.000000 
+BS 1 azimuth beamwidth (degrees): 67.000000 
+BS 1 elevation beamwidth (degrees): 7.500000 
+BS 1 front-to-back ratio (dB): -30 
+
+BS 2 location: 900.000000 -300.000000 20.000000 
+BS 2 number of sectors: 3.000000 
+BS 2 azimuth rotations (degrees): 45.000000 -45.000000 180.000000 
+BS 2 downtilts (degrees): 7.000000 10.000000 10.000000 
+BS 2 azimuth beamwidth (degrees): 67.000000 
+BS 2 elevation beamwidth (degrees): 7.500000 
+BS 2 front-to-back ratio (dB): -30 
+
+BS 3 location: 0.000000 0.000000 25.000000 
+BS 3 number of sectors: 3.000000 
+BS 3 azimuth rotations (degrees): 0.000000 135.000000 -135.000000 
+BS 3 downtilts (degrees): 25.000000 45.000000 45.000000 
+BS 3 azimuth beamwidth (degrees): 67.000000 
+BS 3 elevation beamwidth (degrees): 7.500000 
+BS 3 front-to-back ratio (dB): -30 
+
+
+Simulation Parameters 
+
+Carrier Frequency (Hz): 28000000000.000000 
+Sampling Frequency (Hz): 1000.000000 
+Samples: 40000.000000 
+Bandwidth (MHz): 10.000000 
+Resource Blocks: 50.000000 
+Simulation duration (s): 40.000000 

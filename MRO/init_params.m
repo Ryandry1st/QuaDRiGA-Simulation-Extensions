@@ -6,6 +6,12 @@ show_plot = 1;                                          % set to 1 to show plots
 save_work = 0;                                          % set to 1 if you want to save the workspace
 save_opt = 0;                                           % set to 1 if you want to save json and npz files for later use by optimization algs.
 save_npz = 0;                                           % set to 1 if you want to save json to npz
+restore_config = 1;
+config_file = 'simulation_config.txt';
+
+rng('default');
+seed = 0;
+rng(seed);
 
 downtilt = 10;                                           % Downtilt value, can be independently set for each sector
 TX_P = 0.1;
@@ -27,3 +33,7 @@ FB_RATIO_DB = -30;                        % Front to back ratio in dB
 ANTENNA_ELEMENTS = 4;                     % Number of antenna elements in a sector
 FC = 1.8e9;                               % Carrier frequency
 N_SECTORS = 3;
+
+if restore_config
+    [no_rx, initial_loc, heading, speed, total_time, fs, fc, no_tx, N_SECTORS, orientations, tx_pos] = read_config(config_file);
+end
