@@ -5,14 +5,17 @@ clear all;
 tic;
 init_params;
 
-sim_num = '0.4';
+
 %% File path information
 % save_folder = ['Output_files\',datestr(now,'mm-dd-HH-MM'),'\'];
 if restore_config
-    save_folder = ['Output_files\Scenario ', sim_num, '\'];
+    save_folder = ['Output_files/Scenario ', sim_num, '/'];
+    if ~exist(save_folder, 'dir')
+        mkdir(save_folder);
+    end
     directories = dir(save_folder);
     num_dir = numel(directories([directories(:).isdir]))-2;
-    save_folder = [save_folder, num2str(num_dir+1), '\'];  
+    save_folder = [save_folder, num2str(num_dir+1), '/'];  
     mkdir(save_folder);
     
     distance = speed .* total_time;
@@ -114,6 +117,9 @@ end
 
 l.rx_array = qd_arrayant('dipole');
 
+if numel(Tx_P_dBm) == 1
+    Tx_P_dBm = ones(l.no_tx, N_SECTORS)*Tx_P_dBm;
+end
 %% UE path
 for i=1:l.no_rx
     t = qd_track('linear', distance(i), heading(i));  % heading north 400m
@@ -148,7 +154,8 @@ l.visualize([],[],0);                                     % Show BS and MT posit
 % And finally a .mat file of anything useful like p and cn
 Write_Spectral_Tracks;
 saveas(gcf, strcat(save_folder, 'Layout.png'))
-gen_config;
+write_txt_config;
+write_json_config;
 % save(strcat(save_folder, 'workspace.mat'), '-v7.3', 'p', 'cn');
 % config file should have tx locations, rx start, heading, speed, end, the
 % antenna descriptions, and scenario.
@@ -156,7 +163,7 @@ gen_config;
 fprintf("Total time = %3.1f s", toc);
 if process_powermap == 1
     
-    [ map,x_coords,y_coords] = l.power_map('3GPP_3D_UMa_NLOS', 'quick',grid_resolution,-max_xy,max_xy,-max_xy,max_xy,ue_height, Tx_P_dBm);
+    [ map,x_coords,y_coords] = l.power_map('3GPP_3D_UMa_NLOS', 'quick',grid_resolution,-max_xy,max_xy,-max_xy,max_xy,ue_height, Tx_P_dBm(1, 1));
     % scenario FB_UMa_NLOS, type 'quick', sample distance, x,y min/max, rx
     % height; type can be 'quick', 'sf', 'detailed', 'phase'
     

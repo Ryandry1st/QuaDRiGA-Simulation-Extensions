@@ -7,7 +7,7 @@ num_RBs = 50;
 BW = 10e6;
 fft_size = 1024;
 RB_BW = 180e3;
-Tx_P = 10^(0.1*Tx_P_dBm)/1000;
+Tx_P = 10.^(0.1*Tx_P_dBm)/1000;
 
 for tx_k=1:l.no_tx
     for rx_k=1:l.no_rx
@@ -37,7 +37,7 @@ for tx_k=1:l.no_tx
             X = X(range_of_interest, :);
             % X = 10*log10(abs(X).^2./(fft_size*BW)); % normalization
             % already occurs in the .fr() method. Scale by transmit power
-            X = abs(X).^2*Tx_P; 
+            X = abs(X).^2 .* Tx_P(tx_k, sector); 
             edges = 1:useful_fft_points/num_RBs:useful_fft_points+1;
             bin_sets = discretize(1:useful_fft_points, edges);
             [~, len] = size(X);

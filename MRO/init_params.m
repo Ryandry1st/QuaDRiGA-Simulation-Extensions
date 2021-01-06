@@ -7,15 +7,16 @@ save_work = 0;                                          % set to 1 if you want t
 save_opt = 0;                                           % set to 1 if you want to save json and npz files for later use by optimization algs.
 save_npz = 0;                                           % set to 1 if you want to save json to npz
 restore_config = 1;
-config_file = 'simulation_config.txt';
+config_file = 'config.json';
 
 rng('default');
 seed = 0;
 rng(seed);
 
+sim_num = '0.4';
 downtilt = 10;                                           % Downtilt value, can be independently set for each sector
-TX_P = 0.1;
-Tx_P_dBm = 10*log10(TX_P)+30;  
+Tx_P = 0.1;
+Tx_P_dBm = 10*log10(Tx_P)+30; 
 
 max_xy = 1000;                                            % max x and y extent for power map (change to 300)
 ue_height = 1.5;                                        % height at which to create power map
@@ -34,6 +35,7 @@ ANTENNA_ELEMENTS = 4;                     % Number of antenna elements in a sect
 FC = 1.8e9;                               % Carrier frequency
 N_SECTORS = 3;
 
+
 if restore_config
-    [no_rx, initial_loc, heading, speed, total_time, fs, fc, no_tx, N_SECTORS, orientations, tx_pos] = read_config(config_file);
+    [no_rx, initial_loc, heading, speed, total_time, fs, fc, no_tx, N_SECTORS, orientations, tx_pos, Tx_P_dBm, sim_num, scen] = read_config(config_file);
 end
