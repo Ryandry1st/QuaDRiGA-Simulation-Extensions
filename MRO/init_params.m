@@ -11,7 +11,7 @@ config_file = 'config.json';
 
 rng('default');
 seed = 0;
-rng(seed);
+
 
 sim_num = '0.4';
 downtilt = 10;                                           % Downtilt value, can be independently set for each sector
@@ -35,7 +35,9 @@ ANTENNA_ELEMENTS = 4;                     % Number of antenna elements in a sect
 FC = 1.8e9;                               % Carrier frequency
 N_SECTORS = 3;
 
-
+ARRAY_TYPE = 'omni';
 if restore_config
-    [no_rx, initial_loc, heading, speed, total_time, fs, fc, no_tx, N_SECTORS, orientations, tx_pos, Tx_P_dBm, sim_num, scen] = read_config(config_file);
+    [no_rx, initial_loc, heading, speed, total_time, fs, fc, no_tx, N_SECTORS, orientations, tx_pos, Tx_P_dBm, sim_num, scen, seed] = read_config(config_file);
 end
+
+rng(seed);

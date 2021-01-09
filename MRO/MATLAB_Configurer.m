@@ -2,54 +2,56 @@
 % Create a config file for running the MRO data generation
 output_file_path = '';
 config = {};
+    
+    config.UE(1).name = 'UE_1';
+    config.UE(1).initial_position = [100, -200, 1.5];
+    config.UE(1).velocity = [-8.4849, 8.4849, 0];
+    
+    config.UE(2).name = 'UE_2';
+    config.UE(2).initial_position = [600, 400, 1.5];
+    config.UE(2).velocity = [0, -24.9988, 0];
+    
+    
+    config.BS(1).name = 'BS_1';
+    config.BS(1).location = [-500, 500, 30];
+    config.BS(1).number_of_sectors = 3;
+    config.BS(1).azimuth_rotations_degrees = [135, -135, 0];
+    config.BS(1).downtilts_degrees = [5, 1, 5];
+    config.BS(1).tx_p_dbm = [20, 20, 20];                 
+    config.BS(1).azimuth_beamwidth_degrees = 67;
+    config.BS(1).elevation_beamwidth_degrees = 7.5;
+    config.BS(1).front_to_back_ratio = -30;
+    
+    config.BS(2).name = 'BS_2';
+    config.BS(2).location = [900, -300, 20];
+    config.BS(2).number_of_sectors = 3;
+    config.BS(2).azimuth_rotations_degrees = [45, -45, 180];
+    config.BS(2).downtilts_degrees = [7, 10, 10];
+    config.BS(2).tx_p_dbm = [20, 20, 20];
+    config.BS(2).azimuth_beamwidth_degrees = 67;
+    config.BS(2).elevation_beamwidth_degrees = 7.5;
+    config.BS(2).front_to_back_ratio = -30;
+    
+    config.BS(3).name = 'BS_3';
+    config.BS(3).location = [0, 0, 25];
+    config.BS(3).number_of_sectors = 3;
+    config.BS(3).azimuth_rotations_degrees = [0, 135, -135];
+    config.BS(3).downtilts_degrees = [25, 45, 45];
+    config.BS(3).tx_p_dbm = [20, 20, 20];
+    config.BS(3).azimuth_beamwidth_degrees = 67;
+    config.BS(3).elevation_beamwidth_degrees = 7.5;
+    config.BS(3).front_to_back_ratio = -30;
 
-    config.sim_num = 0.5;
-    config.no_UE = 1;
     
-    config.UE_1_initial_position = [100, -200, 1.5];
-    config.UE_1_velocity = [-8.4849, 8.4849, 0];
-    config.UE_1_end_position = [-239.3943, 139.3943, 1.5];
-    
-    config.UE_2_initial_position = [600, 400, 1.5];
-    config.UE_2_velocity = [0, -24.9988, 0];
-    config.UE_2_end_position = [600, -599.95, 1.5];
-    
-    config.no_BS = 1;
-    
-    config.BS_1_location = [-500, 500, 30];
-    config.BS_1_number_of_sectors = 3;
-    config.BS_1_azimuth_rotations_degrees = [135, -135, 0];
-    config.BS_1_downtilts_degrees = [5, 1, 5];
-    config.BS_1_Tx_P_dBm = [20, 20, 20];                 
-    config.BS_1_azimuth_beamwidth_degrees = 67;
-    config.BS_1_elevation_beamwidth_degrees = 7.5;
-    config.BS_1_front_to_back_ratio = -30;
-    
-    config.BS_2_location = [900, -300, 20];
-    config.BS_2_number_of_sectors = 3;
-    config.BS_2_azimuth_rotations_degrees = [45, -45, 180];
-    config.BS_2_downtilts_degrees = [7, 10, 10];
-    config.BS_2_Tx_P_dBm = [20, 20, 20];
-    config.BS_2_azimuth_beamwidth_degrees = 67;
-    config.BS_2_elevation_beamwidth_degrees = 7.5;
-    config.BS_2_front_to_back_ratio = -30;
-    
-    config.BS_3_location = [0, 0, 25];
-    config.BS_3_number_of_sectors = 3;
-    config.BS_3_azimuth_rotations_degrees = [0, 135, -135];
-    config.BS_3_downtilts_degrees = [25, 45, 45];
-    config.BS_3_Tx_P_dBm = [20, 20, 20];
-    config.BS_3_azimuth_beamwidth_degrees = 67;
-    config.BS_3_elevation_beamwidth_degrees = 7.5;
-    config.BS_3_front_to_back_ratio = -30;
-
-    
-    config.Carrier_Frequency_Hz = 28000000000.0;
-    config.Sampling_Frequency_Hz = 1000;
-    config.Samples = 40000;
-    config.Bandwidth_MHz = 10;
-    config.Resource_Blocks = 50;
-    config.Simulation_Duration_s = 40;
+    config.simulation.sim_num = '0.6'; % should be a string
+    config.simulation.seed = 0;
+    config.simulation.carrier_frequency_hz = 28000000000.0;
+    config.simulation.sampling_frequency_hz = 1000;
+    config.simulation.samples = 40000;
+    config.simulation.bandwidth_Mhz = 10;
+    config.simulation.resource_blocks = 50;
+    config.simulation.simulation_duration_s = 40;
+    config.simulation.scenario = 'Freespace';
 
 
 jsonStr = jsonencode(config);

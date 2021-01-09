@@ -15,7 +15,7 @@ if restore_config
     end
     directories = dir(save_folder);
     num_dir = numel(directories([directories(:).isdir]))-2;
-    save_folder = [save_folder, num2str(num_dir+1), '/'];  
+    save_folder = [save_folder, 'trial ', num2str(num_dir+1), '/'];  
     mkdir(save_folder);
     
     distance = speed .* total_time;
@@ -36,12 +36,12 @@ if restore_config
 
     for i=1:l.no_tx
         l.tx_position(:, i) = tx_pos(i, :)';
-        index = N_SECTORS*(i-1)+1;
+        index = N_SECTORS(i)*(i-1)+1;
         l.tx_array(i) = qd_arrayant(ARRAY_TYPE, AZI_BEAMWIDTH, ELE_BEAMWIDTH, -FB_RATIO_DB, orientations(index, 1));
         l.tx_array(i).rotate_pattern(orientations(index, 2), 'z');
         % fprintf('antenna %d sector 1 with dt = %d and azi = %d \n', i, orientations(index, 2), orientations(index, 1));
 
-        for j=1:N_SECTORS-1
+        for j=1:N_SECTORS(i)-1
             a = qd_arrayant(ARRAY_TYPE, AZI_BEAMWIDTH, ELE_BEAMWIDTH, -FB_RATIO_DB, orientations(index+j, 1));
             a.rotate_pattern(orientations(index+j, 2), 'z');
             l.tx_array(i).append_array(a);
@@ -82,7 +82,7 @@ else
     %% Chose BS layout
     l = qd_layout(s);
     l.no_tx = 3;
-    N_SECTORS = 3;
+    N_SECTORS(i) = 3;
     orientations = [5, 135;
                     1, -135;
                     5, 0;
@@ -98,12 +98,12 @@ else
     l.tx_position(:, 2) = [900, -300, 20]';
 
     for i=1:l.no_tx
-        index = N_SECTORS*(i-1)+1;
+        index = N_SECTORS(i)*(i-1)+1;
         l.tx_array(i) = qd_arrayant(ARRAY_TYPE, AZI_BEAMWIDTH, ELE_BEAMWIDTH, -FB_RATIO_DB, orientations(index, 1));
         l.tx_array(i).rotate_pattern(orientations(index, 2), 'z');
         % fprintf('antenna %d sector 1 with dt = %d and azi = %d \n', i, orientations(index, 2), orientations(index, 1));
 
-        for j=1:N_SECTORS-1
+        for j=1:N_SECTORS(i)-1
             a = qd_arrayant(ARRAY_TYPE, AZI_BEAMWIDTH, ELE_BEAMWIDTH, -FB_RATIO_DB, orientations(index+j, 1));
             a.rotate_pattern(orientations(index+j, 2), 'z');
             l.tx_array(i).append_array(a);
@@ -118,7 +118,7 @@ end
 l.rx_array = qd_arrayant('dipole');
 
 if numel(Tx_P_dBm) == 1
-    Tx_P_dBm = ones(l.no_tx, N_SECTORS)*Tx_P_dBm;
+    Tx_P_dBm = ones(l.no_tx, N_SECTORS(i))*Tx_P_dBm;
 end
 %% UE path
 for i=1:l.no_rx

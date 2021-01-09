@@ -14,6 +14,7 @@ desired_output_path = ''
 config = {
     'sim_num': '0.5',
     'no_UE' : 1,
+    'seed' : 0,
     
     'UE_1_initial_position': [100, -200, 1.5],
     'UE_1_velocity': [-8.4849, 8.4849, 0],
