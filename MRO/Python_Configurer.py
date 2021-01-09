@@ -12,52 +12,65 @@ desired_output_path = ''
 # and can be changed in the MATLAB init_sim script.
 
 config = {
-    'sim_num': '0.5',
-    'no_UE' : 1,
-    'seed' : 0,
-    
-    'UE_1_initial_position': [100, -200, 1.5],
-    'UE_1_velocity': [-8.4849, 8.4849, 0],
-    
-    'UE_2_initial_position': [600, 400, 1.5],
-    'UE_2_velocity': [0, -24.9988, 0],
-    
-    'no_BS': 1,
-    
-    'BS_1_location': [-500, 500, 30],
-    'BS_1_number_of_sectors': 3,
-    'BS_1_azimuth_rotations_degrees': [135, -135, 0],
-    'BS_1_downtilts_degrees': [5, 1, 5],
-    'BS_1_Tx_P_dBm': [20, 20, 20],                     
-    'BS_1_azimuth_beamwidth_degrees': 67,              # not currently used
-    'BS_1_elevation_beamwidth_degrees': 7.5,           # not currently used
-    'BS_1_front_to_back_ratio': -30,                   # not currently used
-    
-    'BS_2_location': [900, -300, 20],
-    'BS_2_number_of_sectors': 3,
-    'BS_2_azimuth_rotations_degrees': [45, -45, 180],
-    'BS_2_downtilts_degrees': [7, 10, 10],
-    'BS_2_Tx_P_dBm': [20, 20, 20],
-    'BS_2_azimuth_beamwidth_degrees': 67,              # not currently used
-    'BS_2_elevation_beamwidth_degrees': 7.5,           # not currently used
-    'BS_2_front_to_back_ratio': -30,                   # not currently used
-    
-    'BS_3_location': [0, 0, 25],
-    'BS_3_number_of_sectors': 3,
-    'BS_3_azimuth_rotations_degrees': [0, 135, -135],
-    'BS_3_downtilts_degrees': [25, 45, 45],
-    'BS_3_Tx_P_dBm': [20, 20, 20],
-    'BS_3_azimuth_beamwidth_degrees': 67,              # not currently used
-    'BS_3_elevation_beamwidth_degrees': 7.5,           # not currently used
-    'BS_3_front_to_back_ratio': -30,                   # not currently used
-
-    
-    'Carrier_Frequency_Hz': 28000000000.0,
-    'Sampling_Frequency_Hz': 1000,
-    'Samples': 40000,                                  # not currently used
-    'Bandwidth_MHz': 10,                               # not currently used
-    'Resource_Blocks': 50,                             # not currently used
-    'Simulation_Duration_s': 40
+    'simulation': {
+        'sim_num': '0.5',                                 # should be a string
+        'no_UE' : 1,
+        'seed' : 0,
+        'carrier_frequency_hz': 28000000000.0,
+        'sampling_frequency_hz': 1000,
+        'samples': 10000,                                  # not currently used
+        'bandwidth_Mhz': 10,                               # not currently used
+        'resource_blocks': 50,                             # not currently used
+        'simulation_duration_s': 10,
+        'scenario' : 'Freespace',
+        },
+    'UE': [
+        {
+            'name': 'UE_1',
+            'initial_position': [0, 100, 1.5],
+            'velocity': [-0.15, -10, 0],
+        },
+        {
+            'name': 'UE_2',
+            'initial_position': [0, 100, 1.5],
+            'velocity': [-0.15, -10, 0], 
+        }
+        ],
+    'BS': [
+        {
+            'name' : 'BS_1',
+            'location' : [0, 100, 20],
+            'number_of_sectors': 1,
+            'azimuth_rotations_degrees' : -90,
+            'downtilts_degrees' : 15,
+            'tx_p_dbm' : 5,
+            'azimuth_beamdwidth_degrees': 67,
+            'elevation_beamwidth_degrees': 7.5,
+            'front_to_back_ratio': -30
+            },
+            {
+            'name' : 'BS_2',
+            'location' : [-50*np.sqrt(3), 0, 20],
+            'number_of_sectors': 1,
+            'azimuth_rotations_degrees' : 45,
+            'downtilts_degrees' : 15,
+            'tx_p_dbm' : 10,
+            'azimuth_beamdwidth_degrees': 67,
+            'elevation_beamwidth_degrees': 7.5,
+            'front_to_back_ratio': -30
+            },
+        {
+            'name' : 'BS_3',
+            'location' : [50*np.sqrt(3), 0, 20],
+            'number_of_sectors': 1,
+            'azimuth_rotations_degrees' : 135,
+            'downtilts_degrees' : 15,
+            'tx_p_dbm' : 10,
+            'azimuth_beamdwidth_degrees': 67,
+            'elevation_beamwidth_degrees': 7.5,
+            'front_to_back_ratio': -30
+            },
+        ]
 }
 
 
