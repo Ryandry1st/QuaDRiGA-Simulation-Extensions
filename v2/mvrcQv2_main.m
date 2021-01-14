@@ -104,7 +104,9 @@ if isempty(orientations)
     orientations = [ori_azi, ori_dt];
 end
 
+fprintf('\tSetting tx antenna arrays...');
 for i = 1:l.no_tx
+    fprintf('%d(of %d)/',i,l.no_tx);
     index = params.no_sectors * (i - 1) + 1;
     for j = 1:params.no_sectors
         n = index + j - 1;
@@ -131,6 +133,7 @@ for i = 1:l.no_tx
     end
     l.tx_array(i) = tx_array_i;
 end
+fprintf('done.\n');
 
 % rx array
 l.rx_array = params.a_mt;
@@ -139,10 +142,10 @@ l.set_scenario(params.chn_scenario, [], [], params.indoor_frc, params.SC_lambda_
 fprintf('done.\n');
 
 if params.save_layout
+    fprintf('\nSaving layout file...')
     if ~exist([pwd, '/savedLayouts'], 'dir')
         mkdir(pwd, '/savedLayouts');
     end
-    fprintf('\nSaving layout file...')
     save('savedLayouts/layout.mat', '-v7.3', 'l', 'x_min', 'x_max', 'y_min', 'y_max', 'x_coords', 'y_coords', 'n_x_coords', 'n_y_coords', 'params.sample_distance', 'params.no_rx_min');
     fprintf('success.\n');
 end

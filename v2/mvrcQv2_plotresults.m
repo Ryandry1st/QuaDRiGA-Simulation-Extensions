@@ -12,9 +12,8 @@ set(0, 'DefaultAxesTitleFontWeight', 'normal');
 load(savedResultFile);
 
 %% PLOTS
-
 % visualize the antenna array
-%params.tx_array_3gpp_3d.visualize;
+params.tx_array_3gpp_3d.visualize;
 
 figure('Renderer', 'painters', 'Position', [10, 10, 1000, 1500]); clf
 % Cell ID
