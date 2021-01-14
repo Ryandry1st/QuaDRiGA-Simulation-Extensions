@@ -5,14 +5,14 @@ close all;
 addpath(genpath([pwd,'/QuaDriGa_2020.11.03_v2.4.0']));
 
 %set random seed
-seed = 0;
+seed = 100;
 %----------------------------
 
 %initialize parameters
 params = mvrcQv2_init(seed);
 %----------------------------
 
-tilts = 0;
+tilts = 5:1:15;
 
 for n = 1:length(tilts)
 

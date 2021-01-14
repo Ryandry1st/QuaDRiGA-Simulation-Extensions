@@ -33,7 +33,7 @@ clean_code = 0;
 % layout
 no_rx_min = 50000;
 no_tx = 10;
-sample_distance = 20;
+sample_distance = 25;
 BS_drop = "rnd"; %hex, rnd, csv
 downtilt = 10;
 isd = 200;
@@ -48,10 +48,10 @@ tx_height_max = tx_height;
 SC_lambda_rx = 50;
 SC_lambda_tx = [];
 indoor_frc = 0;
-chn_scenario = 'Freespace';
+chn_scenario = '3GPP_3D_UMi_LOS';
 %      * Freespace
-%      * 3GPP_3D_UMi 
-%      * 3GPP_38.901_UMi Example: [Tx height:25m, Rx height: 1.5-2.5 m, ISD: 200m] 
+%      * 3GPP_3D_UMi
+%      * 3GPP_38.901_UMi Example: [Tx height:25m, Rx height: 1.5-2.5 m, ISD: 200m]
 %      * 3GPP_38.901_UMa Example: [Tx height:25m, Rx height: 1.5-2.5 m, ISD: 500m]
 %      * 3GPP_38.901_RMa Example: [Tx height:35m, Rx height: 1.5-2.5 m, ISD: 5000m]
 %      * 3GPP_38.901_Indoor_Mixed_Office

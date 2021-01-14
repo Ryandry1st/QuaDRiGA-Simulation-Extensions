@@ -36,7 +36,7 @@ fprintf('\tSetting tx positions...');
 orientations = [];
 
 switch params.BS_drop
-
+    
     case 'csv'
         fprintf('\tLoading CSV file...')
         % Read the csv file for BS locations and sector orientations using the python helper functions
@@ -54,7 +54,7 @@ switch params.BS_drop
         end
         orientations = str2num(output);
         params.no_tx = size(tx_locs, 1);
-
+        
     case "rnd"
         boundary_xy = 0.9 * max_xy;
         locs_xy = zeros(params.no_tx, 2);
@@ -71,7 +71,7 @@ switch params.BS_drop
         locs_z = params.tx_height_min + (params.tx_height_max - params.tx_height_min) .* rand(params.no_tx, 1);
         tx_locs = [locs_xy, locs_z];
         fprintf('done.\n');
-
+        
     case 'hex'
         l_tmp = qd_layout.generate('regular', params.no_tx, params.isd);
         tx_locs = (l_tmp.tx_position).';
@@ -252,10 +252,10 @@ if params.save_results == 1
     if ~exist([pwd, '/savedResults/mat'], 'dir')
         mkdir([pwd, '/savedResults/mat']);
     end
-
+    
     file_name = append('powermatrixDT', num2str(round(params.downtilt)));
     save([pwd, '/savedResults/mat/', file_name], 'no_rx', 'tx_locs', 'n_x_coords', 'n_y_coords', 'x_min', 'x_max', 'y_min', 'y_max', 'cell_id', 'rsrp_2d', 'sinr_2d', 'params', '-v7.3');
-
+    
     jsonStr = jsonencode(powermatrix);
     fid = fopen(['savedResults/json/', file_name, '.json'], 'w');
     if fid == -1, error('Cannot create JSON file'); end
