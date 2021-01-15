@@ -9,6 +9,7 @@ rng(seed);
 
 if ismac
     python_path = '/Users/ayp/opt/anaconda3/bin/python';
+    python_path = '/Users/rmd2758/opt/anaconda3/bin/python';
 elseif isunix
     python_path = '/home/user/anaconda3/bin/python';
 end

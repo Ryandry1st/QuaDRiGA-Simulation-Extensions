@@ -166,6 +166,7 @@ if params.save_load_channels
             p_builder(1, i).tx_array(1, :) = l.tx_array(i).copy();
         end
         cl = merge(get_channels(p_builder));
+        cl = qf.reshapeo( cl, [no_rx, l.no_tx]); % reshape the channels for each tx
     catch
         fprintf("Could not find builder or channel data, recalculating. \n");
         [cl, p_builder] = l.get_channels; % Generate channels
