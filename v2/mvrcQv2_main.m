@@ -156,14 +156,33 @@ fprintf('[Generate layout] runtime = %1.0f min\n', toc(layout_tic)/60);
 % Channels are now generated using the default QuaDRiGa method (phase 1 only used the LOS path).
 % This w1l take quite some time.
 generate_channels_tic = tic;
-[cl, p_builder] = l.get_channels; % Generate channels
+
+if params.save_load_channels
+    try
+        load([pwd, '/savedBuilders/builder_obj.mat']);
+        fprintf("Found a builder!\n");
+        % replace the base station transmitters with the new ones
+        for i=1:numel(p_builder)
+            p_builder(1, i).tx_array(1, :) = l.tx_array(i).copy();
+        end
+        cl = merge(get_channels(p_builder));
+    catch
+        fprintf("Could not find builder or channel data, recalculating. \n");
+        [cl, p_builder] = l.get_channels; % Generate channels
+
+        if ~exist([pwd, '/savedBuilders'], 'dir')
+            mkdir(pwd, '/savedBuilders');
+        end
+        save([pwd, '/savedBuilders/builder_obj.mat'], '-v7.3', 'p_builder');
+    end
+end
 
 nEl = l.tx_array(1, 1).no_elements / 3; % Number of elements per sector
 nEl = {1:nEl, nEl + 1:2 * nEl, 2 * nEl + 1:3 * nEl}; % Element indices per sector
 fprintf('Spliting channels between sectors...');
 c(:, :) = split_tx(cl, nEl); % Split channels from each sector
 fprintf('success.');
-fprintf('\n[Generate channels] runtime = %1.0f min\n', toc(generate_channels_tic)/60)
+fprintf('\n[Generate channels] runtime = %1.3f min\n', toc(generate_channels_tic)/60)
 
 %% POSTPROCESSING
 fprintf('Post processing...');

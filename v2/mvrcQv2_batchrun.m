@@ -12,7 +12,7 @@ seed = 100;
 params = mvrcQv2_init(seed);
 %----------------------------
 
-tilts = 5:1:15;
+tilts = 1;
 
 for n = 1:length(tilts)
 
