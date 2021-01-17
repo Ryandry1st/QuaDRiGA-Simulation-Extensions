@@ -50,15 +50,15 @@ for i=1:l.no_tx
 end
 
 config.simulation.carrier_frequency_hz = s.center_frequency;
-config.sampling_frequency_hz = fs;
+config.simulation.sampling_frequency_hz = fs;
 [~, samples] = size(l.rx_track(1).positions);
-config.samples = samples;
-config.bandwidth_Mhz = BW/1e6;
-config.resource_blocks = num_RBs;
-config.simulation_duration_s = samples/fs;
-config.sim_num = sim_num;
-config.scenario = scen;
-config.seed = seed;
+config.simulation.samples = samples;
+config.simulation.bandwidth_Mhz = BW/1e6;
+config.simulation.resource_blocks = num_RBs;
+config.simulation.simulation_duration_s = samples/fs;
+config.simulation.sim_num = sim_num;
+config.simulation.scenario = scen;
+config.simulation.seed = seed;
 
 jsonStr = jsonencode(config);
 fid = fopen(append(save_folder,'config.json'), 'w');
