@@ -9,7 +9,7 @@ rng(seed);
 
 if ismac
     python_path = '/Users/ayp/opt/anaconda3/bin/python';
-    python_path = '/Users/rmd2758/opt/anaconda3/bin/python';
+    %python_path = '/Users/rmd2758/opt/anaconda3/bin/python';
 elseif isunix
     python_path = '/home/user/anaconda3/bin/python';
 end
@@ -33,8 +33,8 @@ random_ori_azi = 0;
 clean_code = 0;
 
 % layout
-no_rx_min = 5000;
-no_tx = 3;
+no_rx_min = 50000;
+no_tx = 10;
 sample_distance = 25;
 BS_drop = "rnd"; %hex, rnd, csv
 downtilt = 10;

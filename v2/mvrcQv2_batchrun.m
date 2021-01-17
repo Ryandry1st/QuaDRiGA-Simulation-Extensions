@@ -12,10 +12,12 @@ seed = 100;
 params = mvrcQv2_init(seed);
 %----------------------------
 
-tilts = 1;
+tilts = [0,10];
 
 for n = 1:length(tilts)
 
+    big_tic = tic;
+    
     %change params variables here
     params.downtilt = tilts(n);
     %----------------------------
@@ -29,5 +31,7 @@ for n = 1:length(tilts)
     fprintf('BATCHRUN(%i/%i):Finished tilt = %d\n', n, length(tilts), tilts(n))
     fprintf('----------------------------------------------\n')
     %----------------------------
+
+    fprintf('[tilt=%.0f] runtime: %.1f sec (%1.1f min)\n',tilts(n), toc(big_tic), toc(big_tic)/60);
 
 end

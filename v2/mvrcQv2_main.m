@@ -4,7 +4,7 @@ if nargin == 0
     params = mvrcQv2_init;
 end
 
-big_tic = tic;
+
 
 %% Drop users
 fprintf('[Generate layout]');
@@ -292,7 +292,6 @@ if params.save_results == 1
 end
 
 %% END OF PROGRAM
-fprintf('[Simulation] runtime: %.1f s = %1.1f min (%.0f UE/sec.)\n', toc(big_tic), toc(big_tic)/60, no_rx/toc(big_tic));
 if params.clean_code
     MBeautify.formatCurrentEditorPage()
 end
