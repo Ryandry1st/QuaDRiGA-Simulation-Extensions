@@ -12,6 +12,8 @@ if ismac
     %python_path = '/Users/rmd2758/opt/anaconda3/bin/python';
 elseif isunix
     python_path = '/home/user/anaconda3/bin/python';
+else
+    python_path = 'python';
 end
 
 fixed_cvs_file = "csvData/Mavenir_locs.csv";
@@ -27,17 +29,17 @@ s.use_absolute_delays = 1;
 
 % flags
 save_results = 1;
-save_layout = 0;
+save_layout = 1;
 save_load_channels = 1;
 random_ori_azi = 0;
 clean_code = 0;
 
 % layout
-no_rx_min = 50000;
+no_rx_min = 20000;
 no_tx = 10;
-sample_distance = 25;
+sample_distance = 10;
 BS_drop = "rnd"; %hex, rnd, csv
-downtilt = 10;
+downtilt = 3;
 isd = 200;
 tx_pwr_dBm = 46;
 nSC = 600;
