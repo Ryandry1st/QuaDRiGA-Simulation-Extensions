@@ -22,24 +22,24 @@ fixed_cvs_file = "csvData/Mavenir_locs.csv";
 
 s = qd_simulation_parameters; % Set general simulation parameters
 s.center_frequency = 2e9; % 2 GHz center frequency
-s.sample_density = 1;
-s.use_3GPP_baseline = 1; % Disable spherical waves
+s.sample_density = 5;
+s.use_3GPP_baseline = 0; % Disable spherical waves
 s.show_progress_bars = 1; % Enable / disable status display
-s.use_absolute_delays = 1;
+s.use_absolute_delays = 0;
 
 % flags
 save_results = 1;
-save_layout = 1;
-save_load_channels = 1;
+save_layout = 0;
+save_load_channels = 0;
 random_ori_azi = 0;
 clean_code = 0;
 
 % layout
-no_rx_min = 20000;
+no_rx_min = 50000;
 no_tx = 10;
-sample_distance = 10;
+sample_distance = 25;
 BS_drop = "rnd"; %hex, rnd, csv
-downtilt = 3;
+downtilt = 0;
 isd = 200;
 tx_pwr_dBm = 46;
 nSC = 600;
@@ -49,10 +49,10 @@ no_sectors = 3;
 tx_height_min = tx_height;
 tx_height_max = tx_height;
 
-SC_lambda_rx = 50;
+SC_lambda_rx = [];
 SC_lambda_tx = [];
 indoor_frc = 0;
-chn_scenario = '3GPP_3D_UMi_LOS';
+chn_scenario = '3GPP_38.901_UMi_LOS';
 %      * Freespace
 %      * 3GPP_3D_UMi
 %      * 3GPP_38.901_UMi Example: [Tx height:25m, Rx height: 1.5-2.5 m, ISD: 200m]
@@ -103,7 +103,7 @@ tx_array_3gpp_macro.name = '3gpp-macro';
 % downtilt = -downtilt; % Don't negate downtilt unless you are manually
 % rotating the antenna
 
-tx_antenna_3gpp_3d.M = 2;
+tx_antenna_3gpp_3d.M = 4;
 tx_antenna_3gpp_3d.N = 1;
 tx_antenna_3gpp_3d.center_freq = s.center_frequency;
 tx_antenna_3gpp_3d.pol = 4;

@@ -1,5 +1,5 @@
 %postprocessing visualization
-file_name = 'powermatrixDT5.mat';
+file_name = 'powermatrixDT10.mat';
 
 savedResultFile = [pwd, '/savedResults/mat/', file_name];
 if exist(savedResultFile, 'file')

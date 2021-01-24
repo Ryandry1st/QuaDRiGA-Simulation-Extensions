@@ -51,7 +51,7 @@ function varargout = mvrcQv2_layout(params)
             params.no_tx = size(tx_locs, 1);
 
         case "rnd"
-            boundary_xy = 0.9 * max_xy;
+            boundary_xy = 0.8 * max_xy;
             locs_xy = zeros(params.no_tx, 2);
             locs_xy(1, :) = -boundary_xy + 2 * boundary_xy * rand(1, 2);
             counter = 1;

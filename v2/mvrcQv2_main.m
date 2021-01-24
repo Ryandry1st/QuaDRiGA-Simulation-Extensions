@@ -1,9 +1,11 @@
-function mvrcQv2_main(params)
+function mvrcQv2_main(params, tilt)
 
 if nargin == 0
     params = mvrcQv2_init;
 end
-new_downtilt = params.downtilt;
+%new_downtilt = params.downtilt;
+params.downtilt = tilt;
+new_downtilt = tilt;
 
 %% Drop users
 layout_tic = tic;
@@ -69,7 +71,7 @@ fprintf('[Generate layout] runtime = %1.2f min\n', toc(layout_tic)/60);
 % Channels are now generated using the default QuaDRiGa method (phase 1 only used the LOS path).
 % This w1l take quite some time.
 generate_channels_tic = tic;
-
+cl = [];
 if params.save_load_channels
     fprintf("Attempting to load a builder...");
     try
@@ -84,12 +86,14 @@ if params.save_load_channels
     catch
         fprintf("Could not find builder or channel data, recalculating. \n");
         [cl, p_builder] = l.get_channels; % Generate channels
-
+        
         if ~exist([pwd, '/savedBuilders'], 'dir')
             mkdir(pwd, '/savedBuilders');
         end
         save([pwd, '/savedBuilders/builder_obj.mat'], '-v7.3', 'p_builder');
     end
+else
+    [cl, ~] = l.get_channels; % Generate channels
 end
 
 nEl = l.tx_array(1, 1).no_elements / 3; % Number of elements per sector
