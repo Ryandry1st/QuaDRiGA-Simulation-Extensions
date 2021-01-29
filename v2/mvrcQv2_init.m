@@ -29,8 +29,8 @@ s.use_absolute_delays = 0;
 
 % flags
 save_results = 1;
-save_layout = 0;
-save_load_channels = 0;
+save_layout = 1;
+save_load_channels = 1;
 random_ori_azi = 0;
 clean_code = 0;
 

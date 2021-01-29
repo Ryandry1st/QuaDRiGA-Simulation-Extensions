@@ -2,8 +2,9 @@ function mvrcQv2_main(params, tilt)
 
 if nargin == 0
     params = mvrcQv2_init;
+    tilt = params.downtilt;
 end
-%new_downtilt = params.downtilt;
+new_downtilt = params.downtilt;
 params.downtilt = tilt;
 new_downtilt = tilt;
 
