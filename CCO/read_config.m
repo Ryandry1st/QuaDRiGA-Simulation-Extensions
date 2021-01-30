@@ -4,7 +4,7 @@
 config_file = 'config.json';
 
 info = jsondecode(fileread(config_file));
-sim_style = info.simulation.MRO;
+sim_style = info.simulation.CCO_0_MRO_1;
 no_rx = numel(info.UE);
 
 if sim_style
@@ -47,3 +47,17 @@ else
     BS_drop = 0; % If 0, then don't overwrite the placements
 end
 
+if numel(info.simulation.batch_tilts) == 0
+    % don't overwrite the downtilts
+    fprintf("Using pre-defined BS\n");
+elseif numel(info.simulation.batch_tilts) == 1
+    % overwrite the downtilts with a single value and run once
+    fprintf("Setting all downtilts to %i\n", info.simulation.batch_tilts);
+    downtilt = info.simulation.batch_tilts;
+    orientations(:, 2) = downtilt;
+else
+    % eventually add support for batch job
+    fprintf("Batch jobs not supported yet, reverting to just %i downtilt\n", info.simulation.batch_tilts(1));
+    downtilt = info.simulation.batch_tilts(1);
+    orientations(:, 2) = downtilt;
+end

@@ -7,6 +7,9 @@ end
 rng('default');
 rng(seed);
 
+addpath(genpath([pwd, '/QuaDriGa_2020.11.03_v2.4.0']));
+gcp; % initialize parallel pool
+
 if ismac
 %     python_path = '/Users/ayp/opt/anaconda3/bin/python';
     python_path = '/Users/rmd2758/opt/anaconda3/bin/python';

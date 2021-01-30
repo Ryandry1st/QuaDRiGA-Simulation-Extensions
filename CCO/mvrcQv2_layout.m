@@ -138,12 +138,13 @@ function varargout = mvrcQv2_layout(params)
     l.set_scenario(params.scen, [], [], params.indoor_frc, params.SC_lambda_rx, params.SC_lambda_tx);
     fprintf('done.\n');
 
+    old_orientations = orientations;
     if params.save_layout
         fprintf('\nSaving layout file...')
         if ~exist([pwd, '/savedLayouts'], 'dir')
             mkdir(pwd, '/savedLayouts');
         end
-        save('savedLayouts/layout.mat', '-v7.3', 'l', 'x_min', 'x_max', 'y_min', 'y_max', 'x_coords', 'y_coords', 'n_x_coords', 'n_y_coords', 'orientations');
+        save('savedLayouts/layout.mat', '-v7.3', 'l', 'x_min', 'x_max', 'y_min', 'y_max', 'x_coords', 'y_coords', 'n_x_coords', 'n_y_coords', 'old_orientations');
         fprintf('success.\n');
     end
     

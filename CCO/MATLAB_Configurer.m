@@ -12,12 +12,12 @@ config = {};
     config.simulation.resource_blocks = 50;
     config.simulation.simulation_duration_s = 40;
     config.simulation.scenario = 'Freespace';
-    config.simulation.MRO = 0;
+    config.simulation.CCO_0_MRO_1 = 0;    % set to 1 for MRO
     config.simulation.no_tx = 7;
-    config.simulation.downtilt = 5;
     config.simulation.sample_distance = 50;
     config.simulation.no_rx_min = 1500;
-    config.simulation.BS_drop = 0;
+    config.simulation.BS_drop = 0;        % Choose 'hex', 'rnd', 'csv' for built in layouts
+    config.simulation.batch_tilts = [7];
     
     
     config.UE(1).name = 'UE_1';
@@ -60,6 +60,29 @@ config = {};
     config.BS(3).front_to_back_ratio = -30;
 
 
+% error reporting
+fprintf(['Preparing simulation number ', config.simulation.sim_num, '\n']);
+
+fprintf(['...Setting path loss model to ', config.simulation.scenario, '\n'])
+
+if numel(config.simulation.batch_tilts) == 0
+    fprintf("...Using the BS tilts you defined.\n");
+elseif numel(config.simulation.batch_tilts) == 1
+    fprintf('...Setting all BS tilts to %i.\n', config.simulation.batch_tilts);
+else
+    fpritnf('...You tried to set multiple tilts, but this is not available yet, falling back to just %i degrees.\n', config.simulation.batch_tilts);
+end
+
+if strcmp(config.simulation.BS_drop, 'hex') || strcmp(config.simulation.BS_drop, 'rnd') || strcmp(config.simulation.BS_drop, 'csv')
+    fprintf('...Using a new BS layout for %i locations.\n', config.simulation.no_tx);
+else
+    fprintf('...Using the locations you defined for the BS.\n');
+end
+
+if config.simulation.CCO_0_MRO_1 == 0 && config.simulation.no_rx_min < 1000
+    fprintf('...Did you mean to do CCO? You have chosen very few no_rx_min=%i.\n', config.simulation.no_rx_min);
+end
+    
 jsonStr = jsonencode(config);
 fid = fopen(append(output_file_path,'config.json'), 'w');
 if fid == -1, error('Cannot create JSON file'); end

@@ -22,12 +22,12 @@ config = {
         'resource_blocks': 50,                             # not currently used
         'simulation_duration_s': 10,
         'scenario': '3GPP_3D_UMi_LOS', # 3GPP_3D_UMi_LOS, Freespace
-        'MRO': 0,
+        'CCO_0_MRO_1': 0,   # set to 1 for MRO or 0 for CCO
         'no_tx': 3,
-        'downtilt': 5,
         'sample_distance': 10,
-        'no_rx_min': 2000,
-        'BS_drop': '0',
+        'no_rx_min': 500,  
+        'BS_drop': '0',     # set to 'csv', 'rnd', 'hex', to generate new BS locations
+        'batch_tilts': [7], # make this blank to keep defined BS tilts
         },
     'UE': [
         {
@@ -78,6 +78,24 @@ config = {
         ]
 }
 
+print(f"Preparing simulation number {config['simulation']['sim_num']}")
+
+print(f"... Setting path loss model to {config['simulation']['scenario']}");
+
+if len(config['simulation']['batch_tilts']) == 0:
+    print("... using the BS tilts you defined.")
+elif len(config['simulation']['batch_tilts']) == 1:
+    print(f"...Setting all BS tilts to {config['simulation']['batch_tilts']}");
+else:
+    print(f"...You tried to set multiple tilts, but this is not available yet, falling back to just {config['simulation']['batch_tilts'][0]} degrees.")
+
+if config['simulation']['BS_drop'] == 'hex' or config['simulation']['BS_drop'] == 'rnd' or config['simulation']['BS_drop'] == 'csv':
+    print(f"...Using a new BS layout for {config['simulation']['no_tx']} locations")
+else:
+    print("...Using the BS locations you defined")
+
+if config['simulation']['CCO_0_MRO_1'] == 0 and config['simulation']['no_rx_min'] < 1000:
+    print(f"...Did you mean to do CCO? You have chosen very few no_rx_min={config['simulation']['no_rx_min']}.'")
 
 # store in a file
 with open(desired_output_path+'config.json', 'w') as file_out:

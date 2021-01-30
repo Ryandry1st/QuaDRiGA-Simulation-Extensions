@@ -208,10 +208,10 @@ if params.save_results == 1
         if fid == -1, error('Cannot create JSON file'); end
         fwrite(fid, jsonStr, 'char');
         fclose(fid);
-        commandStr = sprintf('%s pyScripts/make_npz_from_json.py %s', params.python_path, file_name);
+        commandStr = sprintf('%s pyScripts/make_npz_from_json.py %s', params.python_path, ['savedResults/json/', file_name, '.json']);
         fprintf('Attempting to write to NPZ file...')
         status = system(commandStr);
-        if ~(status == 0)
+        if status
             error('Cannot create NPZ file!');
         else
             fprintf('success.\n')
