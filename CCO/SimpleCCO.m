@@ -55,7 +55,7 @@ if params.save_layout
         end
         fprintf('done.\n');
     catch
-        fprintf('Not found.\n');
+        fprintf('Failure. Recalculating.\n');
         if ~exist([pwd, '/savedLayouts'], 'dir')
             mkdir(pwd, '/savedLayouts');
         end

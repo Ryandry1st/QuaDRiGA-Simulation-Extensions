@@ -36,6 +36,9 @@ sim_num = info.simulation.sim_num;
 scen = info.simulation.scenario;
 seed = info.simulation.seed;
 
+rng('default');
+rng(seed);
+
 %% Need to add
 % reading for antenna models -- '3gpp-macro', 'omni' will be first
 sample_distance = info.simulation.sample_distance;

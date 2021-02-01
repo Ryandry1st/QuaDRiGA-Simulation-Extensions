@@ -4,7 +4,7 @@ output_file_path = '';
 config = {};
 
     config.simulation.sim_num = '0.6'; % should be a string
-    config.simulation.seed = 0;
+    config.simulation.seed = 3;
     config.simulation.carrier_frequency_Mhz = 28000.0;
     config.simulation.sampling_frequency_hz = 1000;
     config.simulation.samples = 40000;
@@ -15,8 +15,8 @@ config = {};
     config.simulation.CCO_0_MRO_1 = 0;    % set to 1 for MRO
     config.simulation.no_tx = 7;
     config.simulation.sample_distance = 50;
-    config.simulation.no_rx_min = 1500;
-    config.simulation.BS_drop = 0;        % Choose 'hex', 'rnd', 'csv' for built in layouts
+    config.simulation.no_rx_min = 2500;
+    config.simulation.BS_drop = 'rnd';        % Choose 'hex', 'rnd', 'csv' for built in layouts
     config.simulation.batch_tilts = [7];
     
     
