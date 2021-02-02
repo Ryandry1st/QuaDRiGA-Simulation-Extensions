@@ -27,7 +27,8 @@ elseif length(range_of_interest) < useful_fft_points
 end
             
        
-Y_save = zeros(num_RBs, total_time*fs);
+Y_save = zeros(num_RBs, total_time*fs, N_SECTORS(1));
+tic
 for tx_k=1:l.no_tx
     for rx_k=1:l.no_rx
         for sector=1:N_SECTORS(tx_k)
@@ -49,7 +50,7 @@ for tx_k=1:l.no_tx
 
             for i=1:num_RBs
                 Y = mean(X(bin_sets==i, :), 1); % average over the bin
-                Y_save(i, :) = mean(X(bin_sets==i, :), 1);
+                Y_save(i, :, sector) = mean(X(bin_sets==i, :), 1);
                for j=1:len
                     fprintf(file, '%g ', Y(j));
                 end
@@ -57,7 +58,25 @@ for tx_k=1:l.no_tx
             end
             fclose(file);
             
-            writematrix(Y_save, strcat(name, '.csv')); % Writes too many digits
+        end
+        for sector=1:N_SECTORS(tx_k)
+           name = strcat(save_folder, 'ULDL_', 'TX_', num2str(tx_k), '_Sector_',num2str(sector), '_UE_', num2str(rx_k), '_Channel_Response');
+           writematrix(Y_save(:, :, sector), strcat(name, '.csv')); % Writes too many digits 
+        end
+        if show_plot
+            f = figure('Position', [100, 200, 1800, 800]);
+            t = tiledlayout(f, 1, N_SECTORS(tx_k));
+            for sector=1:N_SECTORS(tx_k)
+                nexttile
+                surf(1:100:total_time*fs, 1:num_RBs, 10*log10(Y_save(:, 1:100:end, sector)));
+                xlabel("Time [ms]")
+                ylabel("Frequency [Hz]")
+                zlabel("Channel Gain [dB]")
+            end
+            title(t, ['Time-Freq Response ','TX', num2str(tx_k), ' UE', num2str(rx_k)]);
+            saveas(gcf, strcat(save_folder, ['Time-Freq_Response' '_TX_', num2str(tx_k), '_UE_', num2str(rx_k), '.png']));
+            close all;
         end
     end
 end
+toc

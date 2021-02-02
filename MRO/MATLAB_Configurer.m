@@ -50,8 +50,8 @@ config = {};
     config.simulation.samples = 40000;
     config.simulation.bandwidth_Mhz = 10;
     config.simulation.resource_blocks = 50;
-    config.simulation.simulation_duration_s = 40;
-    config.simulation.scenario = 'Freespace';
+    config.simulation.simulation_duration_s = 10;
+    config.simulation.scenario = '3GPP_3D_UMi';
 
 
 jsonStr = jsonencode(config);
