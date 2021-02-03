@@ -19,6 +19,8 @@ if params.save_layout
             fprintf("Layout mismatch, recalculating\n");
             error("Mismatch between layouts, recalculate\n")
         end
+        params.orientations = old_orientations;
+        params.orientations(:, 2) = params.downtilt;
         
         for i = 1:l.no_tx
             fprintf('%d(of %d)/',i,l.no_tx);
@@ -50,7 +52,7 @@ if params.save_layout
         end
         fprintf('done.\n');
     catch
-        fprintf('Not found.\n');
+        fprintf('Failure. Recalculating.\n');
         if ~exist([pwd, '/savedLayouts'], 'dir')
             mkdir(pwd, '/savedLayouts');
         end
@@ -65,12 +67,9 @@ for i = 1:l.no_tx
     tx_locs(i, :) = l.tx_position(:, i);
 end
 
-%l.visualize([],[],0);axis square
 fprintf('[Generate layout] runtime = %1.2f min\n', toc(layout_tic)/60);
 
 %% Generate channels
-% Channels are now generated using the default QuaDRiGa method (phase 1 only used the LOS path).
-% This w1l take quite some time.
 generate_channels_tic = tic;
 
 if params.save_load_channels
@@ -141,8 +140,6 @@ sector_pwr = pwr_mW_perSC_perMIMOtx * ones(l.no_tx*params.no_sectors, 1);
 rsrp_p0 = zeros(l.no_rx, l.no_tx*params.no_sectors);
 
 % Calculate the RSRP value from the first transmit antenna:
-% TODO this has problems with 1 sector because some
-% dimensions are 0....
 for ir = 1:l.no_rx
     for it = 1:l.no_tx * params.no_sectors
         tmp = c(ir, it).coeff(:, 1, :); % Coefficients from first Tx antenna

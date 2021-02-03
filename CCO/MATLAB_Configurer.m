@@ -17,7 +17,7 @@ config = {};
     config.simulation.sample_distance = 50;
     config.simulation.no_rx_min = 2500;
     config.simulation.BS_drop = 'rnd';        % Choose 'hex', 'rnd', 'csv' for built in layouts
-    config.simulation.batch_tilts = [7];
+    config.simulation.batch_tilts = [7, 3, 10];
     
     
     config.UE(1).name = 'UE_1';
@@ -70,7 +70,7 @@ if numel(config.simulation.batch_tilts) == 0
 elseif numel(config.simulation.batch_tilts) == 1
     fprintf('...Setting all BS tilts to %i.\n', config.simulation.batch_tilts);
 else
-    fpritnf('...You tried to set multiple tilts, but this is not available yet, falling back to just %i degrees.\n', config.simulation.batch_tilts);
+    fprintf(['...You set multiple tilts = ', num2str(config.simulation.batch_tilts), '.\n']);
 end
 
 if strcmp(config.simulation.BS_drop, 'hex') || strcmp(config.simulation.BS_drop, 'rnd') || strcmp(config.simulation.BS_drop, 'csv')

@@ -1,34 +1,26 @@
-clc;
-clear all;
-close all;
+function mvrcQv2_batchrun(params)
 
-addpath(genpath([pwd,'/QuaDriGa_2020.11.03_v2.4.0']));
+tilts = params.info.simulation.batch_tilts;
 
-%set random seed
-seed = 100;
-%----------------------------
-
-%initialize parameters
-params = mvrcQv2_init(seed);
-%----------------------------
-
-tilts = [0,10];
-
-for n = 1:length(tilts)
+param_copies = {};
+for n=1:numel(tilts)
+   param_copies{n} = params;
+   param_copies{n}.downtilt = tilts(n);
+   param_copies{n}.orientations(:, 2) = tilts(n);
+end
+parfor n = 1:numel(tilts)
 
     big_tic = tic;
     
-    %change params variables here
-    params.downtilt = tilts(n);
     %----------------------------
 
     %main run
     fprintf('----------------------------------------------\n')
-    fprintf('BATCHRUN(%i/%i):Running tilt = %d ...\n', n, length(tilts), tilts(n))
+    fprintf('BATCHRUN(%i/%i):Running tilt = %d ...\n', n, numel(tilts), tilts(n))
 
-    mvrcQv2_main(params);
+    mvrcQv2_main(param_copies{n});
 
-    fprintf('BATCHRUN(%i/%i):Finished tilt = %d\n', n, length(tilts), tilts(n))
+    fprintf('BATCHRUN(%i/%i):Finished tilt = %d\n', n, numel(tilts), tilts(n))
     fprintf('----------------------------------------------\n')
     %----------------------------
 

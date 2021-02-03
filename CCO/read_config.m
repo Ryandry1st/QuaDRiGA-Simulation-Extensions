@@ -4,10 +4,10 @@
 config_file = 'config.json';
 
 info = jsondecode(fileread(config_file));
-sim_style = info.simulation.CCO_0_MRO_1;
+sim_style = 1- info.simulation.CCO_0_MRO_1;
 no_rx = numel(info.UE);
 
-if sim_style
+if ~sim_style
     for i = 1:no_rx
         initial_loc(i, :) = info.UE(i).initial_position;
         velocity = info.UE(i).velocity;
@@ -46,21 +46,23 @@ no_rx_min = info.simulation.no_rx_min;
 if strcmp(info.simulation.BS_drop, 'hex') || strcmp(info.simulation.BS_drop, 'rnd') || strcmp(info.simulation.BS_drop, 'csv')
     BS_drop = info.simulation.BS_drop; % should be 'hex', 'rnd', 'csv'
     no_tx = info.simulation.no_tx; % overwrite the tx field
+    
+    if numel(info.simulation.batch_tilts) == 0
+        error("You need to set the batch_tilts to run BS_dro[");
+    elseif numel(info.simulation.batch_tilts) == 1
+        % overwrite the downtilts with a single value and run once
+        fprintf("Setting all downtilts to %i\n", info.simulation.batch_tilts);
+        downtilt = info.simulation.batch_tilts;
+        orientations = [];
+        sim_style = 1;
+    else
+        % eventually add support for batch job
+        fprintf(['Batch job requested for downtilts =[', num2str(info.simulation.batch_tilts'), ']\n']);
+        orientations = [];
+        sim_style = 2;
+
+    end
 else
     BS_drop = 0; % If 0, then don't overwrite the placements
-end
-
-if numel(info.simulation.batch_tilts) == 0
-    % don't overwrite the downtilts
     fprintf("Using pre-defined BS\n");
-elseif numel(info.simulation.batch_tilts) == 1
-    % overwrite the downtilts with a single value and run once
-    fprintf("Setting all downtilts to %i\n", info.simulation.batch_tilts);
-    downtilt = info.simulation.batch_tilts;
-    orientations(:, 2) = downtilt;
-else
-    % eventually add support for batch job
-    fprintf("Batch jobs not supported yet, reverting to just %i downtilt\n", info.simulation.batch_tilts(1));
-    downtilt = info.simulation.batch_tilts(1);
-    orientations(:, 2) = downtilt;
 end
