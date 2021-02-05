@@ -17,7 +17,7 @@ config = {};
     config.simulation.sample_distance = 50;
     config.simulation.no_rx_min = 2500;
     config.simulation.BS_drop = 'rnd';        % Choose 'hex', 'rnd', 'csv' for built in layouts
-    config.simulation.batch_tilts = [7, 3, 10];
+    config.simulation.batch_tilts = [2, 4];
     
     
     config.UE(1).name = 'UE_1';

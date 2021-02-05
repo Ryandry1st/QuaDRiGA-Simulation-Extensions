@@ -5,8 +5,8 @@ import os
 from pathlib import Path
 import re
 
-# json_file = sys.argv[1]
-json_file = 'savedResults/json/powermatrixDT7.json'
+json_file = sys.argv[1]
+# json_file = 'savedResults/json/powermatrixDT7.json'
 print(json_file)
 
 filepath = re.match(r'(.*[json]+/)(.*)(\.json)+', json_file).group(1)

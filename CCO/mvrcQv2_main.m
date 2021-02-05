@@ -199,7 +199,7 @@ if params.save_results == 1
     if all(params.orientations(:, 2) == params.orientations(1, 2))
         % save in format for one downtilt
         save_folder = [pwd, '/savedResults/mat/'];
-        file_name = append('powermatrixDT', num2str(round(params.downtilt)));
+        file_name = append('powermatrixDT', num2str(round(params.orientations(1, 2))));
         mat_file = [save_folder, file_name];
         save(mat_file, 'no_rx', 'tx_locs', 'n_x_coords', 'n_y_coords', 'x_min', 'x_max', 'y_min', 'y_max', 'cell_id', 'rsrp_2d', 'sinr_2d', 'params', '-v7.3');
     
