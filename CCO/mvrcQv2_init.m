@@ -11,8 +11,8 @@ addpath(genpath([pwd, '/QuaDriGa_2020.11.03_v2.4.0']));
 gcp; % initialize parallel pool
 
 if ismac
-    python_path = '/Users/ayp/opt/anaconda3/bin/python';
-%     python_path = '/Users/rmd2758/opt/anaconda3/bin/python';
+%     python_path = '/Users/ayp/opt/anaconda3/bin/python';
+    python_path = '/Users/rmd2758/opt/anaconda3/bin/python';
 elseif isunix
     python_path = '/home/user/anaconda3/bin/python';
 else
@@ -32,8 +32,8 @@ s.use_absolute_delays = 1;
 
 % flags
 save_results = 1;
-save_layout = 1;
-save_load_channels = 1;
+save_layout = 0;
+save_load_channels = 0;
 random_ori_azi = 0;
 clean_code = 0;
 

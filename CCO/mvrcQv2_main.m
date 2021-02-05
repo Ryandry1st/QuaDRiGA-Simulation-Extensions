@@ -96,6 +96,9 @@ if params.save_load_channels
         end
         save([pwd, '/savedBuilders/builder_obj.mat'], '-v7.3', 'p_builder');
     end
+else
+    fprintf("Could not find builder or channel data, recalculating. \n");
+    [cl, p_builder] = l.get_channels; % Generate channels
 end
 
 nEl = l.tx_array(1, 1).no_elements / 3; % Number of elements per sector
