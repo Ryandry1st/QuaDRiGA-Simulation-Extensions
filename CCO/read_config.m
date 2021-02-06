@@ -66,3 +66,13 @@ else
     BS_drop = 0; % If 0, then don't overwrite the placements
     fprintf("Using pre-defined BS\n");
 end
+
+ps = parallel.Settings;
+if ~info.simulation.parallel
+   ps.Pool.AutoCreate = false;
+   poolobj = gcp('nocreate');
+   delete(poolobj);
+else
+    ps.Pool.AutoCreate = true;
+    gcp;
+end

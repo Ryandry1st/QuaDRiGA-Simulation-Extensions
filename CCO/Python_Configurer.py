@@ -28,6 +28,7 @@ config = {
         'no_rx_min': 500,  
         'BS_drop': '0',     # set to 'csv', 'rnd', 'hex', to generate new BS locations
         'batch_tilts': [7], # make this blank to keep defined BS tilts
+        'parallel': 0,
         },
     'UE': [
         {

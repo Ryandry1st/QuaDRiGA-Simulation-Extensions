@@ -23,6 +23,11 @@ elseif params.sim_style == 1
     fprintf("Starting CCO with downtilt=%i\n", params.downtilt);
     mvrcQv2_main(params);
 else
+    fprintf("Pre-creating layout");
+    mvrcQv2_layout(params);
+    if ~isfile([pwd, 'savedBuilders/builders_obj.mat'])
+        params.save_load_channels = 0;
+    end
     fprintf(['Starting batch CCO for downtilts=[', num2str(params.info.simulation.batch_tilts'), ']\n']);
     mvrcQv2_batchrun(params);
 end
