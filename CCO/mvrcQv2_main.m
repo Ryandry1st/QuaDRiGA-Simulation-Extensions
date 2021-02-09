@@ -56,10 +56,10 @@ if params.save_layout
         if ~exist([pwd, '/savedLayouts'], 'dir')
             mkdir(pwd, '/savedLayouts');
         end
-        [l, x_min, x_max, y_min, y_max, x_coords, y_coords, n_x_coords, n_y_coords, orientations] = mvrcQv2_layout(params);
+        [l, x_min, x_max, y_min, y_max, x_coords, y_coords, n_x_coords, n_y_coords, params.orientations] = mvrcQv2_layout(params);
     end
 else
-    [l, x_min, x_max, y_min, y_max, x_coords, y_coords, n_x_coords, n_y_coords, orientations] = mvrcQv2_layout(params);
+    [l, x_min, x_max, y_min, y_max, x_coords, y_coords, n_x_coords, n_y_coords, params.orientations] = mvrcQv2_layout(params);
 end
 
 no_rx = l.no_rx;
