@@ -7,7 +7,7 @@ end
 rng('default');
 rng(seed);
 
-addpath(genpath([pwd, '/QuaDriGa_2020.11.03_v2.4.0']));
+addpath(genpath([fileparts(pwd), '/QuaDriGa_2020.11.03_v2.4.0']));
 gcp; % initialize parallel pool
 
 if ismac
