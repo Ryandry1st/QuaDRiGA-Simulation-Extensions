@@ -35,6 +35,11 @@ end
 sim_num = info.simulation.sim_num;
 scen = info.simulation.scenario;
 seed = info.simulation.seed;
+if isfield(info.simulation, 'isd')
+    if isnumeric(info.simulation.isd)
+        isd = info.simulation.isd;
+    end
+end
 
 rng('default');
 rng(seed);
