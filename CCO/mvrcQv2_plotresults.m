@@ -178,4 +178,25 @@ title(sprintf('(min,max,avg)=(%0.0f,%0.0f,%0.0f)', cdf_data_min, cdf_data_max, c
 %             grid on; title('{3GPP\_3D\_UMi}:Black=LOS,White=NLOS')
 %         end
 
+% RSRP
+%Heatmap
+%figure('Renderer', 'painters', 'Position', [10, 10, 1000, 1000]); clf
+figure(100);
+imagesc([x_min, x_max], [y_min, y_max], rsrp_2d);
+c1 = colorbar;
+%caxis([-120, -60]);
+c1.Location = 'northoutside';
+c1.Label.String = "RSRP (dBm)";
+axis([x_min, x_max, y_min, y_max]);
+axis square;
+hold on
+for b = 1:size(tx_locs, 1)
+    plot(tx_locs(b, 1), -tx_locs(b, 2), ...
+        '.r', 'Markersize', 24);
+    hold on;
+end
+xlabel('x (m)');
+ylabel('y (m)');
+grid on;
+
 end

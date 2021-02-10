@@ -90,7 +90,7 @@ if params.save_load_channels
     catch
         fprintf("Could not find builder or channel data, recalculating. \n");
         [cl, p_builder] = l.get_channels; % Generate channels
-
+        
         if ~exist([pwd, '/savedBuilders'], 'dir')
             mkdir(pwd, '/savedBuilders');
         end
@@ -202,7 +202,7 @@ if params.save_results == 1
         file_name = append('powermatrixDT', num2str(round(params.orientations(1, 2))));
         mat_file = [save_folder, file_name];
         save(mat_file, 'no_rx', 'tx_locs', 'n_x_coords', 'n_y_coords', 'x_min', 'x_max', 'y_min', 'y_max', 'cell_id', 'rsrp_2d', 'sinr_2d', 'params', '-v7.3');
-    
+        
         jsonStr = jsonencode(powermatrix);
         fid = fopen(['savedResults/json/', file_name, '.json'], 'w');
         if fid == -1, error('Cannot create JSON file'); end
@@ -223,12 +223,12 @@ if params.save_results == 1
         end
         directories = dir([pwd, '/savedResults/Scenarios/', params.sim_num]);
         num_dir = numel(directories([directories(:).isdir]))-2;
-        save_folder = [pwd, '/savedResults/Scenarios/', params.sim_num, '/trial_', num2str(num_dir+1), '/'];  
+        save_folder = [pwd, '/savedResults/Scenarios/', params.sim_num, '/trial_', num2str(num_dir+1), '/'];
         mkdir(save_folder);
         
         mat_file = [save_folder, 'powermatrix.mat'];
         save([save_folder, 'powermatrix.mat'], 'no_rx', 'tx_locs', 'n_x_coords', 'n_y_coords', 'x_min', 'x_max', 'y_min', 'y_max', 'cell_id', 'rsrp_2d', 'sinr_2d', 'params', '-v7.3');
-    
+        
         jsonStr = jsonencode(powermatrix);
         fid = fopen([save_folder, 'powermatrix.json'], 'w');
         if fid == -1, error('Cannot create JSON file'); end
@@ -246,7 +246,7 @@ if params.save_results == 1
     end
 end
 
-mvrcQv2_plotresults(mat_file); 
+mvrcQv2_plotresults(mat_file);
 %% END OF PROGRAM
 if params.clean_code
     MBeautify.formatCurrentEditorPage()

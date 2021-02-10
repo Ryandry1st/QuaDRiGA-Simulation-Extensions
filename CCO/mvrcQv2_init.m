@@ -1,5 +1,8 @@
 function params = mvrcQv2_init(seed)
 
+gcp; % initialize parallel pool
+addpath(genpath([fileparts(pwd), '/QuaDriGa_2020.11.03_v2.4.0']));
+
 if nargin == 0
     seed = 0;
 end
@@ -7,12 +10,9 @@ end
 rng('default');
 rng(seed);
 
-addpath(genpath([fileparts(pwd), '/QuaDriGa_2020.11.03_v2.4.0']));
-gcp; % initialize parallel pool
-
 if ismac
-%     python_path = '/Users/ayp/opt/anaconda3/bin/python';
-    python_path = '/Users/rmd2758/opt/anaconda3/bin/python';
+    python_path = '/Users/ayp/opt/anaconda3/bin/python';
+    %python_path = '/Users/rmd2758/opt/anaconda3/bin/python';
 elseif isunix
     python_path = '/home/user/anaconda3/bin/python';
 else
@@ -26,9 +26,9 @@ fixed_cvs_file = "csvData/Mavenir_locs.csv";
 s = qd_simulation_parameters; % Set general simulation parameters
 s.center_frequency = 2e9; % 2 GHz center frequency
 s.sample_density = 1;
-s.use_3GPP_baseline = 1; % Disable spherical waves
+s.use_3GPP_baseline = 0; % Disable spherical waves
 s.show_progress_bars = 1; % Enable / disable status display
-s.use_absolute_delays = 1;
+s.use_absolute_delays = 0;
 
 % flags
 save_results = 1;
@@ -38,12 +38,12 @@ random_ori_azi = 0;
 clean_code = 0;
 
 % layout
-no_rx_min = 3000;
+no_rx_min = 5000;
 no_tx = 10;
 sample_distance = 10;
 BS_drop = "rnd"; %hex, rnd, csv
-downtilt = 3; % only used if orientations = []
-isd = 200;
+downtilt = 0; % only used if orientations = []
+isd = 500;
 tx_pwr_dBm = 46;
 nSC = 600;
 rx_height = 1.5;
@@ -55,7 +55,7 @@ tx_height_max = tx_height;
 SC_lambda_rx = 50;
 SC_lambda_tx = [];
 indoor_frc = 0;
-scen = '3GPP_3D_UMi_LOS';
+scen = '3GPP_38.901_UMa';
 %      * Freespace
 %      * 3GPP_3D_UMi
 %      * 3GPP_38.901_UMi Example: [Tx height:25m, Rx height: 1.5-2.5 m, ISD: 200m]
@@ -102,9 +102,6 @@ tx_array_3gpp_macro.name = '3gpp-macro';
 %           6. K=M, +/-45 degree polarized elements
 %      * tilt - The electric downtilt angle in [deg] for pol = 4,5,6
 %      * spacing - Element spacing in [λ], Default: 0.5
-
-% downtilt = -downtilt; % Don't negate downtilt unless you are manually
-% rotating the antenna
 
 tx_antenna_3gpp_3d.M = 2;
 tx_antenna_3gpp_3d.N = 1;

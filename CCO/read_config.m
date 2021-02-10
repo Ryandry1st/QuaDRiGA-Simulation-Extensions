@@ -60,7 +60,7 @@ if strcmp(info.simulation.BS_drop, 'hex') || strcmp(info.simulation.BS_drop, 'rn
         fprintf(['Batch job requested for downtilts =[', num2str(info.simulation.batch_tilts'), ']\n']);
         orientations = [];
         sim_style = 2;
-
+        
     end
 else
     BS_drop = 0; % If 0, then don't overwrite the placements
@@ -69,9 +69,9 @@ end
 
 ps = parallel.Settings;
 if ~info.simulation.parallel
-   ps.Pool.AutoCreate = false;
-   poolobj = gcp('nocreate');
-   delete(poolobj);
+    ps.Pool.AutoCreate = false;
+    poolobj = gcp('nocreate');
+    delete(poolobj);
 else
     ps.Pool.AutoCreate = true;
     gcp;
