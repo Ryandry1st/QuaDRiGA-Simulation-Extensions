@@ -20,7 +20,7 @@ params = mvrcQv2_init;
 
 if params.sim_style == 0
     fprintf("ERROR MRO simulation is not yet added here yet, please change the configurer for CCO");
-    
+
 elseif params.sim_style == 1
     fprintf("Starting CCO with downtilt=%i\n", params.downtilt);
     mvrcQv2_main(params);

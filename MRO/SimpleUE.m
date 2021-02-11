@@ -3,8 +3,8 @@
 close all;
 clear all;
 tic;
-init_params;
 
+init_params;
 
 %% File path information
 % save_folder = ['Output_files\',datestr(now,'mm-dd-HH-MM'),'\'];
@@ -15,11 +15,11 @@ if restore_config
     end
     directories = dir(save_folder);
     num_dir = numel(directories([directories(:).isdir]))-2;
-    save_folder = [save_folder, 'trial ', num2str(num_dir+1), '/'];  
+    save_folder = [save_folder, 'trial ', num2str(num_dir+1), '/'];
     mkdir(save_folder);
     
     distance = speed .* total_time;
-    samples_per_meter = fs/max(speed); 
+    samples_per_meter = fs/max(speed);
     
     s = qd_simulation_parameters;             % New simulation parameters
     s.center_frequency = fc;               % 1.8 GHz carrier frequency middle of lte band 3
@@ -33,14 +33,14 @@ if restore_config
     l = qd_layout(s);
     l.no_tx = no_tx;
     
-
+    
     for i=1:l.no_tx
         l.tx_position(:, i) = tx_pos(i, :)';
         index = N_SECTORS(i)*(i-1)+1;
         l.tx_array(i) = qd_arrayant(ARRAY_TYPE, AZI_BEAMWIDTH, ELE_BEAMWIDTH, -FB_RATIO_DB, orientations(index, 1));
         l.tx_array(i).rotate_pattern(orientations(index, 2), 'z');
         % fprintf('antenna %d sector 1 with dt = %d and azi = %d \n', i, orientations(index, 2), orientations(index, 1));
-
+        
         for j=1:N_SECTORS(i)-1
             a = qd_arrayant(ARRAY_TYPE, AZI_BEAMWIDTH, ELE_BEAMWIDTH, -FB_RATIO_DB, orientations(index+j, 1));
             a.rotate_pattern(orientations(index+j, 2), 'z');
@@ -48,26 +48,26 @@ if restore_config
         end
         l.tx_array(i).center_frequency = fc;
     end
-
+    
     %% Setup UE
     l.no_rx = no_rx;
     
 else
     save_folder = ['Output_files\Scenario ', sim_num, '\'];
     mkdir(save_folder);
-
+    
     %% Simulation Choices
     initial_loc = [100, -200, 1.5;
-                   600, 400, 1.5];
-
+        600, 400, 1.5];
+    
     heading = [3*pi/4, 3*pi/2];
     speed = [12, 25];
     total_time = 40; % 40s time frame
     fs = 1000;                               % 1ms sampling time
-
+    
     distance = speed .* total_time;
-    samples_per_meter = fs/max(speed); 
-
+    samples_per_meter = fs/max(speed);
+    
     %% General setup
     s = qd_simulation_parameters;             % New simulation parameters
     s.center_frequency = 28e9;               % 1.8 GHz carrier frequency middle of lte band 3
@@ -77,32 +77,32 @@ else
     s.use_3GPP_baseline = 0;
     s.samples_per_meter = samples_per_meter;
     s.sample_density = samples_per_meter*3e8/2/s.center_frequency;
-
-
+    
+    
     %% Chose BS layout
     l = qd_layout(s);
     l.no_tx = 3;
     N_SECTORS(i) = 3;
     orientations = [5, 135;
-                    1, -135;
-                    5, 0;
-                    7, 45;
-                    10, -45;
-                    10, 180;
-                    25, 0;
-                    45, 135;
-                    45, -135];
-
+        1, -135;
+        5, 0;
+        7, 45;
+        10, -45;
+        10, 180;
+        25, 0;
+        45, 135;
+        45, -135];
+    
     l.tx_position(:, 1) = [-500, 500, 30]';
     l.tx_position(:, 2) = [-500, -500, 30]';
     l.tx_position(:, 2) = [900, -300, 20]';
-
+    
     for i=1:l.no_tx
         index = N_SECTORS(i)*(i-1)+1;
         l.tx_array(i) = qd_arrayant(ARRAY_TYPE, AZI_BEAMWIDTH, ELE_BEAMWIDTH, -FB_RATIO_DB, orientations(index, 1));
         l.tx_array(i).rotate_pattern(orientations(index, 2), 'z');
         % fprintf('antenna %d sector 1 with dt = %d and azi = %d \n', i, orientations(index, 2), orientations(index, 1));
-
+        
         for j=1:N_SECTORS(i)-1
             a = qd_arrayant(ARRAY_TYPE, AZI_BEAMWIDTH, ELE_BEAMWIDTH, -FB_RATIO_DB, orientations(index+j, 1));
             a.rotate_pattern(orientations(index+j, 2), 'z');
@@ -110,7 +110,7 @@ else
         end
         l.tx_array(i).center_frequency = FC;
     end
-
+    
     %% Setup UE
     l.no_rx = 2;
 end
@@ -124,11 +124,11 @@ end
 for i=1:l.no_rx
     t = qd_track('linear', distance(i), heading(i));  % heading north 400m
     t.initial_position(:, 1) = initial_loc(i, :);
-
-%     t.scenario{1} = scen;
-
+    
+    %     t.scenario{1} = scen;
+    
     t.movement_profile = [0, total_time; % time points
-                            0, distance(i)];     % distance points
+        0, distance(i)];     % distance points
     t.name = ['rx' num2str(i)];
     t.calc_orientation; % calculate receiver orientations
     [~, l.rx_track(1, i)] = interpolate(t.copy, 'time', 1/fs); % interpolate the track at 1/fs rate
@@ -144,7 +144,7 @@ c = get_channels( p );                                    % Generate channel coe
 cn = merge( c );
 
 used_time = toc;
-fprintf("Time taken for simulation = %3.1f s", used_time); 
+fprintf("Time taken for simulation = %3.1f s", used_time);
 l.visualize([],[],0);                                     % Show BS and MT positions on the map
 
 

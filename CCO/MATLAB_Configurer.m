@@ -12,13 +12,13 @@ config.simulation.bandwidth_Mhz = 10;
 config.simulation.resource_blocks = 50;
 config.simulation.simulation_duration_s = 40;
 config.simulation.scenario = '3GPP_38.901_UMa';
-config.simulation.CCO_0_MRO_1 = 0;          % set to 1 for MRO
+config.simulation.CCO_0_MRO_1 = 0; % set to 1 for MRO
 config.simulation.no_tx = 19;
-config.simulation.isd = 500;                % intersite distance
+config.simulation.isd = 500; % intersite distance
 config.simulation.sample_distance = 20;
 config.simulation.no_rx_min = 25000;
-config.simulation.BS_drop = 'hex';          % Choose 'hex', 'rnd', 'csv' for built in layouts
-config.simulation.batch_tilts = [2];
+config.simulation.BS_drop = 'hex'; % Choose 'hex', 'rnd', 'csv' for built in layouts
+config.simulation.batch_tilts = [0];
 config.simulation.parallel = 1; % Set to 1 to enable parallel operation
 
 config.UE(1).name = 'UE_1';
@@ -35,7 +35,7 @@ config.BS(1).location = [-500, 500, 30];
 config.BS(1).number_of_sectors = 3;
 config.BS(1).azimuth_rotations_degrees = [135, -135, 0];
 config.BS(1).downtilts_degrees = [5, 1, 5];
-config.BS(1).tx_p_dbm = [20, 20, 20];
+config.BS(1).tx_p_dbm = [0, 0, 0];
 config.BS(1).azimuth_beamwidth_degrees = 67;
 config.BS(1).elevation_beamwidth_degrees = 7.5;
 config.BS(1).front_to_back_ratio = -30;
@@ -45,7 +45,7 @@ config.BS(2).location = [900, -300, 20];
 config.BS(2).number_of_sectors = 3;
 config.BS(2).azimuth_rotations_degrees = [45, -45, 180];
 config.BS(2).downtilts_degrees = [7, 10, 10];
-config.BS(2).tx_p_dbm = [20, 20, 20];
+config.BS(2).tx_p_dbm = [0, 0, 0];
 config.BS(2).azimuth_beamwidth_degrees = 67;
 config.BS(2).elevation_beamwidth_degrees = 7.5;
 config.BS(2).front_to_back_ratio = -30;
@@ -55,7 +55,7 @@ config.BS(3).location = [0, 0, 25];
 config.BS(3).number_of_sectors = 3;
 config.BS(3).azimuth_rotations_degrees = [0, 135, -135];
 config.BS(3).downtilts_degrees = [25, 45, 45];
-config.BS(3).tx_p_dbm = [20, 20, 20];
+config.BS(3).tx_p_dbm = [0, 0, 0];
 config.BS(3).azimuth_beamwidth_degrees = 67;
 config.BS(3).elevation_beamwidth_degrees = 7.5;
 config.BS(3).front_to_back_ratio = -30;
@@ -85,7 +85,7 @@ if config.simulation.CCO_0_MRO_1 == 0 && config.simulation.no_rx_min < 1000
 end
 
 jsonStr = jsonencode(config);
-fid = fopen(append(output_file_path,'config.json'), 'w');
+fid = fopen(append(output_file_path, 'config.json'), 'w');
 if fid == -1, error('Cannot create JSON file'); end
 fwrite(fid, jsonStr, 'char');
 fclose(fid);

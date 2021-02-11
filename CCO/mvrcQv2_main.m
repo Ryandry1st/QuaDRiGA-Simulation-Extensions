@@ -14,16 +14,16 @@ if params.save_layout
         % reset tx antennas in case downtilt changed
         fprintf('Reseting tx antenna arrays...');
         % check if within 20%, no_tx are correct, distances correct
-        if norm(l.no_rx - params.no_rx_min) > params.no_rx_min/5 || l.no_tx ~= params.no_tx || min(l.rx_position(1, :)) ~= params.x_min
+        if norm(l.no_rx-params.no_rx_min) > params.no_rx_min / 5 || l.no_tx ~= params.no_tx || min(l.rx_position(1, :)) ~= params.x_min
             % layout does not match, recalculate.
             fprintf("Layout mismatch, recalculating\n");
             error("Mismatch between layouts, recalculate\n")
         end
         params.orientations = old_orientations;
         params.orientations(:, 2) = params.downtilt;
-        
+
         for i = 1:l.no_tx
-            fprintf('%d(of %d)/',i,l.no_tx);
+            fprintf('%d(of %d)/', i, l.no_tx);
             index = params.no_sectors * (i - 1) + 1;
             for j = 1:params.no_sectors
                 n = index + j - 1;
@@ -82,15 +82,15 @@ if params.save_load_channels
         end
         fprintf("success.\n");
         % replace the base station transmitters with the new ones
-        for i=1:numel(p_builder)
+        for i = 1:numel(p_builder)
             p_builder(1, i).tx_array(1, :) = l.tx_array(i).copy();
         end
         cl = merge(get_channels(p_builder));
-        cl = qf.reshapeo( cl, [l.no_rx, l.no_tx]); % reshape the channels for each tx
+        cl = qf.reshapeo(cl, [l.no_rx, l.no_tx]); % reshape the channels for each tx
     catch
         fprintf("Could not find builder or channel data, recalculating. \n");
         [cl, p_builder] = l.get_channels; % Generate channels
-        
+
         if ~exist([pwd, '/savedBuilders'], 'dir')
             mkdir(pwd, '/savedBuilders');
         end
@@ -195,14 +195,14 @@ if params.save_results == 1
     if ~exist([pwd, '/savedResults/mat'], 'dir')
         mkdir([pwd, '/savedResults/mat']);
     end
-    
+
     if all(params.orientations(:, 2) == params.orientations(1, 2))
         % save in format for one downtilt
         save_folder = [pwd, '/savedResults/mat/'];
         file_name = append('powermatrixDT', num2str(round(params.orientations(1, 2))));
         mat_file = [save_folder, file_name];
         save(mat_file, 'no_rx', 'tx_locs', 'n_x_coords', 'n_y_coords', 'x_min', 'x_max', 'y_min', 'y_max', 'cell_id', 'rsrp_2d', 'sinr_2d', 'params', '-v7.3');
-        
+
         jsonStr = jsonencode(powermatrix);
         fid = fopen(['savedResults/json/', file_name, '.json'], 'w');
         if fid == -1, error('Cannot create JSON file'); end
@@ -222,13 +222,13 @@ if params.save_results == 1
             mkdir([pwd, '/savedResults/Scenarios/', params.sim_num]);
         end
         directories = dir([pwd, '/savedResults/Scenarios/', params.sim_num]);
-        num_dir = numel(directories([directories(:).isdir]))-2;
-        save_folder = [pwd, '/savedResults/Scenarios/', params.sim_num, '/trial_', num2str(num_dir+1), '/'];
+        num_dir = numel(directories([directories(:).isdir])) - 2;
+        save_folder = [pwd, '/savedResults/Scenarios/', params.sim_num, '/trial_', num2str(num_dir + 1), '/'];
         mkdir(save_folder);
-        
+
         mat_file = [save_folder, 'powermatrix.mat'];
         save([save_folder, 'powermatrix.mat'], 'no_rx', 'tx_locs', 'n_x_coords', 'n_y_coords', 'x_min', 'x_max', 'y_min', 'y_max', 'cell_id', 'rsrp_2d', 'sinr_2d', 'params', '-v7.3');
-        
+
         jsonStr = jsonencode(powermatrix);
         fid = fopen([save_folder, 'powermatrix.json'], 'w');
         if fid == -1, error('Cannot create JSON file'); end
@@ -247,6 +247,7 @@ if params.save_results == 1
 end
 
 mvrcQv2_plotresults(mat_file);
+
 %% END OF PROGRAM
 if params.clean_code
     MBeautify.formatCurrentEditorPage()
