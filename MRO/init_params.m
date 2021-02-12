@@ -45,7 +45,7 @@ N_SECTORS = 3;
 
 ARRAY_TYPE = 'omni';
 if restore_config
-    [no_rx, initial_loc, heading, speed, total_time, fs, fc, no_tx, N_SECTORS, orientations, tx_pos, Tx_P_dBm, sim_num, scen, seed] = read_config(config_file);
+    [no_rx, initial_loc, heading, speed, total_time, fs, fc, no_tx, N_SECTORS, orientations, tx_pos, Tx_P_dBm, sim_num, scen, seed, BW] = read_config(config_file);
 end
 
 rng(seed);

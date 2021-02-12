@@ -48,7 +48,7 @@ for tx_k = 1:l.no_tx
     for rx_k = 1:l.no_rx
         for sector = 1:N_SECTORS(tx_k)
             name = strcat(save_folder, 'ULDL_', 'TX_', num2str(tx_k), '_Sector_', num2str(sector), '_UE_', num2str(rx_k), '_Channel_Response');
-            file = fopen(strcat(name, '.txt'), 'wt');
+%             file = fopen(strcat(name, '.txt'), 'wt');
 
             % Get the frequency response values
             X = cn((tx_k-1)*l.no_rx+rx_k).fr(fft_freq, fft_size);
@@ -65,12 +65,12 @@ for tx_k = 1:l.no_tx
             for i = 1:num_RBs
                 Y = mean(X(bin_sets == i, :), 1); % average over the bin
                 Y_save(i, :, sector) = mean(X(bin_sets == i, :), 1);
-                for j = 1:len
-                    fprintf(file, '%g ', Y(j));
-                end
-                fprintf(file, '\n');
+%                 for j = 1:len
+%                     fprintf(file, '%g ', Y(j));
+%                 end
+%                 fprintf(file, '\n');
             end
-            fclose(file);
+%             fclose(file);
 
         end
         for sector = 1:N_SECTORS(tx_k)
