@@ -61,4 +61,5 @@ else % json file instead
     scen = info.simulation.scenario;
     seed = info.simulation.seed;
 end
+BW = config.simulation.bandwidth_Mhz;
 end
