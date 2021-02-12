@@ -186,44 +186,48 @@ for i = 1:l.no_tx
     powermatrix.(append('Tx', int2str(i), 'loc')) = l.tx_position(:, i);
 end
 if params.save_results == 1
-    if ~exist([pwd, '/savedResults/json'], 'dir')
-        mkdir([pwd, '/savedResults/json']);
+    
+    save_folder_r = [pwd,sprintf('/savedResults/r%i/',params.run_i)];
+    
+    if ~exist([save_folder_r,'json'], 'dir')
+        mkdir([save_folder_r,'json']);
     end
-    if ~exist([pwd, '/savedResults/npz'], 'dir')
-        mkdir([pwd, '/savedResults/npz']);
+    if ~exist([save_folder_r,'npz'], 'dir')
+        mkdir([save_folder_r,'npz']);
     end
-    if ~exist([pwd, '/savedResults/mat'], 'dir')
-        mkdir([pwd, '/savedResults/mat']);
+    if ~exist([save_folder_r,'mat'], 'dir')
+        mkdir([save_folder_r,'mat']);
     end
 
     if all(params.orientations(:, 2) == params.orientations(1, 2))
         % save in format for one downtilt
-        save_folder = [pwd, '/savedResults/mat/'];
+        %save_folder = [pwd, '/savedResults/mat/'];
         file_name = append('powermatrixDT', num2str(round(params.orientations(1, 2))));
-        mat_file = [save_folder, file_name];
+        mat_file = [[save_folder_r,'mat/'], file_name];
         save(mat_file, 'no_rx', 'tx_locs', 'n_x_coords', 'n_y_coords', 'x_min', 'x_max', 'y_min', 'y_max', 'cell_id', 'rsrp_2d', 'sinr_2d', 'params', '-v7.3');
 
         jsonStr = jsonencode(powermatrix);
-        fid = fopen(['savedResults/json/', file_name, '.json'], 'w');
+        fid = fopen([[save_folder_r,'json/'], file_name, '.json'], 'w');
         if fid == -1, error('Cannot create JSON file'); end
         fwrite(fid, jsonStr, 'char');
         fclose(fid);
-        commandStr = sprintf('%s pyScripts/make_npz_from_json.py %s', params.python_path, ['savedResults/json/', file_name, '.json']);
+        commandStr = sprintf('%s pyScripts/make_npz_from_json.py %s', params.python_path, [[sprintf('savedResults/r%i/',params.run_i),'json/'], file_name, '.json']);
         fprintf('Attempting to write to NPZ file...')
-        status = system(commandStr);
+        [status,cmdout] = system(commandStr);
         if status
+            cmdout
             error('Cannot create NPZ file!');
         else
             fprintf('success.\n')
         end
     else
         % save by scenario number because downtilts are varied
-        if ~exist([pwd, '/savedResults/Scenarios/', params.sim_num])
-            mkdir([pwd, '/savedResults/Scenarios/', params.sim_num]);
+        if ~exist([pwd,sprintf('/savedResults/r%i/Scenarios/',params.run_i), params.sim_num])
+            mkdir([pwd,sprintf('/savedResults/r%i/Scenarios/',params.run_i), params.sim_num]);
         end
-        directories = dir([pwd, '/savedResults/Scenarios/', params.sim_num]);
+        directories = dir([pwd,sprintf('/savedResults/r%i/Scenarios/',params.run_i), params.sim_num]);
         num_dir = numel(directories([directories(:).isdir])) - 2;
-        save_folder = [pwd, '/savedResults/Scenarios/', params.sim_num, '/trial_', num2str(num_dir + 1), '/'];
+        save_folder = [pwd,sprintf('/savedResults/r%i/Scenarios/',params.run_i), params.sim_num, '/trial_', num2str(num_dir + 1), '/'];
         mkdir(save_folder);
 
         mat_file = [save_folder, 'powermatrix.mat'];
@@ -245,8 +249,6 @@ if params.save_results == 1
         copyfile([pwd, '/config.json'], [save_folder, '/config.json']);
     end
 end
-
-mvrcQv2_plotresults(mat_file);
 
 %% END OF PROGRAM
 if params.clean_code

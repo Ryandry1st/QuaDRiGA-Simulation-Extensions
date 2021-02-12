@@ -1,7 +1,7 @@
 function mvrcQv2_plotresults(savedResultFile)
 
-set(0, 'defaultTextFontSize', 18) % Default Font Size
-set(0, 'defaultAxesFontSize', 18) % Default Font Size
+set(0, 'defaultTextFontSize', 20) % Default Font Size
+set(0, 'defaultAxesFontSize', 20) % Default Font Size
 set(0, 'defaultAxesFontName', 'Helvetica') % Default Font Type
 set(0, 'defaultTextFontName', 'Helvetica') % Default Font Type
 set(0, 'defaultFigurePaperPositionMode', 'auto') % Default Plot position
@@ -28,7 +28,7 @@ axis square;
 hold on
 for b = 1:size(tx_locs, 1)
     plot(tx_locs(b, 1), -tx_locs(b, 2), ...
-        '.r', 'Markersize', 24);
+        '.r', 'Markersize', 28);
     hold on;
 end
 xlabel('x (m)');
@@ -57,7 +57,7 @@ xlabel('Cell ID');
 %     hold on
 %     for b = 1:size(tx_locs,1)
 %         plot(tx_locs(b,1), -tx_locs(b,2), ...
-%             '.r','Markersize', 24);
+%             '.r','Markersize', 28);
 %         hold on;
 %     end
 %          xlabel('x (m)');
@@ -92,7 +92,7 @@ axis square;
 hold on
 for b = 1:size(tx_locs, 1)
     plot(tx_locs(b, 1), -tx_locs(b, 2), ...
-        '.r', 'Markersize', 24);
+        '.r', 'Markersize', 28);
     hold on;
 end
 xlabel('x (m)');
@@ -128,7 +128,7 @@ axis square;
 hold on
 for b = 1:size(tx_locs, 1)
     plot(tx_locs(b, 1), -tx_locs(b, 2), ...
-        '.r', 'Markersize', 24);
+        '.r', 'Markersize', 28);
     hold on;
 end
 xlabel('x (m)');
@@ -170,7 +170,7 @@ title(sprintf('(min,max,avg)=(%0.0f,%0.0f,%0.0f)', cdf_data_min, cdf_data_max, c
 %             colormap(f, gray(2));
 %             for b = 1:size(tx_locs,1)
 %                 plot(tx_locs(b,1), -tx_locs(b,2), ...
-%                     '.r','Markersize', 24);
+%                     '.r','Markersize', 28);
 %                 hold on;
 %             end
 %             xlabel('x (m)');
@@ -178,6 +178,7 @@ title(sprintf('(min,max,avg)=(%0.0f,%0.0f,%0.0f)', cdf_data_min, cdf_data_max, c
 %             grid on; title('{3GPP\_3D\_UMi}:Black=LOS,White=NLOS')
 %         end
 
+close all
 % RSRP
 %Heatmap
 %figure('Renderer', 'painters', 'Position', [10, 10, 1000, 1000]); clf
@@ -185,14 +186,14 @@ figure(100);
 imagesc([x_min, x_max], [y_min, y_max], rsrp_2d);
 c1 = colorbar;
 %caxis([-120, -60]);
-c1.Location = 'northoutside';
+c1.Location = 'eastoutside';
 c1.Label.String = "RSRP (dBm)";
 axis([x_min, x_max, y_min, y_max]);
 axis square;
 hold on
 for b = 1:size(tx_locs, 1)
     plot(tx_locs(b, 1), -tx_locs(b, 2), ...
-        '.r', 'Markersize', 24);
+        '.r', 'Markersize', 32);
     hold on;
 end
 xlabel('x (m)');

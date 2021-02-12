@@ -1,6 +1,5 @@
 function params = mvrcQv2_init(seed)
 
-gcp; % initialize parallel pool
 addpath(genpath([fileparts(pwd), '/QuaDriGa_2020.11.03_v2.4.0']));
 
 if nargin == 0
@@ -36,6 +35,7 @@ save_layout = 0;
 save_load_channels = 0;
 random_ori_azi = 0;
 clean_code = 0;
+run_i = 0;
 
 % layout
 no_rx_min = 5000;

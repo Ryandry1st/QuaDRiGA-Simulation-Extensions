@@ -8,6 +8,14 @@ for n=1:numel(tilts)
    param_copies{n}.downtilt = tilts(n);
    param_copies{n}.orientations(:, 2) = tilts(n);
 end
+
+p = gcp('nocreate'); % If no pool, do not create new one.
+if isempty(p)
+    poolsize = 0;
+else
+    poolsize = p.NumWorkers
+end
+
 parfor n = 1:numel(tilts)
 
     big_tic = tic;
@@ -27,3 +35,5 @@ parfor n = 1:numel(tilts)
     fprintf('[tilt=%.0f] runtime: %.1f sec (%1.1f min)\n',tilts(n), toc(big_tic), toc(big_tic)/60);
 
 end
+
+delete(gcp('nocreate'))

@@ -13,12 +13,12 @@ config.simulation.resource_blocks = 50;
 config.simulation.simulation_duration_s = 40;
 config.simulation.scenario = '3GPP_38.901_UMa';
 config.simulation.CCO_0_MRO_1 = 0; % set to 1 for MRO
-config.simulation.no_tx = 19;
+config.simulation.no_tx = 7;
 config.simulation.isd = 500; % intersite distance
-config.simulation.sample_distance = 20;
-config.simulation.no_rx_min = 25000;
+config.simulation.sample_distance = 15;
+config.simulation.no_rx_min = 10000;
 config.simulation.BS_drop = 'hex'; % Choose 'hex', 'rnd', 'csv' for built in layouts
-config.simulation.batch_tilts = [0];
+config.simulation.batch_tilts = [2];
 config.simulation.parallel = 1; % Set to 1 to enable parallel operation
 
 config.UE(1).name = 'UE_1';
