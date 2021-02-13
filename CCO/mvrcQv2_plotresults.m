@@ -13,7 +13,13 @@ load(savedResultFile);
 
 %% PLOTS
 % visualize the antenna array
-params.tx_array_3gpp_3d.visualize;
+switch params.tx_antenna_type
+    case '3gpp-macro'
+        tx_array_cpy = qd_arrayant('3gpp-macro', params.tx_antenna_3gpp_macro.phi_3dB, params.tx_antenna_3gpp_macro.theta_3dB, params.tx_antenna_3gpp_macro.rear_gain, params.downtilt);
+    case '3gpp-3d'
+        tx_array_cpy = qd_arrayant('3gpp-3d', params.tx_antenna_3gpp_3d.M, params.tx_antenna_3gpp_3d.N, params.tx_antenna_3gpp_3d.center_freq, params.tx_antenna_3gpp_3d.pol, theta_n, params.tx_antenna_3gpp_3d.spacing);
+end
+tx_array_cpy.visualize;
 
 % figure('Renderer', 'painters', 'Position', [10, 10, 1000, 1500]); clf
 % % Cell ID

@@ -14,12 +14,11 @@ if params.save_layout
         % reset tx antennas in case downtilt changed
         fprintf('Reseting tx antenna arrays...');
         % check if within 20%, no_tx are correct, distances correct
-        if norm(l.no_rx-params.no_rx_min) > params.no_rx_min / 5 || l.no_tx ~= params.no_tx || min(l.rx_position(1, :)) ~= params.x_min
+        if ~Compare_layout(l, params)
             % layout does not match, recalculate.
             fprintf("Layout mismatch, recalculating\n");
             error("Mismatch between layouts, recalculate\n")
         end
-        params.orientations = old_orientations;
         params.orientations(:, 2) = params.downtilt;
 
         for i = 1:l.no_tx
@@ -57,9 +56,11 @@ if params.save_layout
             mkdir(pwd, '/savedLayouts');
         end
         [l, x_min, x_max, y_min, y_max, x_coords, y_coords, n_x_coords, n_y_coords, params.orientations] = mvrcQv2_layout(params);
+        params.save_load_channels = 0;
     end
 else
     [l, x_min, x_max, y_min, y_max, x_coords, y_coords, n_x_coords, n_y_coords, params.orientations] = mvrcQv2_layout(params);
+    params.save_load_channels = 0;
 end
 
 no_rx = l.no_rx;

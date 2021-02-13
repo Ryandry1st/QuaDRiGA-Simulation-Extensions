@@ -27,10 +27,13 @@ elseif params.sim_style == 1
     mvrcQv2_main(params);
 else
     fprintf("Pre-creating layout");
+    params.save_layout = 1; % Force loading the layout to ensure base stations do not move between runs
+    params.save_load_channels = 1; % Force loading channels because parallel outer loop is disabled
     mvrcQv2_layout(params);
-    if ~isfile([pwd, 'savedBuilders/builders_obj.mat'])
-        params.save_load_channels = 0;
-    end
+%     if ~isfile([pwd, 'savedBuilders/builders_obj.mat'])
+%         params.save_load_channels = 0;
+%     end
+
     fprintf(['Starting batch CCO for downtilts=[', num2str(params.info.simulation.batch_tilts'), ']\n']);
     mvrcQv2_batchrun(params);
 end
