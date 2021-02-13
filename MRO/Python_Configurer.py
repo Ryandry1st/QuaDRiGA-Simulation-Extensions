@@ -19,7 +19,7 @@ config = {
         'carrier_frequency_hz': 28000000000.0,
         'sampling_frequency_hz': 1000,
         'samples': 10000,                                  # not currently used
-        'bandwidth_Mhz': 10,                               # not currently used
+        'bandwidth_Mhz': 10,                               #[1.25, 2.5, 5, 10, 15, 20];
         'resource_blocks': 50,                             # not currently used
         'simulation_duration_s': 10,
         'scenario' : 'Freespace',

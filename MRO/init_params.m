@@ -1,3 +1,5 @@
+addpath(genpath([fileparts(pwd), '/QuaDriGa_2020.11.03_v2.4.0']));
+
 if ismac
     python_path = '/Users/ayp/opt/anaconda3/bin/python';
     %python_path = '/Users/rmd2758/opt/anaconda3/bin/python';
@@ -43,7 +45,7 @@ N_SECTORS = 3;
 
 ARRAY_TYPE = 'omni';
 if restore_config
-    [no_rx, initial_loc, heading, speed, total_time, fs, fc, no_tx, N_SECTORS, orientations, tx_pos, Tx_P_dBm, sim_num, scen, seed] = read_config(config_file);
+    [no_rx, initial_loc, heading, speed, total_time, fs, fc, no_tx, N_SECTORS, orientations, tx_pos, Tx_P_dBm, sim_num, scen, seed, BW] = read_config(config_file);
 end
 
 rng(seed);
