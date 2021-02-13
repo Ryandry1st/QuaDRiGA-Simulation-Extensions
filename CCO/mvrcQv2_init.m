@@ -32,10 +32,10 @@ s.use_absolute_delays = 0;
 % flags
 save_results = 1;
 save_layout = 1;
-save_load_channels = 1;
+save_load_channels = 0;
 random_ori_azi = 0;
 clean_code = 0;
-run_i = 9;
+run_i = 'freespace';
 
 % layout
 no_rx_min = 5000;
@@ -69,7 +69,7 @@ scen = 'Freespace';
 %      * 3GPP_38.901_InF_DH
 
 % Array type at bs, main options include: omni, dipole, half-wave-dipole, patch, 3gpp-macro, 3gpp-3d (more available in generate.m)
-tx_antenna_type = '3gpp-macro';
+tx_antenna_type = '3gpp-3d';
 
 %3gpp_macro:phi_3dB, theta_3dB, rear_gain, electric_tilt
 % BS height is 32m
@@ -103,7 +103,7 @@ tx_array_3gpp_macro.name = '3gpp-macro';
 %      * tilt - The electric downtilt angle in [deg] for pol = 4,5,6
 %      * spacing - Element spacing in [λ], Default: 0.5
 
-tx_antenna_3gpp_3d.M = 8;
+tx_antenna_3gpp_3d.M = 4;
 tx_antenna_3gpp_3d.N = 1;
 tx_antenna_3gpp_3d.center_freq = s.center_frequency;
 tx_antenna_3gpp_3d.pol = 4;

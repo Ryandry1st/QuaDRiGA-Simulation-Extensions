@@ -188,7 +188,7 @@ for i = 1:l.no_tx
 end
 if params.save_results == 1
 
-    save_folder_r = [pwd, sprintf('/savedResults/r%i/', params.run_i)];
+    save_folder_r = [pwd, sprintf('/savedResults/%s/', params.run_i)];
 
     if ~exist([save_folder_r, 'json'], 'dir')
         mkdir([save_folder_r, 'json']);
@@ -212,7 +212,7 @@ if params.save_results == 1
         if fid == -1, error('Cannot create JSON file'); end
         fwrite(fid, jsonStr, 'char');
         fclose(fid);
-        commandStr = sprintf('%s pyScripts/make_npz_from_json.py %s', params.python_path, [[sprintf('savedResults/r%i/', params.run_i), 'json/'], file_name, '.json']);
+        commandStr = sprintf('%s pyScripts/make_npz_from_json.py %s', params.python_path, [[sprintf('savedResults/%s/', params.run_i), 'json/'], file_name, '.json']);
         fprintf('Attempting to write to NPZ file...')
         [status, cmdout] = system(commandStr);
         if status
@@ -223,12 +223,12 @@ if params.save_results == 1
         end
     else
         % save by scenario number because downtilts are varied
-        if ~exist([pwd, sprintf('/savedResults/r%i/Scenarios/', params.run_i), params.sim_num])
-            mkdir([pwd, sprintf('/savedResults/r%i/Scenarios/', params.run_i), params.sim_num]);
+        if ~exist([pwd, sprintf('/savedResults/%s/Scenarios/', params.run_i), params.sim_num])
+            mkdir([pwd, sprintf('/savedResults/%s/Scenarios/', params.run_i), params.sim_num]);
         end
-        directories = dir([pwd, sprintf('/savedResults/r%i/Scenarios/', params.run_i), params.sim_num]);
+        directories = dir([pwd, sprintf('/savedResults/%s/Scenarios/', params.run_i), params.sim_num]);
         num_dir = numel(directories([directories(:).isdir])) - 2;
-        save_folder = [pwd, sprintf('/savedResults/r%i/Scenarios/', params.run_i), params.sim_num, '/trial_', num2str(num_dir + 1), '/'];
+        save_folder = [pwd, sprintf('/savedResults/%s/Scenarios/', params.run_i), params.sim_num, '/trial_', num2str(num_dir + 1), '/'];
         mkdir(save_folder);
 
         mat_file = [save_folder, 'powermatrix.mat'];
