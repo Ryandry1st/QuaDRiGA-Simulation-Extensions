@@ -35,14 +35,14 @@ save_layout = 0;
 save_load_channels = 0;
 random_ori_azi = 0;
 clean_code = 0;
-run_i = 0;
+run_i = 9;
 
 % layout
 no_rx_min = 5000;
 no_tx = 10;
 sample_distance = 10;
 BS_drop = "rnd"; %hex, rnd, csv
-downtilt = 0; % only used if orientations = []
+downtilt = 20; % only used if orientations = []
 isd = 500;
 tx_pwr_dBm = 46;
 nSC = 600;
@@ -52,10 +52,10 @@ no_sectors = 3;
 tx_height_min = tx_height;
 tx_height_max = tx_height;
 
-SC_lambda_rx = 50;
+SC_lambda_rx = 20;
 SC_lambda_tx = [];
 indoor_frc = 0;
-scen = '3GPP_38.901_UMa';
+scen = 'Freespace';
 %      * Freespace
 %      * 3GPP_3D_UMi
 %      * 3GPP_38.901_UMi Example: [Tx height:25m, Rx height: 1.5-2.5 m, ISD: 200m]
@@ -103,11 +103,11 @@ tx_array_3gpp_macro.name = '3gpp-macro';
 %      * tilt - The electric downtilt angle in [deg] for pol = 4,5,6
 %      * spacing - Element spacing in [λ], Default: 0.5
 
-tx_antenna_3gpp_3d.M = 2;
+tx_antenna_3gpp_3d.M = 8;
 tx_antenna_3gpp_3d.N = 1;
 tx_antenna_3gpp_3d.center_freq = s.center_frequency;
 tx_antenna_3gpp_3d.pol = 4;
-tx_antenna_3gpp_3d.tilt = 15;
+tx_antenna_3gpp_3d.tilt = 0;
 tx_antenna_3gpp_3d.spacing = 0.5;
 
 % BS antenna configuration

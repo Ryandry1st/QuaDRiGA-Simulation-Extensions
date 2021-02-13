@@ -140,7 +140,7 @@ fprintf('done.\n');
 
 old_orientations = orientations;
 if params.save_layout
-    fprintf('\nSaving layout file...')
+    fprintf('Saving layout file...')
     if ~exist([pwd, '/savedLayouts'], 'dir')
         mkdir(pwd, '/savedLayouts');
     end

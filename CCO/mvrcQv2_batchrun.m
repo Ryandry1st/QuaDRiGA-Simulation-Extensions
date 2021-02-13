@@ -9,14 +9,8 @@ for n=1:numel(tilts)
    param_copies{n}.orientations(:, 2) = tilts(n);
 end
 
-p = gcp('nocreate'); % If no pool, do not create new one.
-if isempty(p)
-    poolsize = 0;
-else
-    poolsize = p.NumWorkers
-end
 
-parfor n = 1:numel(tilts)
+for n = 1:numel(tilts)
 
     big_tic = tic;
     
@@ -36,4 +30,3 @@ parfor n = 1:numel(tilts)
 
 end
 
-delete(gcp('nocreate'))

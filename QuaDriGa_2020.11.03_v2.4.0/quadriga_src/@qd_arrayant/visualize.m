@@ -49,7 +49,7 @@ end
 
 az = double(h_qd_arrayant.azimuth_grid);
 if numel(az) == 361
-    indt = 1:5:361;
+    indt = 1:2:361;
 else
     indt = 1:numel(az);
 end
@@ -57,7 +57,7 @@ az = az(indt);
 
 elev = double(h_qd_arrayant.elevation_grid');
 if numel(elev) == 181
-    indp = 1:5:181;
+    indp = 1:2:181;
 else
     indp = 1:numel(elev);
 end
@@ -86,21 +86,20 @@ for n = 1:numel(i_element)
     tmp = sqrt(directivity_lin./P_max);
     Fa = Fa .* tmp;
     Fb = Fb .* tmp;
+    figure('Position', [10, 10, 600, 600])
+%     h_figures(n) = figure('Position', [50, 400, 1200, 500],...
+%         'Name', [h_qd_arrayant.name ' element ', num2str(i_element(n))]);
+%     
+%     axes('position',[0 0 0.92 0.9]);%,'Visible','Off');
+%     axis off
     
-    h_figures(n) = figure('Position', [50, 400, 1200, 500],...
-        'Name', [h_qd_arrayant.name ' element ', num2str(i_element(n))]);
+    %title(['Array Antenna Element ', num2str(i_element(n))] );
+
+    %text(0.9 ,1,'D^{[\phi]}(\theta, \phi)');
     
-    axes('position',[0 0 0.92 0.9]);%,'Visible','Off');
-    axis off
-    
-    title(['Array Antenna Element ', num2str(i_element(n))] );
-    
-    text(0.02,1,'D^{[\theta]}(\theta, \phi)');
-    text(0.9 ,1,'D^{[\phi]}(\theta, \phi)');
-    
-    for m = 1:2
+    for m = 1:1
         
-        axes('position',[-0.4+0.45*m 0.12 0.38 0.82]);
+        %axes('position',[-0.4+0.45*m 0.12 0.38 0.82]);
         switch m
             case 1
                 Po = 10*log10( abs(Fa).^2 );
@@ -118,27 +117,27 @@ for n = 1:numel(i_element)
         Z = P .* Zi;
         
         surf(X, Y, Z, Po,'Linewidth',0.1)
-        
+        title('Antenna pattern: D^{[\theta]}(\theta, \phi)');
         axis('square');
         axis(scaling.*[-1 1 -1 1 -1 1]);
         caxis([min_value, directivity_dbi]);
-        set(gca, 'xtick', (-1:1).*scaling/2);
-        set(gca, 'ytick', (-1:1).*scaling/2);
-        set(gca, 'ztick', (-1:1).*scaling/2);
+        %set(gca, 'xtick', (-1:1).*scaling/2);
+        %set(gca, 'ytick', (-1:1).*scaling/2);
+        %set(gca, 'ztick', (-1:1).*scaling/2);
         xlabel('x')
         ylabel('y')
         zlabel('z')
        
-        view(45, 33)
+        view(10, 10)
     end
     
-    axes('position', [0.08 0.08 0.08 0.08],'Visible','Off');
-    caxis([min_value, directivity_dbi]);
+    %axes('position', [0.08 0.08 0.08 0.08],'Visible','Off');
+    %caxis([min_value, directivity_dbi]);
     %han = colorbar( 'EastOutside','XTick', min_value:3:floor(directivity_dbi));
-    han = colorbar( 'XTick', min_value:3:floor(directivity_dbi));
-    set(han, 'position', [0.92 0.06 0.02 0.90])
-    zlab = get(han, 'ylabel');
-    set(zlab, 'String', 'Partial Directivity in dBi');
+    %han = colorbar( 'XTick', min_value:3:floor(directivity_dbi));
+    %set(han, 'position', [0.92 0.06 0.02 0.90])
+    %zlab = get(han, 'ylabel');
+    %set(zlab, 'String', 'Partial Directivity in dBi');
     
 end
 

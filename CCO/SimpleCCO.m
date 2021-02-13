@@ -15,12 +15,13 @@ clc;
 clear all;
 close all;
 big_tic = tic;
+fprintf('SIMULATION STARTED ON: %s\n\n',datetime('now'))
 
 params = mvrcQv2_init;
 
 if params.sim_style == 0
     fprintf("ERROR MRO simulation is not yet added here yet, please change the configurer for CCO");
-
+    
 elseif params.sim_style == 1
     fprintf("Starting CCO with downtilt=%i\n", params.downtilt);
     mvrcQv2_main(params);
@@ -34,4 +35,7 @@ else
     mvrcQv2_batchrun(params);
 end
 
+fprintf('==========================================\n');
+fprintf('SIMULATION ENDED ON: %s\n',datetime('now'))
 fprintf('SIMULATION RUNTIME = %0.0f sec (%0.1f h)\n', toc(big_tic), toc(big_tic)/3600);
+
