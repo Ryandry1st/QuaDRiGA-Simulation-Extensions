@@ -44,7 +44,7 @@ sample_distance = 10;
 BS_drop = "rnd"; %hex, rnd, csv
 downtilt = 20; % only used if orientations = []
 isd = 500;
-tx_pwr_dBm = 0; %average tx power (total over all antenna and all freq)
+tx_pwr_dBm = 46; %average tx power (total over all antenna and all freq)
 nSC = 600;
 rx_height = 1.5;
 tx_height = 25;
@@ -55,7 +55,7 @@ tx_height_max = tx_height;
 SC_lambda_rx = 20;
 SC_lambda_tx = [];
 indoor_frc = 0;
-scen = '3GPP_3D_UMa';
+scen = 'Freespace';
 %      * Freespace
 %      * 3GPP_3D_UMi
 %      * 3GPP_38.901_UMi Example: [Tx height:25m, Rx height: 1.5-2.5 m, ISD: 200m]
