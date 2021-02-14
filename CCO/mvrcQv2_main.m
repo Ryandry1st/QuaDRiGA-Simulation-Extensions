@@ -190,6 +190,11 @@ if params.save_results == 1
 
     save_folder_r = [pwd, sprintf('/savedResults/%s/', params.run_i)];
 
+    if ~exist([save_folder_r, 'config'], 'dir')
+        mkdir([save_folder_r, 'config']); 
+    end
+    copyfile([pwd, '/config.json'], [save_folder_r, '/config/config.json']);
+    
     if ~exist([save_folder_r, 'json'], 'dir')
         mkdir([save_folder_r, 'json']);
     end

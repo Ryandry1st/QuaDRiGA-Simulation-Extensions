@@ -1,4 +1,4 @@
-function mvrcQv2_plotresults(savedResultFile)
+function [rsrp_fig]=mvrcQv2_plotresults(savedResultFile)
 
 set(0, 'defaultTextFontSize', 20) % Default Font Size
 set(0, 'defaultAxesFontSize', 20) % Default Font Size
@@ -188,7 +188,7 @@ tx_array_cpy.visualize;
 % RSRP
 %Heatmap
 %figure('Renderer', 'painters', 'Position', [10, 10, 1000, 1000]); clf
-figure(100);
+rsrp_fig = figure(100);
 imagesc([x_min, x_max], [y_min, y_max], rsrp_2d);
 c1 = colorbar;
 %caxis([-120, -60]);

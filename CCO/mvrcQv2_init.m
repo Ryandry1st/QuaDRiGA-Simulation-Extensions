@@ -35,7 +35,7 @@ save_layout = 1;
 save_load_channels = 0;
 random_ori_azi = 0;
 clean_code = 0;
-run_i = 'freespace';
+run_i = '3GPP_38.901_UMa';
 
 % layout
 no_rx_min = 5000;
@@ -55,7 +55,7 @@ tx_height_max = tx_height;
 SC_lambda_rx = 20;
 SC_lambda_tx = [];
 indoor_frc = 0;
-scen = 'Freespace';
+scen = '3GPP_38.901_UMa';
 %      * Freespace
 %      * 3GPP_3D_UMi
 %      * 3GPP_38.901_UMi Example: [Tx height:25m, Rx height: 1.5-2.5 m, ISD: 200m]
