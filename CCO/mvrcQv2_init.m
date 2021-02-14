@@ -35,7 +35,7 @@ save_layout = 1;
 save_load_channels = 0;
 random_ori_azi = 0;
 clean_code = 0;
-run_i = '3GPP_3D_UMa';
+run_i = 'Freespace';
 
 % layout
 no_rx_min = 5000;
@@ -44,7 +44,7 @@ sample_distance = 10;
 BS_drop = "rnd"; %hex, rnd, csv
 downtilt = 20; % only used if orientations = []
 isd = 500;
-tx_pwr_dBm = 46;
+tx_pwr_dBm = 0; %average tx power (total over all antenna and all freq)
 nSC = 600;
 rx_height = 1.5;
 tx_height = 25;

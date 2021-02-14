@@ -1,4 +1,4 @@
-function [rsrp_fig]=mvrcQv2_plotresults(savedResultFile)
+function [rsrp_fig,gf_fig,cellid_fig]=mvrcQv2_plotresults(savedResultFile)
 
 set(0, 'defaultTextFontSize', 20) % Default Font Size
 set(0, 'defaultAxesFontSize', 20) % Default Font Size
@@ -19,7 +19,7 @@ switch params.tx_antenna_type
     case '3gpp-3d'
         tx_array_cpy = qd_arrayant('3gpp-3d', params.tx_antenna_3gpp_3d.M, params.tx_antenna_3gpp_3d.N, params.tx_antenna_3gpp_3d.center_freq, params.tx_antenna_3gpp_3d.pol, params.downtilt, params.tx_antenna_3gpp_3d.spacing);
 end
-tx_array_cpy.visualize;
+%tx_array_cpy.visualize;
 
 % figure('Renderer', 'painters', 'Position', [10, 10, 1000, 1500]); clf
 % % Cell ID
@@ -185,13 +185,49 @@ tx_array_cpy.visualize;
 % %         end
 
 
+% Cell ID
+cellid_fig = figure(100);
+imagesc([x_min, x_max], [y_min, y_max], cell_id);
+c1 = colorbar;
+c1.Location = 'eastoutside';
+c1.Label.String = "Cell ID";
+axis([x_min, x_max, y_min, y_max]);
+axis square;
+hold on
+for b = 1:size(tx_locs, 1)
+    plot(tx_locs(b, 1), -tx_locs(b, 2), ...
+        '.r', 'Markersize', 28);
+    hold on;
+end
+xlabel('x (m)');
+ylabel('y (m)');
+grid on;
+
+
+% Geometry factor (=SINR)
+gf_fig = figure(101);
+imagesc([x_min, x_max], [y_min, y_max], sinr_2d);
+c1 = colorbar;
+caxis([-5, 25]);
+c1.Location = 'eastoutside';
+c1.Label.String = "Geometry factor (dB)";
+axis([x_min, x_max, y_min, y_max]);
+axis square;
+hold on
+for b = 1:size(tx_locs, 1)
+    plot(tx_locs(b, 1), -tx_locs(b, 2), ...
+        '.r', 'Markersize', 28);
+    hold on;
+end
+xlabel('x (m)');
+ylabel('y (m)');
+grid on;
+
 % RSRP
-%Heatmap
-%figure('Renderer', 'painters', 'Position', [10, 10, 1000, 1000]); clf
-rsrp_fig = figure(100);
+rsrp_fig = figure(102);
 imagesc([x_min, x_max], [y_min, y_max], rsrp_2d);
 c1 = colorbar;
-%caxis([-120, -60]);
+caxis([-140, -80]);
 c1.Location = 'eastoutside';
 c1.Label.String = "RSRP (dBm)";
 axis([x_min, x_max, y_min, y_max]);
@@ -199,7 +235,7 @@ axis square;
 hold on
 for b = 1:size(tx_locs, 1)
     plot(tx_locs(b, 1), -tx_locs(b, 2), ...
-        '.r', 'Markersize', 32);
+        '.r', 'Markersize', 28);
     hold on;
 end
 xlabel('x (m)');

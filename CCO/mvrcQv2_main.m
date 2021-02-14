@@ -197,12 +197,15 @@ if params.save_results == 1
     
     if ~exist([save_folder_r, 'json'], 'dir')
         mkdir([save_folder_r, 'json']);
+        copyfile([pwd, '/config.json'], [save_folder_r, '/json/config.json']);
     end
     if ~exist([save_folder_r, 'npz'], 'dir')
         mkdir([save_folder_r, 'npz']);
+        copyfile([pwd, '/config.json'], [save_folder_r, '/npz/config.json']);
     end
     if ~exist([save_folder_r, 'mat'], 'dir')
         mkdir([save_folder_r, 'mat']);
+        copyfile([pwd, '/config.json'], [save_folder_r, '/mat/config.json']);
     end
 
     if all(params.orientations(:, 2) == params.orientations(1, 2))
