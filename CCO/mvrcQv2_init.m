@@ -35,7 +35,7 @@ save_layout = 1;
 save_load_channels = 0;
 random_ori_azi = 0;
 clean_code = 0;
-run_i = 'Freespace';
+run_i = 'hex_tx7_rx20164_3gpp3duma_seed0';
 
 % layout
 no_rx_min = 5000;
@@ -125,7 +125,7 @@ read_config();
 n_coords = ceil(sqrt(no_rx_min))^2;
 max_xy = floor((sample_distance*floor(sqrt(n_coords))-1)/2);
 x_min = -max_xy;
-
+celledge_angle = atand(tx_height/(max_xy/2));
 % put everything in a struct for later use
 w = whos;
 params = struct();

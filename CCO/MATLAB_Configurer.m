@@ -11,7 +11,7 @@ config.simulation.samples = 40000;
 config.simulation.bandwidth_Mhz = 10;
 config.simulation.resource_blocks = 50;
 config.simulation.simulation_duration_s = 40;
-config.simulation.scenario = 'Freespace'; %'Freespace', '3GPP_38.901_UMa', '3GPP_3D_UMa'
+config.simulation.scenario = '3GPP_3D_UMa'; %'Freespace', '3GPP_38.901_UMa', '3GPP_3D_UMa'
 config.simulation.CCO_0_MRO_1 = 0; % set to 1 for MRO
 config.simulation.no_tx = 7;
 config.simulation.isd = 500; % intersite distance
@@ -22,7 +22,7 @@ config.simulation.batch_tilts = [2,4,6,8,10,12,14,16];
 
 config.simulation.parallel = 1; % Set to 1 to enable parallel operation
 %config.simulation.run_i = 'hex_tx7_rx20164_3gpp3duma_seed0';
-config.simulation.run_i = 'freespace';
+config.simulation.run_i = 'hex_tx7_rx20164_3gpp3duma_seed0';
 
 config.UE(1).name = 'UE_1';
 config.UE(1).initial_position = [100, -200, 1.5];

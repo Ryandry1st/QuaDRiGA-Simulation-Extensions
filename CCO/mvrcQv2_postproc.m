@@ -3,8 +3,8 @@ close all;
 clear all;
 clc
 
-run_i = 'hex_tx7_rx20164_3gpp3duma_seed0';
-run_i = 'hex_tx7_rx20164_freespace_seed0';
+run_i = 'hex_tx1_rx20164_3gpp3duma_seed0';
+%run_i = 'Freespace';
 
 tilt = [2,4,6,8,10,12,14,16]
 

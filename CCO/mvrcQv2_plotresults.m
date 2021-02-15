@@ -227,7 +227,7 @@ grid on;
 rsrp_fig = figure(102);
 imagesc([x_min, x_max], [y_min, y_max], rsrp_2d);
 c1 = colorbar;
-caxis([-140, -80]);
+%caxis([-120, -80]);
 c1.Location = 'eastoutside';
 c1.Label.String = "RSRP (dBm)";
 axis([x_min, x_max, y_min, y_max]);
