@@ -140,8 +140,13 @@ calc_orientation(l.rx_track)
 l.set_scenario(scen, [], [], 0);
 p = l.init_builder;                                       % Create channel builders
 gen_parameters( p );                                      % Generate small-scale fading
-c = get_channels( p );                                    % Generate channel coefficients
-cn = merge( c );
+                                  % Generate channel coefficients
+cn = merge( get_channels( p ) );
+cn = reshape(cn, [l.no_rx, l.no_tx]);
+nEl = l.tx_array(1, 1).no_elements / 3; % Number of elements per sector
+nEl = {1:nEl, nEl + 1:2 * nEl, 2 * nEl + 1:3 * nEl}; % Element indices per sector
+fprintf('Spliting channels between sectors...');
+c(:, :) = split_tx(cn, nEl); % Split channels from each sector
 
 used_time = toc;
 fprintf("Time taken for simulation = %3.1f s", used_time);

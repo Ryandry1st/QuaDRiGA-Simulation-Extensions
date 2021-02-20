@@ -45,7 +45,7 @@ config.BS(3).front_to_back_ratio = -30;
 
 config.simulation.sim_num = '0.6'; % should be a string
 config.simulation.seed = 0;
-config.simulation.carrier_frequency_hz = 28000000000.0;
+config.simulation.carrier_frequency_hz = 2.8e9;
 config.simulation.sampling_frequency_hz = 1000;
 config.simulation.samples = 40000;
 config.simulation.bandwidth_Mhz = 10; % [1.25, 2.5, 5, 10, 15, 20];

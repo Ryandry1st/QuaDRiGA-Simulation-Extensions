@@ -15,13 +15,21 @@ SC_options   = 12 * RB_options;
 
 
 choice = find(BW_options == BW);
+if isempty(choice)
+    choice = find(BW_options*10e6 == BW);
+    if isempty(choice)
+        error("No valid BW selected, try again");
+    end
+else
+    BW = 10e6*BW;
+end
 
 num_RBs = RB_options(choice);
 fft_size = FFT_options(choice);
 fft_freq = FFT_Sampling(choice);
 RB_BW = 180e3;
 subcarrier_spacing_Hz = 15e3;
-BW = 10e6*BW;
+
 
 Tx_P = 10.^(0.1 * Tx_P_dBm) / 1000;
 
@@ -42,17 +50,20 @@ elseif length(range_of_interest) < useful_fft_points
 
 end
 
+MRO_report = zeros(5, total_time*fs); % Holds the UE measurement report (x, y, z, rsrp, t)
 Y_save = zeros(num_RBs, total_time*fs, N_SECTORS(1));
+
 tic
+
+MRO_report(5, :) = (1:l.rx_track(1).no_snapshots)/fs;
 for tx_k = 1:l.no_tx
     for rx_k = 1:l.no_rx
-        for sector = 1:N_SECTORS(tx_k)
-            name = strcat(save_folder, 'ULDL_', 'TX_', num2str(tx_k), '_Sector_', num2str(sector), '_UE_', num2str(rx_k), '_Channel_Response');
-%             file = fopen(strcat(name, '.txt'), 'wt');
+        MRO_report(1:3, :) = l.rx_track(rx_k).positions + l.rx_track(rx_k).initial_position;
 
+        for sector = 1:N_SECTORS(tx_k)
             % Get the frequency response values
-            X = cn((tx_k-1)*l.no_rx+rx_k).fr(fft_freq, fft_size);
-            X = squeeze(X(1, sector, :, :));
+            X = c(rx_k, (tx_k-1)*N_SECTORS(tx_k)+sector).fr(fft_freq, fft_size);
+            X = squeeze(X);
 
             X = X(range_of_interest, :);
             % X = 10*log10(abs(X).^2./(fft_size*BW)); % normalization
@@ -65,17 +76,20 @@ for tx_k = 1:l.no_tx
             for i = 1:num_RBs
                 Y = mean(X(bin_sets == i, :), 1); % average over the bin
                 Y_save(i, :, sector) = mean(X(bin_sets == i, :), 1);
-%                 for j = 1:len
-%                     fprintf(file, '%g ', Y(j));
-%                 end
-%                 fprintf(file, '\n');
             end
-%             fclose(file);
+
 
         end
         for sector = 1:N_SECTORS(tx_k)
             name = strcat(save_folder, 'ULDL_', 'TX_', num2str(tx_k), '_Sector_', num2str(sector), '_UE_', num2str(rx_k), '_Channel_Response');
             writematrix(Y_save(:, :, sector), strcat(name, '.csv')); % Writes too many digits
+            
+            name = strcat(save_folder, 'TX_', num2str(tx_k), '_Sector_', num2str(sector), '_UE_', num2str(rx_k), '_Measurement_Report');
+            MRO_report(4, :) = 10*log10(squeeze(mean(Y_save(:, :, sector), 1)))+30; % +30 to get dBm
+            T = array2table(MRO_report');
+            T.Properties.VariableNames(1:5) = {'x','y','z', 'rsrp [dBm]', 't'};
+            writetable(T, strcat(name, '.csv'));
+
         end
         if show_plot % Show a 3D plot of the time-frequency response
             f = figure('Position', [100, 200, 1800, 800]);

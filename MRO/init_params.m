@@ -43,7 +43,7 @@ ANTENNA_ELEMENTS = 4; % Number of antenna elements in a sector
 FC = 1.8e9; % Carrier frequency
 N_SECTORS = 3;
 
-ARRAY_TYPE = 'omni';
+% ARRAY_TYPE = 'omni';
 if restore_config
     [no_rx, initial_loc, heading, speed, total_time, fs, fc, no_tx, N_SECTORS, orientations, tx_pos, Tx_P_dBm, sim_num, scen, seed, BW] = read_config(config_file);
 end

@@ -30,3 +30,4 @@ octave-workspace
 *.txt
 *.png
 CCO/save*
+MRO/Output_files/*
