@@ -68,7 +68,7 @@ for tx_k = 1:l.no_tx
             X = X(range_of_interest, :);
             % X = 10*log10(abs(X).^2./(fft_size*BW)); % normalization
             % already occurs in the .fr() method. Scale by transmit power
-            X = abs(X).^2 .* Tx_P(tx_k, sector);
+            X = abs(X).^2./(fft_size) .* Tx_P(tx_k, sector);
             edges = 1:useful_fft_points / num_RBs:useful_fft_points + 1;
             bin_sets = discretize(1:useful_fft_points, edges);
             [~, len] = size(X);
