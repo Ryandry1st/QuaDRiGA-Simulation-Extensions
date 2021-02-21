@@ -50,11 +50,16 @@ elseif length(range_of_interest) < useful_fft_points
 
 end
 
+% Assumes all BS have the same number of sectors
+no_sectors = N_SECTORS(1); 
+
 MRO_report = zeros(5, total_time*fs); % Holds the UE measurement report (x, y, z, rsrp, t)
 Y_save = zeros(num_RBs, total_time*fs, N_SECTORS(1));
 
-tic
 
+%% Start calculations
+tic
+WidebandRSRP; % Calculates RSRP values
 MRO_report(5, :) = (1:l.rx_track(1).no_snapshots)/fs;
 for tx_k = 1:l.no_tx
     for rx_k = 1:l.no_rx
@@ -78,14 +83,17 @@ for tx_k = 1:l.no_tx
                 Y_save(i, :, sector) = mean(X(bin_sets == i, :), 1);
             end
 
-
+        Y_save = round(Y_save, 5, 'significant');
         end
         for sector = 1:N_SECTORS(tx_k)
             name = strcat(save_folder, 'ULDL_', 'TX_', num2str(tx_k), '_Sector_', num2str(sector), '_UE_', num2str(rx_k), '_Channel_Response');
             writematrix(Y_save(:, :, sector), strcat(name, '.csv')); % Writes too many digits
             
             name = strcat(save_folder, 'TX_', num2str(tx_k), '_Sector_', num2str(sector), '_UE_', num2str(rx_k), '_Measurement_Report');
-            MRO_report(4, :) = 10*log10(squeeze(mean(Y_save(:, :, sector), 1)))+30; % +30 to get dBm
+            % Performs PSD RSRP calculation, not 3gpp version
+%             MRO_report(4, :) = 10*log10(squeeze(mean(Y_save(:, :, sector), 1)))+30; % +30 to get dBm
+            % Performs 3gpp RSRP calculation (wideband)
+            MRO_report(4, :) = rsrp_p0(rx_k, (tx_k-1)*N_SECTORS(tx_k)+sector, :);
             T = array2table(MRO_report');
             T.Properties.VariableNames(1:5) = {'x','y','z', 'rsrp [dBm]', 't'};
             writetable(T, strcat(name, '.csv'));
