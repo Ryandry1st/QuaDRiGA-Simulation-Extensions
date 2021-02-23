@@ -31,3 +31,4 @@ octave-workspace
 *.png
 CCO/save*
 MRO/Output_files/*
+savedResults/*
