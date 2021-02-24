@@ -70,7 +70,7 @@ for tx_k = 1:l.no_tx
             X = X(range_of_interest, :);
             % X = 10*log10(abs(X).^2./(fft_size*BW)); % normalization
             % already occurs in the .fr() method. Scale by transmit power
-            X = abs(X).^2./(fft_size) .* Tx_P(tx_k, sector);
+            X = abs(X).^2./(fft_size) .* Tx_P(1, 1);
             edges = 1:useful_fft_points / num_RBs:useful_fft_points + 1;
             bin_sets = discretize(1:useful_fft_points, edges);
             [~, len] = size(X);
@@ -84,7 +84,7 @@ for tx_k = 1:l.no_tx
         end
         for sector = 1:params.no_sectors
             name = strcat(save_folder, 'ULDL_', 'TX_', num2str(tx_k), '_Sector_', num2str(sector), '_UE_', num2str(rx_k), '_Channel_Response');
-            writematrix(Y_save(:, :, sector), strcat(name, '.csv')); % Writes too many digits
+            writematrix(Y_save(:, :, sector), strcat(name, '.csv'));
             
             name = strcat(save_folder, 'TX_', num2str(tx_k), '_Sector_', num2str(sector), '_UE_', num2str(rx_k), '_Measurement_Report');
             % Performs PSD RSRP calculation, not 3gpp version

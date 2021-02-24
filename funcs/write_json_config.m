@@ -25,7 +25,7 @@ for i=1:l.no_tx
     end
     
     if isfield(params, 'Tx_P_dBm')
-        config.BS(i).tx_p_dbm = params.Tx_P_dBm(i, :);
+        config.BS(i).tx_p_dbm = params.Tx_P_dBm(1, :);
     else
         config.BS(i).tx_p_dbm = -1;
     end
