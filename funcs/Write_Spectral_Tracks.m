@@ -57,7 +57,7 @@ Y_save = zeros(num_RBs, params.total_time*params.fs, params.no_sectors);
 %% Start calculations
 tic
 WidebandRSRP; % Calculates RSRP values
-MRO_report(5, :) = (1:l.rx_track(1).no_snapshots)/params.fs;
+MRO_report(6, :) = (1:l.rx_track(1).no_snapshots)/params.fs;
 for tx_k = 1:l.no_tx
     for rx_k = 1:l.no_rx
         MRO_report(1:3, :) = l.rx_track(rx_k).positions + l.rx_track(rx_k).initial_position;
@@ -90,9 +90,10 @@ for tx_k = 1:l.no_tx
             % Performs PSD RSRP calculation, not 3gpp version
 %             MRO_report(4, :) = 10*log10(squeeze(mean(Y_save(:, :, sector), 1)))+30; % +30 to get dBm
             % Performs 3gpp RSRP calculation (wideband)
-            MRO_report(4, :) = rsrp_p0(rx_k, (tx_k-1)*params.no_sectors+sector, :);
+            MRO_report(5, :) = rsrp_p0(rx_k, (tx_k-1)*params.no_sectors+sector, :);
+            MRO_report(4, :) = pathgain_dB(rx_k, (tx_k-1)*params.no_sectors+sector, :);
             T = array2table(MRO_report');
-            T.Properties.VariableNames(1:5) = {'x','y','z', 'rsrp [dBm]', 't'};
+            T.Properties.VariableNames(1:6) = {'x','y','z','pathgain dB','rsrp dBm','t'};
             writetable(T, strcat(name, '.csv'));
 
         end
