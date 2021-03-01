@@ -9,16 +9,26 @@ batch = 0;
 
 if ~sim_style
     total_time = info.simulation.simulation_duration_s;
-    for i = 1:no_rx
-        initial_loc(i, :) = info.UE(i).initial_position;
-        velocity = info.UE(i).velocity;
-        heading(i) = atan2(velocity(2), velocity(1));
-        speed(i) = norm(velocity);
-        end_loc(i, :) = initial_loc(i, :) + velocity' * total_time;
-        distance(i) = speed(i) * total_time;
-    end
+    random_UEs = info.simulation.random_UEs;
     fs = info.simulation.sampling_frequency_hz;
-    no_rx_min = no_rx;
+    max_xy = info.simulation.max_xy;
+    if random_UEs == 0
+        for i = 1:no_rx
+            initial_loc(i, :) = info.UE(i).initial_position;
+            velocity = info.UE(i).velocity;
+            heading(i) = atan2(velocity(2), velocity(1));
+            speed(i) = norm(velocity);
+            end_loc(i, :) = initial_loc(i, :) + velocity' * total_time;
+            distance(i) = speed(i) * total_time;
+        end
+        no_rx_min = no_rx;
+    else
+        P_local = info.simulation.P_local;
+        local_radius = info.simulation.local_radius;
+        P_turn = info.simulation.P_turn;
+        no_rx_min = random_UEs;
+        no_rx = random_UEs;
+    end
 end
 
 fc = info.simulation.carrier_frequency_Mhz * 1e6;
@@ -55,6 +65,9 @@ sample_distance = info.simulation.sample_distance;
 
 if sim_style
     no_rx_min = info.simulation.no_rx_min;
+    n_coords = ceil(sqrt(no_rx_min))^2;
+    max_xy = floor((sample_distance*floor(sqrt(n_coords))-1)/2);
+    x_min = -max_xy;
 end
 
 if strcmp(info.simulation.BS_drop, 'hex') || strcmp(info.simulation.BS_drop, 'rnd') || strcmp(info.simulation.BS_drop, 'csv')
@@ -81,6 +94,8 @@ else
     BS_drop = 0; % If 0, then don't overwrite the placements
     fprintf("Using pre-defined BS\n");
 end
+
+
 
 ps = parallel.Settings;
 if ~info.simulation.parallel

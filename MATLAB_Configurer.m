@@ -3,27 +3,34 @@
 output_file_path = '';
 config = {};
 
+%config.simulation.run_i = 'hex_tx7_rx20164_3gpp3duma_seed0';
+config.simulation.run_i = 'hex_tx7_rx20164_3gpp3duma_seed0';
+
 config.simulation.sim_num = '0.6'; % should be a string
+config.simulation.parallel = 1; % Set to 1 to enable parallel operation
 config.simulation.seed = 0;
 config.simulation.carrier_frequency_Mhz = 2000.0;
 config.simulation.sampling_frequency_hz = 1000;
-config.simulation.samples = 40000;
-config.simulation.bandwidth_Mhz = 10;
-config.simulation.resource_blocks = 50;
-config.simulation.simulation_duration_s = 5;
-config.simulation.scenario = 'Freespace'; %'Freespace', '3GPP_38.901_UMa', '3GPP_3D_UMa'
-config.simulation.CCO_0_MRO_1 = 1; % set to 1 for MRO
-config.simulation.no_tx = 7;
+config.simulation.scenario = '3GPP_38.901_UMa'; %'Freespace', '3GPP_38.901_UMa', '3GPP_3D_UMa'
+config.simulation.no_tx = 5;
 config.simulation.isd = 500; % intersite distance
+config.simulation.BS_drop = 'hex'; % Choose 'hex', 'rnd', 'csv' for built in layouts
+config.simulation.batch_tilts = [5];
+config.simulation.CCO_0_MRO_1 = 1; % set to 1 for MRO
+% MRO specific options
+config.simulation.bandwidth_Mhz = 1.25;
+config.simulation.simulation_duration_s = 10;
+config.simulation.random_UEs = 40;  % number of random UEs to lay
+config.simulation.P_local = 0.7; % Probability for locally distributed random UEs
+config.simulation.local_radius = 100;  % Distance for a UE to be within as a local UE
+config.simulation.P_turn = 0.05; % Probability of turning every 10m
+config.simulation.max_xy = 600;  % How far in any direction the range goes
+% CCO specific options
 config.simulation.sample_distance = 10;
 config.simulation.no_rx_min = 2000;
-config.simulation.BS_drop = 'hex'; % Choose 'hex', 'rnd', 'csv' for built in layouts
-config.simulation.batch_tilts = [10];
 
-config.simulation.parallel = 1; % Set to 1 to enable parallel operation
-%config.simulation.run_i = 'hex_tx7_rx20164_3gpp3duma_seed0';
-config.simulation.run_i = 'temp';
 
+% Define specific UEs if desired
 config.UE(1).name = 'UE_1';
 config.UE(1).initial_position = [100, -200, 1.5];
 config.UE(1).velocity = [-8.4849, 8.4849, 0];

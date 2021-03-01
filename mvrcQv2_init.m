@@ -123,9 +123,7 @@ a_mt = qd_arrayant('omni');
 a_mt.center_frequency = s.center_frequency;
 
 read_config();
-n_coords = ceil(sqrt(no_rx_min))^2;
-max_xy = floor((sample_distance*floor(sqrt(n_coords))-1)/2);
-x_min = -max_xy;
+
 celledge_angle = atand(tx_height/(max_xy/2));
 % put everything in a struct for later use
 w = whos;

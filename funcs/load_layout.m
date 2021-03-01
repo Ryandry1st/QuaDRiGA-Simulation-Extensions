@@ -57,7 +57,7 @@ catch
         [l, x_min, x_max, y_min, y_max, x_coords, y_coords, n_x_coords, n_y_coords, params.orientations] = mvrcQv2_layout(params);
         max_xy = x_max;
     else
-        [l, max_xy] = mvrcQv2_layout(params);
+        [l, max_xy, params.orientations] = mvrcQv2_layout(params);
     end
     params.save_load_channels = 0;
 end

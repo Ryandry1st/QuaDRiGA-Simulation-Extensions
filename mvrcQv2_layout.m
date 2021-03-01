@@ -6,10 +6,7 @@ fprintf('[Generate layout]');
 
 if params.sim_style == 0
     no_rx = params.no_rx;
-    n_coords = no_rx;
-    points = [vecnorm(params.initial_loc, 2, 2), vecnorm(params.end_loc, 2, 2)];
-    max_xy = 1.2 * max(points, [], 'all'); % arbitrary 
-    
+    max_xy = params.max_xy;
 else
     n_coords = ceil(sqrt(params.no_rx_min))^2;
     max_xy = floor((params.sample_distance*floor(sqrt(n_coords))-1)/2);
@@ -33,57 +30,57 @@ else
     fprintf('done.\n')
 end
 
-    %% Drop basestations
+%% Drop basestations
 
-    fprintf('\tSetting tx positions...');
-    orientations = [];
+fprintf('\tSetting tx positions...');
+orientations = [];
 
-    switch params.BS_drop
+switch params.BS_drop
 
-        case 'csv'
-            fprintf('\tLoading CSV file...')
-            % Read the csv file for BS locations and sector orientations using the python helper functions
-            commandStr = sprintf('%s pyScripts/Tx_Information_from_csv.py %s', params.python_path, params.fixed_cvs_file);
-            [status1, output] = system(commandStr);
-            tx_locs = str2num(output);
-            if (size(tx_locs) < 1)
-                disp("There was a problem with your python, traceback:");
-                error(output)
+    case 'csv'
+        fprintf('\tLoading CSV file...')
+        % Read the csv file for BS locations and sector orientations using the python helper functions
+        commandStr = sprintf('%s pyScripts/Tx_Information_from_csv.py %s', params.python_path, params.fixed_cvs_file);
+        [status1, output] = system(commandStr);
+        tx_locs = str2num(output);
+        if (size(tx_locs) < 1)
+            disp("There was a problem with your python, traceback:");
+            error(output)
+        end
+        commandStr = sprintf('%s pyScripts/Tx_Sector_Information_from_csv.py %s', params.python_path, params.fixed_cvs_file);
+        [status2, output] = system(commandStr);
+        if status1 == 0 && status2 == 0
+            fprintf('success.\n')
+        end
+        orientations = str2num(output);
+        params.no_tx = size(tx_locs, 1);
+
+    case 'rnd'
+        boundary_xy = 0.7 * max_xy;
+        locs_xy = zeros(params.no_tx, 2);
+        locs_xy(1, :) = -boundary_xy + 2 * boundary_xy * rand(1, 2);
+        counter = 1;
+        while counter < params.no_tx
+            candidate_point = -boundary_xy + 2 * boundary_xy * rand(1, 2);
+            d = sqrt((locs_xy(1:counter, 1)-candidate_point(1)).^2+(locs_xy(1:counter, 2) - candidate_point(2)).^2);
+            if d > params.isd
+                counter = counter + 1;
+                locs_xy(counter, :) = candidate_point;
             end
-            commandStr = sprintf('%s pyScripts/Tx_Sector_Information_from_csv.py %s', params.python_path, params.fixed_cvs_file);
-            [status2, output] = system(commandStr);
-            if status1 == 0 && status2 == 0
-                fprintf('success.\n')
-            end
-            orientations = str2num(output);
-            params.no_tx = size(tx_locs, 1);
+        end
+        locs_z = params.tx_height_min + (params.tx_height_max - params.tx_height_min) .* rand(params.no_tx, 1);
+        tx_locs = [locs_xy, locs_z];
+        fprintf('done.\n');
 
-        case 'rnd'
-            boundary_xy = 0.7 * max_xy;
-            locs_xy = zeros(params.no_tx, 2);
-            locs_xy(1, :) = -boundary_xy + 2 * boundary_xy * rand(1, 2);
-            counter = 1;
-            while counter < params.no_tx
-                candidate_point = -boundary_xy + 2 * boundary_xy * rand(1, 2);
-                d = sqrt((locs_xy(1:counter, 1)-candidate_point(1)).^2+(locs_xy(1:counter, 2) - candidate_point(2)).^2);
-                if d > params.isd
-                    counter = counter + 1;
-                    locs_xy(counter, :) = candidate_point;
-                end
-            end
-            locs_z = params.tx_height_min + (params.tx_height_max - params.tx_height_min) .* rand(params.no_tx, 1);
-            tx_locs = [locs_xy, locs_z];
-            fprintf('done.\n');
-
-        case 'hex'
-            l_tmp = qd_layout.generate('regular', params.no_tx, params.isd);
-            tx_locs = (l_tmp.tx_position).';
-            locs_z = params.tx_height_min + (params.tx_height_max - params.tx_height_min) .* rand(params.no_tx, 1);
-            tx_locs(:, 3) = locs_z;
-            fprintf('done.\n');
-        otherwise
-            tx_locs = params.tx_loc;
-    end
+    case 'hex'
+        l_tmp = qd_layout.generate('regular', params.no_tx, params.isd);
+        tx_locs = (l_tmp.tx_position).';
+        locs_z = params.tx_height_min + (params.tx_height_max - params.tx_height_min) .* rand(params.no_tx, 1);
+        tx_locs(:, 3) = locs_z;
+        fprintf('done.\n');
+    otherwise
+        tx_locs = params.tx_loc;
+end
 
     %% Generate layout object
     l = qd_layout(params.s);
@@ -96,18 +93,22 @@ end
     end
     fprintf('\tSetting rx positions...');
     if params.sim_style == 0
-        for i=1:l.no_rx
-            t = qd_track('linear', params.distance(i), params.heading(i));  % heading north 400m
-            t.initial_position(:, 1) = params.initial_loc(i, :);
+        if params.random_UEs == 0
+            for i=1:l.no_rx
+                t = qd_track('linear', params.distance(i), params.heading(i));  % heading north 400m
+                t.initial_position(:, 1) = params.initial_loc(i, :);
 
-            %     t.scenario{1} = scen;
+                %     t.scenario{1} = scen;
 
-            t.movement_profile = [0, params.total_time; % time points
-                0, params.distance(i)];     % distance points
-            t.name = ['rx' num2str(i)];
-            t.calc_orientation; % calculate receiver orientations
-            [~, l.rx_track(1, i)] = interpolate(t.copy, 'time', 1/params.fs); % interpolate the track at 1/fs rate
-            l.rx_track(1, i).positions = l.rx_track(1, i).positions(:, 1:end-1); % remove the last point so it is the correct number of samples
+                t.movement_profile = [0, params.total_time; % time points
+                    0, params.distance(i)];     % distance points
+                t.name = ['rx' num2str(i)];
+                t.calc_orientation; % calculate receiver orientations
+                [~, l.rx_track(1, i)] = interpolate(t.copy, 'time', 1/params.fs); % interpolate the track at 1/fs rate
+                l.rx_track(1, i).positions = l.rx_track(1, i).positions(:, 1:end-1); % remove the last point so it is the correct number of samples
+            end
+        else % Generate and assign random UEs
+            Add_UEs;
         end
     else
         l.rx_position = rx_point;
@@ -183,7 +184,7 @@ end
         varargout {2} = max_xy;
     end
     if nargout > 2
-        varargout {11} = orientations;
+        varargout {3} = orientations;
     end
     if nargout > 3 && params.sim_style > 0
         varargout {4} = x_min; varargout {5} = x_max; varargout {6} = y_min;
