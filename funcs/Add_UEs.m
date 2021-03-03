@@ -4,16 +4,21 @@
 % All UE are 1.5m tall and do not change height
 
 l.no_rx = params.no_rx;
-per_BS_UE = floor(l.no_rx / l.no_tx);
-
+[assignments, edges] = discretize(1:l.no_rx, l.no_tx);
+per_BS_UE = histcounts(assignments);
+ 
 for k=1:l.no_tx
-    [locs, vels, speeds, no_segments, t_unit] = RandomizeUE(per_BS_UE, params.P_local, params.local_radius, params.total_time, l.tx_track(k).initial_position(1), l.tx_track(k).initial_position(2), max_xy, params.P_turn);
+    [locs, vels, speeds, no_segments, t_unit] = RandomizeUE(per_BS_UE(k), params.P_local, params.local_radius, params.total_time, l.tx_track(k).initial_position(1), l.tx_track(k).initial_position(2), max_xy, params.P_turn);
     
-    for i=1:per_BS_UE
+    for i=1:per_BS_UE(k)
     t = qd_track('linear', t_unit*speeds(i), atan2(vels(i, 2, 1), vels(i, 1, 1)));
         t.initial_position = locs(i, :)';
-        t.name = ['Rx',sprintf('%06.0f',i+(k-1)*per_BS_UE)];
-%         t.set_speed(speeds(i));
+        if k>1
+            t.name = ['Rx',sprintf('%06.0f',i + sum(per_BS_UE(1:k-1)))];
+        else
+            t.name = ['Rx',sprintf('%06.0f',i)];
+        end
+
         t.movement_profile = [0, t_unit; 0, speeds(i)*t_unit];
         [~, t] = interpolate(t.copy, 'time', 1/params.fs);
         
@@ -29,8 +34,13 @@ for k=1:l.no_tx
                  1.5*ones(1, numel(tmp.positions(1, 2:end)))]];
                  
         end
-        l.rx_track(i+(k-1)*per_BS_UE) = t.copy();
-        l.rx_track(i+(k-1)*per_BS_UE).positions = l.rx_track(i+(k-1)*per_BS_UE).positions(:, 1:end-1); % remove last unnecessary point
+        if k>1
+            l.rx_track(i + sum(per_BS_UE(1:k-1))) = t.copy();
+            l.rx_track(i + sum(per_BS_UE(1:k-1))).positions = l.rx_track(i + sum(per_BS_UE(1:k-1))).positions(:, 1:end-1); % remove last unnecessary point
+        else
+            l.rx_track(i) = t.copy();
+            l.rx_track(i).positions = l.rx_track(i).positions(:, 1:end-1); % remove last unnecessary point
+        end
     end
 end
 % l.visualize;

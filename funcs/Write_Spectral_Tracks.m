@@ -50,17 +50,35 @@ elseif length(range_of_interest) < useful_fft_points
 
 end
 
-MRO_report = zeros(5, params.total_time*params.fs); % Holds the UE measurement report (x, y, z, rsrp, t)
+% x, y, z, t, associated cell id, associated rsrp, <= 6 neighbor cell ids,
+% <= 6 neighbors rsrps
+if l.no_tx < 2
+    MRO_report = zeros(10, params.total_time*params.fs);
+    kbest = 2;
+    rsrp_index = 9:10;
+elseif l.no_tx == 2
+    MRO_report = zeros(16, params.total_time*params.fs);
+    kbest = 5;
+    rsrp_index = 12:16;
+else
+    MRO_report = zeros(18, params.total_time*params.fs);
+    kbest = 6;
+    rsrp_index = 13:18;
+end
 Y_save = zeros(num_RBs, params.total_time*params.fs, params.no_sectors);
 
 
 %% Start calculations
 tic
 WidebandRSRP; % Calculates RSRP values
-MRO_report(6, :) = (1:l.rx_track(1).no_snapshots)/params.fs;
+MRO_report(4, :) = (1:l.rx_track(1).no_snapshots)/params.fs;
 for tx_k = 1:l.no_tx
     for rx_k = 1:l.no_rx
         MRO_report(1:3, :) = l.rx_track(rx_k).positions + l.rx_track(rx_k).initial_position;
+        [MRO_report(6, :), MRO_report(5, :)] = max(rsrp_p0(rx_k, :, :), [], 2);
+        [B, I] = maxk(rsrp_p0(rx_k, :, :), kbest+1, 2);
+        MRO_report(rsrp_index, :) = B(1, 2:end, :);
+        MRO_report(7:rsrp_index(1)-1, :) = I(1, 2:end, :);
 
         for sector = 1:params.no_sectors
             % Get the frequency response values
@@ -86,17 +104,23 @@ for tx_k = 1:l.no_tx
             name = strcat(save_folder, 'ULDL_', 'TX_', num2str(tx_k), '_Sector_', num2str(sector), '_UE_', num2str(rx_k), '_Channel_Response');
             writematrix(Y_save(:, :, sector), strcat(name, '.csv'));
             
-            name = strcat(save_folder, 'TX_', num2str(tx_k), '_Sector_', num2str(sector), '_UE_', num2str(rx_k), '_Measurement_Report');
-            % Performs PSD RSRP calculation, not 3gpp version
-%             MRO_report(4, :) = 10*log10(squeeze(mean(Y_save(:, :, sector), 1)))+30; % +30 to get dBm
-            % Performs 3gpp RSRP calculation (wideband)
-            MRO_report(5, :) = rsrp_p0(rx_k, (tx_k-1)*params.no_sectors+sector, :);
-            MRO_report(4, :) = pathgain_dB(rx_k, (tx_k-1)*params.no_sectors+sector, :);
-            T = array2table(MRO_report');
-            T.Properties.VariableNames(1:6) = {'x','y','z','pathgain dB','rsrp dBm','t'};
-            writetable(T, strcat(name, '.csv'));
-
         end
+        
+        name = strcat(save_folder,  'track_UE', num2str(rx_k)); %TODO can't place DT here because not all BS have the same
+        % Performs PSD RSRP calculation, not 3gpp version
+%             MRO_report(4, :) = 10*log10(squeeze(mean(Y_save(:, :, sector), 1)))+30; % +30 to get dBm
+        % Performs 3gpp RSRP calculation (wideband)
+        T = array2table(MRO_report');
+        T.Properties.VariableNames(1:6) = {'x','y','z','t','serving cell', 'serving RSRP'};
+        for i=7:rsrp_index(1)-1
+            T.Properties.VariableNames(i) = {['Neighbor ', num2str(i-6), ' ID']};
+        end
+        for i=rsrp_index
+            T.Properties.VariableNames(i) = {['Neighbor ', num2str(i-rsrp_index(1)+1), ' RSRP']};
+        end
+        writetable(T, strcat(name, '.csv'));
+
+            
         if show_plot % Show a 3D plot of the time-frequency response
             f = figure('Position', [100, 200, 1800, 800]);
             t = tiledlayout(f, 1, params.no_sectors);
@@ -113,4 +137,5 @@ for tx_k = 1:l.no_tx
         end
     end
 end
+BSmetadata;
 toc

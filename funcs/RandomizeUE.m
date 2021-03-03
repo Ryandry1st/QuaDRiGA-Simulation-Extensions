@@ -6,6 +6,7 @@ function varargout = RandomizeUE(N, P_local, local_radius, tot_time, center_x, c
 % P_turn is the probability to turn every t_unit seconds
 
 t_unit = 1; % 5 second increments
+min_local_radius = 10;
 % OUTPUT
 % all_locs is [N, 3] for x,y,z location
 % all_vels is [N, 3, max(segments)] where max(segments) is based on the
@@ -32,7 +33,7 @@ no_wide_UEs = N - no_local_UEs;
 
 all_locs = zeros(N, 3);
 
-local_UEs_radii = 10 + (local_radius-10) .* rand(no_local_UEs, 1);
+local_UEs_radii = min_local_radius + (local_radius-10) .* rand(no_local_UEs, 1);
 wide_UEs_radii = -max_xy + 2*max_xy .* rand(no_wide_UEs, 1);
 
 thetas = 2*pi*rand(N, 1);

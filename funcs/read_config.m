@@ -8,7 +8,7 @@ no_rx = numel(info.UE);
 batch = 0;
 
 if ~sim_style
-    total_time = info.simulation.simulation_duration_s;
+    total_time = round(info.simulation.simulation_duration_s);
     random_UEs = info.simulation.random_UEs;
     fs = info.simulation.sampling_frequency_hz;
     max_xy = info.simulation.max_xy;
