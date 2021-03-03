@@ -58,7 +58,7 @@ config.simulation.scenario = params.scen;
 config.simulation.seed = params.seed;
 
 jsonStr = jsonencode(config);
-fid = fopen(append(save_folder,'rf_config.json'), 'w');
+fid = fopen(append(params.save_folder_r,'rf_config.json'), 'w');
 if fid == -1, error('Cannot create JSON file'); end
 fwrite(fid, jsonStr, 'char');
 fclose(fid);

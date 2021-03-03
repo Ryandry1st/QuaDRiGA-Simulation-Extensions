@@ -10,7 +10,7 @@ for n=1:numel(tilts)
 end
 
 
-for n = 1:numel(tilts)
+parfor n = 1:numel(tilts)
 
     big_tic = tic;
     

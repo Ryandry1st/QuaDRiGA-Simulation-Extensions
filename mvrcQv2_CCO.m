@@ -140,35 +140,33 @@ for i = 1:l.no_tx
 end
 if params.save_results == 1
 
-    save_folder_r = [pwd, sprintf('/savedResults/%s/', params.run_i)];
-
-    if ~exist([save_folder_r, 'config'], 'dir')
-        mkdir([save_folder_r, 'config']); 
+    if ~exist([params.save_folder_r, 'config'], 'dir')
+        mkdir([params.save_folder_r, 'config']); 
     end
-    copyfile([pwd, '/config.json'], [save_folder_r, '/config/config.json']);
+    copyfile([pwd, '/config.json'], [params.save_folder_r, '/config/config.json']);
     
-    if ~exist([save_folder_r, 'json'], 'dir')
-        mkdir([save_folder_r, 'json']);
-        copyfile([pwd, '/config.json'], [save_folder_r, '/json/config.json']);
+    if ~exist([params.save_folder_r, 'json'], 'dir')
+        mkdir([params.save_folder_r, 'json']);
+        copyfile([pwd, '/config.json'], [params.save_folder_r, '/json/config.json']);
     end
-    if ~exist([save_folder_r, 'npz'], 'dir')
-        mkdir([save_folder_r, 'npz']);
-        copyfile([pwd, '/config.json'], [save_folder_r, '/npz/config.json']);
+    if ~exist([params.save_folder_r, 'npz'], 'dir')
+        mkdir([params.save_folder_r, 'npz']);
+        copyfile([pwd, '/config.json'], [params.save_folder_r, '/npz/config.json']);
     end
-    if ~exist([save_folder_r, 'mat'], 'dir')
-        mkdir([save_folder_r, 'mat']);
-        copyfile([pwd, '/config.json'], [save_folder_r, '/mat/config.json']);
+    if ~exist([params.save_folder_r, 'mat'], 'dir')
+        mkdir([params.save_folder_r, 'mat']);
+        copyfile([pwd, '/config.json'], [params.save_folder_r, '/mat/config.json']);
     end
 
     if all(params.orientations(:, 2) == params.orientations(1, 2))
         % save in format for one downtilt
         %save_folder = [pwd, '/savedResults/mat/'];
         file_name = append('powermatrixDT', num2str(round(params.orientations(1, 2))));
-        mat_file = [[save_folder_r, 'mat/'], file_name];
+        mat_file = [[params.save_folder_r, 'mat/'], file_name];
         save(mat_file, 'no_rx', 'tx_locs', 'n_x_coords', 'n_y_coords', 'x_min', 'x_max', 'y_min', 'y_max', 'cell_id', 'rsrp_2d', 'sinr_2d', 'params', '-v7.3');
 
         jsonStr = jsonencode(powermatrix);
-        fid = fopen([[save_folder_r, 'json/'], file_name, '.json'], 'w');
+        fid = fopen([[params.save_folder_r, 'json/'], file_name, '.json'], 'w');
         if fid == -1, error('Cannot create JSON file'); end
         fwrite(fid, jsonStr, 'char');
         fclose(fid);

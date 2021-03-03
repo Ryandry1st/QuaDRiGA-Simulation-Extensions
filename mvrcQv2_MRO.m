@@ -5,15 +5,6 @@ if nargin == 0
 end
 tic
 
-save_folder = ['savedResults/Scenario ', params.sim_num, '/'];
-if ~exist(save_folder, 'dir')
-    mkdir(save_folder);
-end
-directories = dir(save_folder);
-num_dir = numel(directories([directories(:).isdir]))-2;
-save_folder = [save_folder, 'trial ', num2str(num_dir+1), '/'];
-mkdir(save_folder);
-
 if ~params.save_layout
     [l, max_xy, params.orientations] = mvrcQv2_layout(params);
 else
@@ -35,7 +26,7 @@ l.visualize([],[],0);                                     % Show BS and MT posit
 
 %% Outputs
 Write_Spectral_Tracks;
-saveas(gcf, strcat(save_folder, 'Layout.png'))
+saveas(gcf, strcat(params.save_folder_r, 'Layout.png'))
 write_json_config;
 % save(strcat(save_folder, 'workspace.mat'), '-v7.3', 'p', 'cn');
 % config file should have tx locations, rx start, heading, speed, end, the
@@ -65,7 +56,7 @@ set(gca,'layer','top')                                    % Show grid on top of 
 hold on;
 set(0,'DefaultFigurePaperSize',[14.5 7.3])                % Adjust paper size for plot                                  % Show BS and MT positions on the map
 
-saveas(gcf, strcat(save_folder, 'Rough_RSRP_Map.png'))
+saveas(gcf, strcat(params.save_folder_r, 'Rough_RSRP_Map.png'))
 
 end
 

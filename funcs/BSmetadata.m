@@ -10,7 +10,7 @@ for i=1:l.no_tx
 end
 
 jsonStr = jsonencode(metadata);
-fid = fopen(append(save_folder,'metadata.json'), 'w');
+fid = fopen(append(params.save_folder_r,'metadata.json'), 'w');
 if fid == -1, error('Cannot create JSON file'); end
 fwrite(fid, jsonStr, 'char');
 fclose(fid);
