@@ -12,10 +12,10 @@ config.simulation.seed = 0;
 config.simulation.carrier_frequency_Mhz = 2000.0;
 config.simulation.sampling_frequency_hz = 1000;
 config.simulation.scenario = '3GPP_38.901_UMa'; %'Freespace', '3GPP_38.901_UMa', '3GPP_3D_UMa'
-config.simulation.no_tx = 3;
+config.simulation.no_tx = 7;
 config.simulation.isd = 500; % intersite distance
 config.simulation.BS_drop = 'hex'; % Choose 'hex', 'rnd', 'csv' for built in layouts
-config.simulation.batch_tilts = [5];
+config.simulation.batch_tilts = [5,10];
 config.simulation.CCO_0_MRO_1 = 1; % set to 1 for MRO
 % MRO specific options
 config.simulation.bandwidth_Mhz = 1.25;

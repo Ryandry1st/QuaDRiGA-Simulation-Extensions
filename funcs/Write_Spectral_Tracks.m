@@ -44,10 +44,10 @@ range_of_interest = floor(difference/2) + 1:fft_size - floor(difference/2) - 1;
 
 if length(range_of_interest) > useful_fft_points
     range_of_interest(end) = [];
-
+    
 elseif length(range_of_interest) < useful_fft_points
     range_of_interest = [range_of_interest, max(range_of_interest) + 1];
-
+    
 end
 
 % x, y, z, t, associated cell id, associated rsrp, <= 6 neighbor cell ids,
@@ -79,12 +79,12 @@ for tx_k = 1:l.no_tx
         [B, I] = maxk(rsrp_p0(rx_k, :, :), kbest+1, 2);
         MRO_report(rsrp_index, :) = B(1, 2:end, :);
         MRO_report(7:rsrp_index(1)-1, :) = I(1, 2:end, :);
-
+        
         for sector = 1:params.no_sectors
             % Get the frequency response values
             X = c(rx_k, (tx_k-1)*params.no_sectors+sector).fr(fft_freq, fft_size);
             X = squeeze(X);
-
+            
             X = X(range_of_interest, :);
             % X = 10*log10(abs(X).^2./(fft_size*BW)); % normalization
             % already occurs in the .fr() method. Scale by transmit power
@@ -92,13 +92,13 @@ for tx_k = 1:l.no_tx
             edges = 1:useful_fft_points / num_RBs:useful_fft_points + 1;
             bin_sets = discretize(1:useful_fft_points, edges);
             [~, len] = size(X);
-
+            
             for i = 1:num_RBs
                 Y = mean(X(bin_sets == i, :), 1); % average over the bin
                 Y_save(i, :, sector) = mean(X(bin_sets == i, :), 1);
             end
-
-        Y_save = round(Y_save, 5, 'significant');
+            
+            Y_save = round(Y_save, 5, 'significant');
         end
         for sector = 1:params.no_sectors
             name = strcat(save_folder, 'ULDL_', 'TX_', num2str(tx_k), '_Sector_', num2str(sector), '_UE_', num2str(rx_k), '_Channel_Response');
@@ -111,19 +111,19 @@ for tx_k = 1:l.no_tx
             name = [name, '_DT', num2str(params.orientations(1))];
         end
         % Performs PSD RSRP calculation, not 3gpp version
-%             MRO_report(4, :) = 10*log10(squeeze(mean(Y_save(:, :, sector), 1)))+30; % +30 to get dBm
+        %             MRO_report(4, :) = 10*log10(squeeze(mean(Y_save(:, :, sector), 1)))+30; % +30 to get dBm
         % Performs 3gpp RSRP calculation (wideband)
-        T = array2table(MRO_report');
-        T.Properties.VariableNames(1:6) = {'x','y','z','t','serving cell', 'serving RSRP'};
+        T = array2table(round(MRO_report',4,'significant'));
+        T.Properties.VariableNames(1:6) = {'x','y','z','t','serving pci', 'serving rsrp'};
         for i=7:rsrp_index(1)-1
-            T.Properties.VariableNames(i) = {['Neighbor ', num2str(i-6), ' ID']};
+            T.Properties.VariableNames(i) = {['neigh ', num2str(i-6), ' pci']};
         end
         for i=rsrp_index
-            T.Properties.VariableNames(i) = {['Neighbor ', num2str(i-rsrp_index(1)+1), ' RSRP']};
+            T.Properties.VariableNames(i) = {['neigh ', num2str(i-rsrp_index(1)+1), ' rsrp']};
         end
         writetable(T, strcat(name, '.csv'));
-
-            
+        
+        
         if show_plot % Show a 3D plot of the time-frequency response
             f = figure('Position', [100, 200, 1800, 800]);
             t = tiledlayout(f, 1, params.no_sectors);
