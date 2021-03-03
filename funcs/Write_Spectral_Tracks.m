@@ -107,13 +107,13 @@ for tx_k = 1:l.no_tx
 
             end
         end
-        
+
         name = strcat(params.save_folder_r,  'track_UE', num2str(rx_k));
 %         if all(params.orientations == params.orientations(1))
         name = [name, '_DT', num2str(params.orientations(1, 2))];
 %         end
         % Performs PSD RSRP calculation, not 3gpp version
-%             MRO_report(4, :) = 10*log10(squeeze(mean(Y_save(:, :, sector), 1)))+30; % +30 to get dBm
+        %             MRO_report(4, :) = 10*log10(squeeze(mean(Y_save(:, :, sector), 1)))+30; % +30 to get dBm
         % Performs 3gpp RSRP calculation (wideband)
         T = array2table(round(MRO_report', 4, 'significant'));
         T.Properties.VariableNames(1:6) = {'x','y','z','t','serving pci', 'serving rsrp'};
@@ -125,7 +125,7 @@ for tx_k = 1:l.no_tx
         end
         writetable(T, strcat(name, '.csv'));
 
-            
+
         if show_plot % Show a 3D plot of the time-frequency response
             f = figure('Position', [100, 200, 1800, 800]);
             t = tiledlayout(f, 1, params.no_sectors);
