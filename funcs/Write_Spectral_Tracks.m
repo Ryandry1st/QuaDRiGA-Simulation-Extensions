@@ -106,7 +106,10 @@ for tx_k = 1:l.no_tx
             
         end
         
-        name = strcat(save_folder,  'track_UE', num2str(rx_k)); %TODO can't place DT here because not all BS have the same
+        name = strcat(save_folder,  'track_UE', num2str(rx_k));
+        if all(params.orientations == params.orientations(1))
+            name = [name, '_DT', num2str(params.orientations(1))];
+        end
         % Performs PSD RSRP calculation, not 3gpp version
 %             MRO_report(4, :) = 10*log10(squeeze(mean(Y_save(:, :, sector), 1)))+30; % +30 to get dBm
         % Performs 3gpp RSRP calculation (wideband)
