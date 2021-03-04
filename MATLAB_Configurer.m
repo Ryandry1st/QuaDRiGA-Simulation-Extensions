@@ -12,7 +12,7 @@ config.simulation.seed = 0;
 config.simulation.carrier_frequency_Mhz = 2000.0;
 config.simulation.sampling_frequency_hz = 1000;
 config.simulation.scenario = '3GPP_38.901_UMa'; %'Freespace', '3GPP_38.901_UMa', '3GPP_3D_UMa'
-config.simulation.no_tx = 7;
+config.simulation.no_tx = 3;
 config.simulation.isd = 500; % intersite distance
 config.simulation.BS_drop = 'hex'; % Choose 'hex', 'rnd', 'csv' for built in layouts
 config.simulation.batch_tilts = [3];
@@ -20,7 +20,7 @@ config.simulation.CCO_0_MRO_1 = 1; % set to 1 for MRO
 % MRO specific options
 config.simulation.bandwidth_Mhz = 1.25;
 config.simulation.simulation_duration_s = 10;
-config.simulation.random_UEs = 100;  % number of random UEs to lay
+config.simulation.random_UEs = 10;  % number of random UEs to lay
 config.simulation.P_local = 0.7; % Probability for locally distributed random UEs
 config.simulation.local_radius = 150;  % Distance for a UE to be within as a local UE
 config.simulation.P_turn = 0.05; % Probability of turning every second

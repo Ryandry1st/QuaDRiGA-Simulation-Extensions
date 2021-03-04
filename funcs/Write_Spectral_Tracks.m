@@ -72,13 +72,14 @@ Y_save = zeros(num_RBs, params.total_time*params.fs, params.no_sectors);
 tic
 WidebandRSRP; % Calculates RSRP values
 MRO_report(4, :) = (1:l.rx_track(1).no_snapshots)/params.fs;
-for tx_k = 1:l.no_tx
-    for rx_k = 1:l.no_rx
-        MRO_report(1:3, :) = l.rx_track(rx_k).positions + l.rx_track(rx_k).initial_position;
-        [MRO_report(6, :), MRO_report(5, :)] = max(rsrp_p0(rx_k, :, :), [], 2);
-        [B, I] = maxk(rsrp_p0(rx_k, :, :), kbest+1, 2);
-        MRO_report(rsrp_index, :) = B(1, 2:end, :);
-        MRO_report(7:rsrp_index(1)-1, :) = I(1, 2:end, :);
+for rx_k = 1:l.no_rx
+    MRO_report(1:3, :) = l.rx_track(rx_k).positions + l.rx_track(rx_k).initial_position;
+    [MRO_report(6, :), MRO_report(5, :)] = max(rsrp_p0(rx_k, :, :), [], 2);
+    [B, I] = maxk(rsrp_p0(rx_k, :, :), kbest+1, 2);
+    MRO_report(rsrp_index, :) = B(1, 2:end, :);
+    MRO_report(7:rsrp_index(1)-1, :) = I(1, 2:end, :);
+    
+    for tx_k = 1:l.no_tx
 
         if ~params.batch
             for sector = 1:params.no_sectors
