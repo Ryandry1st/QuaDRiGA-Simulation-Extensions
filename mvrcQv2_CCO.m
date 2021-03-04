@@ -79,7 +79,7 @@ end
 
 % Calculate the coupling loss from the effective PG
 coupling_loss = 10 * log10(max(pg_eff(:, :), [], 2));
-coupling_loss_2d = reshape(coupling_loss, n_y_coords, n_x_coords);
+coupling_loss_2d = reshape(coupling_loss, uint32(n_y_coords), uint32(n_x_coords));
 
 % Wideband SINR
 % The wideband SINR is essentially the same as the GF. However, the 3GPP model uses the RSRP values
