@@ -77,7 +77,7 @@ if strcmp(info.simulation.BS_drop, 'hex') || strcmp(info.simulation.BS_drop, 'rn
     no_tx = info.simulation.no_tx; % overwrite the tx field
 
     if numel(info.simulation.batch_tilts) == 0
-        error("You need to set the batch_tilts to run BS_dro[");
+        error("You need to set the batch_tilts to run BS_drop");
     elseif numel(info.simulation.batch_tilts) == 1
         % overwrite the downtilts with a single value and run once
         fprintf("Setting all downtilts to %i\n", info.simulation.batch_tilts);
@@ -95,8 +95,35 @@ if strcmp(info.simulation.BS_drop, 'hex') || strcmp(info.simulation.BS_drop, 'rn
 else
     BS_drop = 0; % If 0, then don't overwrite the placements
     fprintf("Using pre-defined BS\n");
+    downtilt = info.simulation.batch_tilts; % TODO need to allow specific downtilt choices
 end
 
+if batch == 1 % MRO or CCO multiple tilts
+    save_folder_r = [pwd, sprintf('/savedResults/%s/', info.simulation.run_i)];
+    
+    if ~exist(save_folder_r, 'dir')
+        mkdir(save_folder_r);
+    end
+else
+     if ~sim_style % MRO single tilt
+        fprintf("Starting MRO with downtilt=%i\n", downtilt);
+
+        save_folder_r = ['savedResults/Scenario ', sim_num, '/'];
+        
+        if ~exist(save_folder_r, 'dir')
+            mkdir(save_folder_r);
+        end
+        directories = dir(save_folder_r);
+        num_dir = numel(directories([directories(:).isdir]))-2;
+        save_folder_r = [save_folder_r, 'trial ', num2str(num_dir+1), '/'];
+        mkdir(save_folder_r);
+     else
+         save_folder_r = [pwd, sprintf('/savedResults/%s/', run_i)];
+         if ~exist(save_folder_r, 'dir')
+            mkdir(save_folder_r);
+        end
+     end
+end
 
 
 ps = parallel.Settings;

@@ -5,8 +5,8 @@ function varargout = RandomizeUE(N, P_local, local_radius, tot_time, center_x, c
 % [(-may_xy, -maxy_xy),(max_xy, max_xy)]. Assumes all UEs are driving and 1.5m tall.
 % P_turn is the probability to turn every t_unit seconds
 
-t_unit = 1; % 5 second increments
-min_local_radius = 10;
+t_unit = 1; % 1 second increments
+min_local_radius = 20;
 % OUTPUT
 % all_locs is [N, 3] for x,y,z location
 % all_vels is [N, 3, max(segments)] where max(segments) is based on the

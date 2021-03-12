@@ -28,48 +28,21 @@ if params.batch == 1 % MRO or CCO multiple tilts
 %         params.save_load_channels = 0;
 %     end
     mvrcQv2_layout(params);
-    
-    save_folder_r = [pwd, sprintf('/savedResults/%s/', params.run_i)];
-    params.save_folder_r = save_folder_r;
-    
-    if ~exist(save_folder_r, 'dir')
-        mkdir(save_folder_r);
-    end
-
     fprintf(['Starting batch CCO for downtilts=[', num2str(params.info.simulation.batch_tilts'), ']\n']);
     mvrcQv2_batchrun(params);
+    
 else
     if ~params.sim_style % MRO single tilt
         fprintf("Starting MRO with downtilt=%i\n", params.downtilt);
-
-        save_folder_r = ['savedResults/Scenario ', params.sim_num, '/'];
-        
-        if ~exist(save_folder_r, 'dir')
-            mkdir(save_folder_r);
-        end
-        directories = dir(save_folder_r);
-        num_dir = numel(directories([directories(:).isdir]))-2;
-        save_folder_r = [save_folder_r, 'trial ', num2str(num_dir+1), '/'];
-        params.save_folder_r = save_folder_r;
-        mkdir(save_folder_r);
-        
         mvrcQv2_MRO(params);
     
     else % CCO single tilt
         fprintf("Starting CCO with downtilt=%i\n", params.downtilt);
-        
-        save_folder_r = [pwd, sprintf('/savedResults/%s/', params.run_i)];
-        params.save_folder_r = save_folder_r;
-        
-        if ~exist(save_folder_r, 'dir')
-            mkdir(save_folder_r);
-        end
-        
         mvrcQv2_CCO(params);
     end
 end
 
-
+copyfile('config.json', [params.save_folder_r, '/config.json']);
 
 fprintf('==========================================\n');
 fprintf('SIMULATION ENDED ON: %s\n',datetime('now'))

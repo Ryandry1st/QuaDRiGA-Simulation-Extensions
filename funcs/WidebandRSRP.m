@@ -14,16 +14,18 @@ no_mimo_links = mimo_no_tx * mimo_no_rx; % Get the number of MIMO sub-channels i
 pwr_mW_perSC_perMIMOtx = (10^(0.1 * params.Tx_P_dBm(1, 1)) / useful_fft_points / mimo_no_tx);
 sector_pwr = pwr_mW_perSC_perMIMOtx * ones(l.no_tx*params.no_sectors);
 
-rsrp_p0 = zeros(l.no_rx, l.no_tx*params.no_sectors, params.total_time*params.fs);
-pathgain_dB = zeros(l.no_rx, l.no_tx*params.no_sectors, params.total_time*params.fs);
+rsrp_p0 = zeros(l.no_rx, l.no_tx*params.no_sectors, params.total_time*params.fs, numel(params.fc));
+pathgain_dB = zeros(l.no_rx, l.no_tx*params.no_sectors, params.total_time*params.fs, numel(params.fc));
 
 % Calculate the RSRP value from the first transmit antenna:
-for ir = 1:l.no_rx
-    for it = 1:l.no_tx * params.no_sectors
-        for is = 1:params.total_time*params.fs
-            tmp = c(ir, it).coeff(1, 1, :, is); % Coefficients from first Tx antenna
-            pathgain_dB(ir, it, is) = 10*log10(sum(abs(tmp(:)).^2/no_mimo_links));
-            rsrp_p0(ir, it, is) = 10*log10((sector_pwr(it)) * sum(abs(tmp(:)).^2) / l.rx_array(1, 1).no_elements); % Divide by num Rx antennas
+for iff = 1:numel(params.fc)
+    for ir = 1:l.no_rx
+        for it = 1:l.no_tx * params.no_sectors
+            for is = 1:params.total_time*params.fs
+                tmp = c(ir, it, iff).coeff(1, 1, :, is); % Coefficients from first Tx antenna
+                pathgain_dB(ir, it, is, iff) = 10*log10(sum(abs(tmp(:)).^2/no_mimo_links));
+                rsrp_p0(ir, it, is, iff) = 10*log10((sector_pwr(it)) * sum(abs(tmp(:)).^2) / l.rx_array(1, 1).no_elements); % Divide by num Rx antennas
+            end
         end
     end
 end
