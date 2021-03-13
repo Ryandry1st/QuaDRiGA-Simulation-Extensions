@@ -104,10 +104,10 @@ tx_array_3gpp_macro.name = '3gpp-macro';
 %      * tilt - The electric downtilt angle in [deg] for pol = 4,5,6
 %      * spacing - Element spacing in [λ], Default: 0.5
 
-tx_antenna_3gpp_3d.M = 4;
-tx_antenna_3gpp_3d.N = 1;
+tx_antenna_3gpp_3d.M = 8;
+tx_antenna_3gpp_3d.N = 8;
 tx_antenna_3gpp_3d.center_freq = s.center_frequency;
-tx_antenna_3gpp_3d.pol = 4;
+tx_antenna_3gpp_3d.pol = 1;
 tx_antenna_3gpp_3d.tilt = 0;
 tx_antenna_3gpp_3d.spacing = 0.5;
 

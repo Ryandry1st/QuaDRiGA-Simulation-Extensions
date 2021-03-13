@@ -29,6 +29,8 @@ if ~sim_style
         no_rx_min = random_UEs;
         no_rx = random_UEs;
     end
+    ue_seed = info.simulation.ue_seed;
+    output_rsrp = info.simulation.output_rsrp == 1;
 end
 
 fc = info.simulation.carrier_frequency_Mhz * 1e6;

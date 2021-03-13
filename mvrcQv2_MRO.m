@@ -4,21 +4,29 @@ if nargin == 0
     params = mvrcQv2_init;
 end
 tic
+params = mvrcQv2_init;
 
 if ~params.save_layout
     [l, max_xy, params.orientations] = mvrcQv2_layout(params);
 else
     [l, max_xy, params.orientations] = load_layout(params);
 end
-p = l.init_builder;                                       % Create channel builders
-gen_parameters( p );                                      % Generate small-scale fading
-                                  % Generate channel coefficients
-cn = merge( get_channels( p ) );
-cn = reshape(cn, [l.no_rx, l.no_tx]);
+if numel(params.fc) == 1
+    p = l.init_builder;                                       % Create channel builders
+    gen_parameters( p );                                      % Generate small-scale fading
+    cn = merge( get_channels( p ) );                         % Generate channel coefficients
+else
+    [c_store, p_builder] = l.get_channels;
+    cn = merge ( c_store);
+end
+cn = reshape(cn, l.no_rx, l.no_tx, []);
 nEl = l.tx_array(1, 1).no_elements / 3; % Number of elements per sector
 nEl = {1:nEl, nEl + 1:2 * nEl, 2 * nEl + 1:3 * nEl}; % Element indices per sector
 fprintf('Spliting channels between sectors...');
-c(:, :) = split_tx(cn, nEl); % Split channels from each sector
+for i=1:numel(params.fc)
+    c(:, :, i) = split_tx(cn(:, :, i), nEl); % Split channels from each sector
+end
+
 
 used_time = toc;
 fprintf("Time taken for simulation = %3.1f s", used_time);
@@ -34,7 +42,7 @@ write_json_config;
 
 fprintf("Total time = %3.1f s", toc);
     
-[ map,x_coords,y_coords] = l.power_map('3GPP_3D_UMa_NLOS', 'quick',5,-max_xy,max_xy,-max_xy,max_xy,1.5, params.Tx_P_dBm(1, 1));
+[ map,x_coords,y_coords] = l.power_map('3GPP_3D_UMa_NLOS', 'sf',15,-max_xy,max_xy,-max_xy,max_xy,1.5, params.Tx_P_dBm(1, 1));
 % scenario FB_UMa_NLOS, type 'quick', sample distance, x,y min/max, rx
 % height; type can be 'quick', 'sf', 'detailed', 'phase'
 

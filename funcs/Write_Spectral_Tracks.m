@@ -90,32 +90,44 @@ for iff = 1:numel(params.fc)
             if ~params.batch
                 for sector = 1:params.no_sectors
                     % Get the frequency response values
-                    tx_sec_index = (tx_k-1)*params.no_sectors+sector;
-                    X = c(rx_k, tx_sec_index, iff).fr(fft_freq, fft_size);
-                    X = squeeze(X);
+                    if params.output_rsrp
+                        tx_sec_index = (tx_k-1)*params.no_sectors+sector;
+                        X = c(rx_k, tx_sec_index, iff).fr(fft_freq, fft_size);
+                        X = squeeze(X);
 
-                    X = X(range_of_interest, :);
-                    % X = 10*log10(abs(X).^2./(fft_size*BW)); % normalization
-                    % already occurs in the .fr() method. Scale by transmit power
-                    X = abs(X).^2./(fft_size) .* Tx_P(1, 1) ./ subcarrier_spacing_Hz;
-                    edges = 1:useful_fft_points / num_RBs:useful_fft_points + 1;
-                    bin_sets = discretize(1:useful_fft_points, edges);
-                    [~, len] = size(X);
+                        X = X(range_of_interest, :);
+                        % X = 10*log10(abs(X).^2./(fft_size*BW)); % normalization
+                        % already occurs in the .fr() method. Scale by transmit power
+                        X = abs(X).^2./(fft_size) .* Tx_P(1, 1) ./ subcarrier_spacing_Hz;
+                        edges = 1:useful_fft_points / num_RBs:useful_fft_points + 1;
+                        bin_sets = discretize(1:useful_fft_points, edges);
+                        [~, len] = size(X);
 
-                    for i = 1:num_RBs
-                        Y = mean(X(bin_sets == i, :), 1); % average over the bin
-                        Y_save(i, rx_k, tx_sec_index, :, iff) = mean(X(bin_sets == i, :), 1);
+                        for i = 1:num_RBs
+                            Y = mean(X(bin_sets == i, :), 1); % average over the bin
+                            Y_save(i, rx_k, tx_sec_index, :, iff) = mean(X(bin_sets == i, :), 1);
+                        end
+
+                        Y_save = round(Y_save, 5, 'significant');
+                        name = strcat(params.save_folder_r, 'ULDL_', 'TX_', num2str(tx_k), '_Sector_', num2str(sector), '_UE_', num2str(rx_k), '_fs_', num2str(params.fc(iff)), '_Channel_Response');
+                        writematrix(squeeze(Y_save(:, rx_k, tx_sec_index, iff, :)), strcat(name, '.csv'));
+
+                    else % provide channels in .mat format
+                        channel = {};
+                        channel.H = c(rx_k, tx_sec_index, iff).coeff;
+                        channel.D = c(rx_k, tx_sec_index, iff).delay;
+                        channel.AoA = c(rx_k, tx_sec_index, iff).par.AoA_cb;
+                        channel.AoD = c(rx_k, tx_sec_index, iff).par.AoD_cb;
+                        channel.EoA = c(rx_k, tx_sec_index, iff).par.EoA_cb;
+                        channel.EoD = c(rx_k, tx_sec_index, iff).par.EoD_cb;
+                        save(['TX_', num2str(tx_k), '_Sector_', num2str(sector), '_UE_', num2str(rx_k), '_fs_', num2str(params.fc(iff)), '_Channel'], '-v7.4', 'channel');
                     end
-
-                    Y_save = round(Y_save, 5, 'significant');
-                    name = strcat(params.save_folder_r, 'ULDL_', 'TX_', num2str(tx_k), '_Sector_', num2str(sector), '_UE_', num2str(rx_k), '_fs_', num2str(params.fc(iff)), '_Channel_Response');
-                    writematrix(squeeze(Y_save(:, rx_k, tx_sec_index, iff, :)), strcat(name, '.csv'));
                 end
             end
 
             name = strcat(params.save_folder_r,  'track_UE', num2str(rx_k));
     %         if all(params.orientations == params.orientations(1))
-            name = [name, '_DT', num2str(params.orientations(1, 2)), '_fs_', num2str(params.fs(iff))];
+            name = [name, '_DT', num2str(params.orientations(1, 2)), '_fc_', num2str(params.fc(iff))];
     %         end
             % Performs PSD RSRP calculation, not 3gpp version
             %             MRO_report(4, :) = 10*log10(squeeze(mean(Y_save(:, :, sector), 1)))+30; % +30 to get dBm
@@ -149,5 +161,5 @@ for iff = 1:numel(params.fc)
     end
 end
 BSmetadata;
-save('Channels.m', 'c', '-v7.3');
+save('Channels.mat', 'c', '-v7.3');
 toc
