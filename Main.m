@@ -1,3 +1,4 @@
+function main(input_config, output_dir)
 %% Steps to use:
 % 1) Use Python_Configurer.py or MATLAB_Configurer.m to set the
 %   configuration you want. In order to run CCO, you need to set
@@ -12,13 +13,32 @@
 %   if all tilts were the same -> files are in the json, npz, mat folder
 %   if tilts are not the same -> files are stored in their scenario folder
 
-clear all;
+% Tip: You can run this from the command line by the command
+% matlab -batch "main('inputconfigfile', 'outputdir')" INCLUDE BOTH " and '
+% where the input and outputs are optional
+
+clearvars -except input_config output_dir
 close all;
 big_tic = tic;
 fprintf('SIMULATION STARTED ON: %s\n\n',datetime('now'))
 
+if nargin > 0  
+    fprintf("Using the given config file\n");
+    params = mvrcQv2_init(input_config);
+else
+    params = mvrcQv2_init();
+end
 
-params = mvrcQv2_init;
+if exist('output_dir', 'var')
+    fprintf("Using the output directory\n");
+    if ~exist(output_dir, 'dir')
+        mkdir(output_dir);
+    end
+    params.save_folder_r = output_dir;
+end
+
+
+
 
 if params.batch == 1 % MRO or CCO multiple tilts
     fprintf("Pre-creating layout");

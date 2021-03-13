@@ -4,7 +4,6 @@ if nargin == 0
     params = mvrcQv2_init;
 end
 tic
-params = mvrcQv2_init;
 
 if ~params.save_layout
     [l, max_xy, params.orientations] = mvrcQv2_layout(params);

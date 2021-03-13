@@ -1,14 +1,12 @@
-function params = mvrcQv2_init(seed)
+function params = mvrcQv2_init(config_file)
+
+if nargin < 1
+    config_file = 'config.json';
+end
 
 addpath(genpath([pwd, '/funcs']));
 addpath(genpath([pwd, '/QuaDriGa_2020.11.03_v2.4.0']));
 
-if nargin == 0
-    seed = 0;
-end
-
-rng('default');
-rng(seed);
 
 if ismac
     python_path = '/Users/ayp/opt/anaconda3/bin/python';

@@ -13,7 +13,7 @@ config.simulation.sampling_frequency_hz = 1000;
 config.simulation.scenario = '3GPP_38.901_UMa'; % '3GPP_3D_UMi', 'Freespace', '3GPP_38.901_UMa', '3GPP_3D_UMa'
 config.simulation.no_tx = 4;
 config.simulation.isd = 290; % intersite distance
-config.simulation.BS_drop = 'hex; % Choose 'hex', 'rnd', 'csv' for built in layouts
+config.simulation.BS_drop = 'hex'; % Choose 'hex', 'rnd', 'csv' for built in layouts
 config.simulation.batch_tilts = [5];
 config.simulation.CCO_0_MRO_1 = 1; % set to 1 for MRO
 % MRO specific options
