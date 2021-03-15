@@ -38,6 +38,7 @@ run_i = 'hex_tx7_rx20164_3gpp3duma_seed0';
 
 % layout
 no_rx_min = 5000;
+max_xy = 500;
 no_tx = 10;
 sample_distance = 10;
 BS_drop = "rnd"; %hex, rnd, csv
