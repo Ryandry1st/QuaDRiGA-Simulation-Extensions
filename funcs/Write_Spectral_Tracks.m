@@ -109,7 +109,11 @@ for iff = 1:numel(params.fc)
                         end
 
                         Y_save = round(Y_save, 5, 'significant');
-                        name = strcat(params.save_folder_r, 'ULDL_', 'TX_', num2str(tx_k), '_Sector_', num2str(sector), '_UE_', num2str(rx_k), '_fc_', num2str(params.fc(iff)), '_Channel_Response');
+                        if numel(params.fc) > 1
+                            name = strcat(params.save_folder_r, 'ULDL_', 'TX_', num2str(tx_k), '_Sector_', num2str(sector), '_UE_', num2str(rx_k), '_fc_', num2str(params.fc(iff)), '_Channel_Response');
+                        else
+                            name = strcat(params.save_folder_r, 'ULDL_', 'TX_', num2str(tx_k), '_Sector_', num2str(sector), '_UE_', num2str(rx_k), '_Channel_Response');
+                        end
                         writematrix(squeeze(Y_save(:, rx_k, tx_sec_index, iff, :)), strcat(name, '.csv'));
 
                     else % provide channels in .mat format
@@ -127,7 +131,10 @@ for iff = 1:numel(params.fc)
 
             name = strcat(params.save_folder_r,  'track_UE', num2str(rx_k));
     %         if all(params.orientations == params.orientations(1))
-            name = [name, '_DT', num2str(params.orientations(1, 2)), '_fc_', num2str(params.fc(iff))];
+            name = [name, '_DT', num2str(params.orientations(1, 2))];
+            if numel(params.fc) > 1
+                name = [name, '_fc_', num2str(params.fc(iff))];
+            end
     %         end
             % Performs PSD RSRP calculation, not 3gpp version
             %             MRO_report(4, :) = 10*log10(squeeze(mean(Y_save(:, :, sector), 1)))+30; % +30 to get dBm
