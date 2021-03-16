@@ -7,7 +7,7 @@ config.simulation.run_i = 'hex_tx7_rx20164_3gpp3duma_seed0';
 
 config.simulation.sim_num = '0.7'; % should be a string
 config.simulation.parallel = 1; % Set to 1 to enable parallel operation
-config.simulation.seed = 0;
+config.simulation.seed = 1;
 config.simulation.carrier_frequency_Mhz = [2000.0, 28e3];
 config.simulation.sampling_frequency_hz = 1000;
 config.simulation.scenario = '3GPP_38.901_UMa'; % '3GPP_3D_UMi', 'Freespace', '3GPP_38.901_UMa', '3GPP_3D_UMa'
@@ -18,7 +18,7 @@ config.simulation.batch_tilts = [5];
 config.simulation.CCO_0_MRO_1 = 1; % set to 1 for MRO
 % MRO specific options
 config.simulation.bandwidth_Mhz = 10;
-config.simulation.ue_seed = 27; %TODO ADD
+config.simulation.ue_seed = 0; %TODO ADD
 config.simulation.simulation_duration_s = 2;
 config.simulation.random_UEs = 3;  % number of random UEs to lay, set to 0 to use specific defined UEs
 config.simulation.P_local = 0.8; % Probability for locally distributed random UEs
