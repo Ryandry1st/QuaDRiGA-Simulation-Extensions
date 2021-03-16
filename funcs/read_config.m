@@ -28,6 +28,11 @@ if ~sim_style
         P_turn = info.simulation.P_turn;
         no_rx_min = random_UEs;
         no_rx = random_UEs;
+        if isfield(info.simulation, 'ue_seed')
+           ue_seed = info.simulation.ue_seed;
+        else
+            ue_seed = 0;
+        end
     end
     ue_seed = info.simulation.ue_seed;
     output_rsrp = info.simulation.output_rsrp == 1;

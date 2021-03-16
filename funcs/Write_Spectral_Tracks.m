@@ -109,7 +109,7 @@ for iff = 1:numel(params.fc)
                         end
 
                         Y_save = round(Y_save, 5, 'significant');
-                        name = strcat(params.save_folder_r, 'ULDL_', 'TX_', num2str(tx_k), '_Sector_', num2str(sector), '_UE_', num2str(rx_k), '_fs_', num2str(params.fc(iff)), '_Channel_Response');
+                        name = strcat(params.save_folder_r, 'ULDL_', 'TX_', num2str(tx_k), '_Sector_', num2str(sector), '_UE_', num2str(rx_k), '_fc_', num2str(params.fc(iff)), '_Channel_Response');
                         writematrix(squeeze(Y_save(:, rx_k, tx_sec_index, iff, :)), strcat(name, '.csv'));
 
                     else % provide channels in .mat format
@@ -120,7 +120,7 @@ for iff = 1:numel(params.fc)
                         channel.AoD = c(rx_k, tx_sec_index, iff).par.AoD_cb;
                         channel.EoA = c(rx_k, tx_sec_index, iff).par.EoA_cb;
                         channel.EoD = c(rx_k, tx_sec_index, iff).par.EoD_cb;
-                        save(['TX_', num2str(tx_k), '_Sector_', num2str(sector), '_UE_', num2str(rx_k), '_fs_', num2str(params.fc(iff)), '_Channel'], '-v7.4', 'channel');
+                        save(['TX_', num2str(tx_k), '_Sector_', num2str(sector), '_UE_', num2str(rx_k), '_fc_', num2str(params.fc(iff)), '_Channel'], '-v7.4', 'channel');
                     end
                 end
             end

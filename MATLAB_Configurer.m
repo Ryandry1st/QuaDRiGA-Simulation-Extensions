@@ -18,7 +18,7 @@ config.simulation.batch_tilts = [5];
 config.simulation.CCO_0_MRO_1 = 1; % set to 1 for MRO
 % MRO specific options
 config.simulation.bandwidth_Mhz = 10;
-config.simulation.ue_seed = 0; %TODO ADD
+config.simulation.ue_seed = 27; %TODO ADD
 config.simulation.simulation_duration_s = 2;
 config.simulation.random_UEs = 3;  % number of random UEs to lay, set to 0 to use specific defined UEs
 config.simulation.P_local = 0.8; % Probability for locally distributed random UEs

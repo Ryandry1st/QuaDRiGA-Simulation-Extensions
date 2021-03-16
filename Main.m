@@ -22,9 +22,13 @@ close all;
 big_tic = tic;
 fprintf('SIMULATION STARTED ON: %s\n\n',datetime('now'))
 
-if ~isempty(input_config) 
-    fprintf("Using the given config file\n");
-    params = mvrcQv2_init(input_config);
+if exist('config_file', 'var')
+    if ~isempty(input_config) 
+        fprintf("Using the given config file\n");
+        params = mvrcQv2_init(input_config);
+    else
+        params = mvrcQv2_init();
+    end
 else
     params = mvrcQv2_init();
 end
