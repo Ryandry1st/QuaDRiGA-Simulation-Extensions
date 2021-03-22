@@ -41,8 +41,8 @@ if exist('output_dir', 'var')
     params.save_folder_r = output_dir;
 end
 
-
 copyfile(params.config_file, [params.save_folder_r, '/quadriga_config.json']);
+copyfile(params.config_file, [params.save_folder_r, '/protocol_config.json']);
 
 if params.batch == 1 % MRO or CCO multiple tilts
     fprintf("Pre-creating layout");
