@@ -3,13 +3,26 @@ BW = 10e6;
 num_RBs = 50;
 
 clear config;
-for i=1:l.no_rx
-    config.UE(i).name = append('UE_', int2str(i));
-    config.UE(i).initial_position = round(l.rx_track(i).initial_position, 2);
-    config.UE(i).velocity = round(l.rx_track(i).positions(:, end)/params.total_time, 4);
-    config.UE(i).end_position = round(l.rx_track(i).initial_position + l.rx_track(i).positions(:, end), 4);
-    config.UE(i).initial_attachment = 1;
+if params.P_turn == 0 || params.total_time == 1
+    for i=1:l.no_rx
+        config.UE(i).name = append('UE_', int2str(i));
+        config.UE(i).initial_position = round(l.rx_track(i).initial_position, 2);
+        config.UE(i).velocity = round(l.rx_track(i).positions(:, end)/params.total_time, 4);
+        config.UE(i).end_position = round(l.rx_track(i).initial_position + l.rx_track(i).positions(:, end), 4);
+        config.UE(i).initial_attachment = 1;
+    end
+    config.simulation.mobility_type='constant_velocity';
+else
+    load([params.save_folder_r, 'ue_mobility.mat']);
+    for i=1:l.no_rx
+        config.UE(i).name = append('UE_', int2str(i));
+        config.UE(i).turn_times = turn_times(i, :);
+        config.UE(i).turn_positions = round(turn_positions(i, :, :), 2);
+        config.UE(i).speed = round(speed_set(i), 2);
+    end
+    config.simulation.mobility_type='random_turns';
 end
+delete([params.save_folder_r, 'ue_mobility.mat']);
 
 
 for i=1:l.no_tx
@@ -17,8 +30,8 @@ for i=1:l.no_tx
     config.BS(i).location = round(l.tx_position(:, i), 2);
     config.BS(i).number_of_sectors = params.no_sectors;
     if isfield(params, 'orientations')
-        config.BS(i).azimuth_rotations_degrees = params.orientations(:, 2);
-        config.BS(i).downtilts_degrees = params.orientations((i-1)*params.no_sectors+1:i*params.no_sectors, 1);
+        config.BS(i).azimuth_rotations_degrees = params.orientations((i-1)*params.no_sectors+1:i*params.no_sectors, 1);
+        config.BS(i).downtilts_degrees = params.orientations((i-1)*params.no_sectors+1:i*params.no_sectors, 2);
     else
         config.BS(i).azimuth_rotations_degrees = -1;
         config.BS(i).downtilts_degrees = -1;

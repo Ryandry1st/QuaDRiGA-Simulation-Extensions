@@ -3,7 +3,7 @@
 
 fprintf(config_file)
 info = jsondecode(fileread(config_file));
-sim_style = 1 - info.simulation.CCO_0_MRO_1;
+sim_style = strcmp(info.simulation.type, 'CCO');
 no_rx = numel(info.UE);
 batch = 0;
 

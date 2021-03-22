@@ -5,7 +5,7 @@ config = {};
 
 config.simulation.run_i = 'hex_tx7_rx20164_3gpp3duma_seed0';
 
-config.simulation.sim_num = '0.8'; % should be a string
+config.simulation.sim_num = '0.8.1'; % should be a string
 config.simulation.parallel = 0; % Set to 1 to enable parallel operation
 config.simulation.seed = 1;
 config.simulation.carrier_frequency_Mhz = [2000.0];
@@ -15,15 +15,15 @@ config.simulation.no_tx = 3;
 config.simulation.isd = 290; % intersite distance
 config.simulation.BS_drop = 'hex'; % Choose 'hex', 'rnd', 'csv' for built in layouts
 config.simulation.batch_tilts = [5];
-config.simulation.CCO_0_MRO_1 = 1; % set to 1 for MRO
+config.simulation.type = 'MRO'; % choose from 'MRO', 'CCO', or any other. Will run MRO mode for any other value
 % MRO specific options
 config.simulation.bandwidth_Mhz = 10;
 config.simulation.ue_seed = 0; %TODO ADD
-config.simulation.simulation_duration_s = 2;
-config.simulation.random_UEs = 3;  % number of random UEs to lay, set to 0 to use specific defined UEs
-config.simulation.P_local = 0.0; % Probability for locally distributed random UEs
+config.simulation.simulation_duration_s = 10;
+config.simulation.random_UEs = 2;  % number of random UEs to lay, set to 0 to use specific defined UEs
+config.simulation.P_local = 0.8; % Probability for locally distributed random UEs
 config.simulation.local_radius = 150;  % Distance for a UE to be within as a local UE
-config.simulation.P_turn = 0.1; % Probability of turning every second
+config.simulation.P_turn = 0.0; % Probability of turning every second
 config.simulation.max_xy = 600;  % How far in any direction the range goes
 config.simulation.output_rsrp = 1; % Boolean for outputing rsrp or full channel values
 % CCO specific options
@@ -101,7 +101,7 @@ else
     fprintf('...Using the locations you defined for the BS.\n');
 end
 
-if config.simulation.CCO_0_MRO_1 == 0 && config.simulation.no_rx_min < 1000
+if strcmp(config.simulation.type, 'CCO') && config.simulation.no_rx_min < 1000
     warning('...Did you intend to do CCO? You have chosen very few no_rx_min=%i.\n', config.simulation.no_rx_min);
 end
 

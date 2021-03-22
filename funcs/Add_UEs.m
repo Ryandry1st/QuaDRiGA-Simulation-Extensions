@@ -13,12 +13,19 @@ per_BS_UE = histcounts(assignments);
 
 rng(params.ue_seed);
 
+turn_positions = zeros(l.no_rx, params.total_time, 3);
+turn_times = zeros(l.no_rx, params.total_time);
+counter = 0;
+speed_set = [];
 for k=1:l.no_tx
-    [locs, vels, speeds, no_segments, t_unit] = RandomizeUE(per_BS_UE(k), params.P_local, params.local_radius, params.total_time, l.tx_track(k).initial_position(1), l.tx_track(k).initial_position(2), max_xy, params.P_turn);
-
+    [locs, vels, speeds, no_segments, t_unit, turns] = RandomizeUE(per_BS_UE(k), params.P_local, params.local_radius, params.total_time, l.tx_track(k).initial_position(1), l.tx_track(k).initial_position(2), max_xy, params.P_turn);
+    speed_set = [speed_set, speeds];
     for i=1:per_BS_UE(k)
-    t = qd_track('linear', t_unit*speeds(i), atan2(vels(i, 2, 1), vels(i, 1, 1)));
-        t.initial_position = locs(i, :)';
+        counter = counter + 1;
+        t = qd_track('linear', t_unit*speeds(i), atan2(vels(i, 2, 1), vels(i, 1, 1)));
+        t.initial_position = locs(i, :)'; 
+        turn_positions(counter, 1, :) = locs(i, :)';
+        
         if k>1
             t.name = ['Rx',sprintf('%06.0f',i + sum(per_BS_UE(1:k-1)))];
         else
@@ -27,6 +34,11 @@ for k=1:l.no_tx
 
         t.movement_profile = [0, t_unit; 0, speeds(i)*t_unit];
         [~, t] = interpolate(t.copy, 'time', 1/params.fs);
+        
+        if no_segments > 1
+            turn_positions(counter, 2, :) = t.positions(:, end)+locs(i, :)';
+            turn_times(counter, 2) = t_unit;
+        end
 
         for j=2:no_segments
             tmp = qd_track('linear', t_unit*speeds(i), atan2(vels(i, 2, j), vels(i, 1, j)));
@@ -38,6 +50,12 @@ for k=1:l.no_tx
                 [t.positions(1, end) + tmp.positions(1, 2:end);
                  t.positions(2, end) + tmp.positions(2, 2:end);
                  1.5*ones(1, numel(tmp.positions(1, 2:end)))]];
+            % only add the next position turn if there is a subsequent
+            % point
+
+            turn_positions(counter, j+1, :) = t.positions(:, end)+locs(i, :)';
+            turn_times(counter, j+1) = t_unit*j;
+
 
         end
         if k>1
@@ -51,4 +69,5 @@ for k=1:l.no_tx
 end
 
 rng(params.seed);
+save(append(params.save_folder_r,'ue_mobility.mat'), 'turn_times', 'turn_positions', 'speed_set');
 % l.visualize;
