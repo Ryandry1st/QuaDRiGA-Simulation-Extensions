@@ -42,7 +42,7 @@ if exist('output_dir', 'var')
 end
 
 
-
+copyfile('config.json', [params.save_folder_r, '/config.json']);
 
 if params.batch == 1 % MRO or CCO multiple tilts
     fprintf("Pre-creating layout");
@@ -65,8 +65,6 @@ else
         mvrcQv2_CCO(params);
     end
 end
-
-copyfile('config.json', [params.save_folder_r, '/config.json']);
 
 fprintf('==========================================\n');
 fprintf('SIMULATION ENDED ON: %s\n',datetime('now'))

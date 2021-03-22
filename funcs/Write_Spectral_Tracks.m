@@ -89,9 +89,9 @@ for iff = 1:numel(params.fc)
 
             if ~params.batch
                 for sector = 1:params.no_sectors
+                    tx_sec_index = (tx_k-1)*params.no_sectors+sector;
                     % Get the frequency response values
-                    if params.output_rsrp
-                        tx_sec_index = (tx_k-1)*params.no_sectors+sector;
+                    if params.output_rsrp   
                         X = c(rx_k, tx_sec_index, iff).fr(fft_freq, fft_size);
                         X = squeeze(X);
 
@@ -117,6 +117,7 @@ for iff = 1:numel(params.fc)
                         writematrix(squeeze(Y_save(:, rx_k, tx_sec_index, iff, :)), strcat(name, '.csv'));
 
                     else % provide channels in .mat format
+                        
                         channel = {};
                         channel.H = c(rx_k, tx_sec_index, iff).coeff;
                         channel.D = c(rx_k, tx_sec_index, iff).delay;
@@ -124,7 +125,7 @@ for iff = 1:numel(params.fc)
                         channel.AoD = c(rx_k, tx_sec_index, iff).par.AoD_cb;
                         channel.EoA = c(rx_k, tx_sec_index, iff).par.EoA_cb;
                         channel.EoD = c(rx_k, tx_sec_index, iff).par.EoD_cb;
-                        save(['TX_', num2str(tx_k), '_Sector_', num2str(sector), '_UE_', num2str(rx_k), '_fc_', num2str(params.fc(iff)), '_Channel'], '-v7.4', 'channel');
+                        save([params.save_folder_r, 'TX_', num2str(tx_k), '_Sector_', num2str(sector), '_UE_', num2str(rx_k), '_fc_', num2str(params.fc(iff)), '_Channel'], '-v7.3', 'channel');
                     end
                 end
             end

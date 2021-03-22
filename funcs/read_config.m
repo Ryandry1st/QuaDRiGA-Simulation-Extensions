@@ -34,8 +34,11 @@ if ~sim_style
             ue_seed = 0;
         end
     end
-    ue_seed = info.simulation.ue_seed;
-    output_rsrp = info.simulation.output_rsrp == 1;
+    if isfield(info.simulation, 'output_rsrp')
+        output_rsrp = info.simulation.output_rsrp == 1;
+    else
+        output_rsrp = 1;
+    end
 end
 
 fc = info.simulation.carrier_frequency_Mhz * 1e6;

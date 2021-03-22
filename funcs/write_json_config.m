@@ -15,10 +15,10 @@ end
 for i=1:l.no_tx
     config.BS(i).name = append('BS_', int2str(i));
     config.BS(i).location = l.tx_position(:, i);
-    config.BS(i).number_of_sectors = l.tx_array(1, i).no_elements;
+    config.BS(i).number_of_sectors = params.no_sectors;
     if isfield(params, 'orientations')
         config.BS(i).azimuth_rotations_degrees = params.orientations(:, 2);
-        config.BS(i).downtilts_degrees = params.orientations((i-1)*l.tx_array(1, i).no_elements+1:i*l.tx_array(1, i).no_elements, 1);
+        config.BS(i).downtilts_degrees = params.orientations((i-1)*params.no_sectors+1:i*params.no_sectors, 1);
     else
         config.BS(i).azimuth_rotations_degrees = -1;
         config.BS(i).downtilts_degrees = -1;

@@ -1,11 +1,7 @@
 function params = mvrcQv2_init(config_file)
 
-if ~exist('config_file', 'var')
+if nargin < 1
     config_file = 'config.json';
-else
-    if isempty(config_file)
-        config_file = 'config.json';
-    end
 end
 
 addpath(genpath([pwd, '/funcs']));
@@ -108,7 +104,7 @@ tx_array_3gpp_macro.name = '3gpp-macro';
 %      * spacing - Element spacing in [λ], Default: 0.5
 
 tx_antenna_3gpp_3d.M = 8;
-tx_antenna_3gpp_3d.N = 8;
+tx_antenna_3gpp_3d.N = 1;
 tx_antenna_3gpp_3d.center_freq = s.center_frequency;
 tx_antenna_3gpp_3d.pol = 4;
 tx_antenna_3gpp_3d.tilt = 0;
