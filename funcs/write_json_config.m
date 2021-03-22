@@ -5,7 +5,7 @@ num_RBs = 50;
 clear config;
 for i=1:l.no_rx
     config.UE(i).name = append('UE_', int2str(i));
-    config.UE(i).initial_position = l.rx_track(i).initial_position;
+    config.UE(i).initial_position = round(l.rx_track(i).initial_position, 2);
     config.UE(i).velocity = round(l.rx_track(i).positions(:, end)/params.total_time, 4);
     config.UE(i).end_position = round(l.rx_track(i).initial_position + l.rx_track(i).positions(:, end), 4);
     config.UE(i).initial_attachment = 1;
@@ -14,7 +14,7 @@ end
 
 for i=1:l.no_tx
     config.BS(i).name = append('BS_', int2str(i));
-    config.BS(i).location = l.tx_position(:, i);
+    config.BS(i).location = round(l.tx_position(:, i), 2);
     config.BS(i).number_of_sectors = params.no_sectors;
     if isfield(params, 'orientations')
         config.BS(i).azimuth_rotations_degrees = params.orientations(:, 2);

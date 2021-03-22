@@ -5,13 +5,13 @@ config = {};
 
 config.simulation.run_i = 'hex_tx7_rx20164_3gpp3duma_seed0';
 
-config.simulation.sim_num = '0.7'; % should be a string
-config.simulation.parallel = 1; % Set to 1 to enable parallel operation
+config.simulation.sim_num = '0.8'; % should be a string
+config.simulation.parallel = 0; % Set to 1 to enable parallel operation
 config.simulation.seed = 1;
 config.simulation.carrier_frequency_Mhz = [2000.0];
 config.simulation.sampling_frequency_hz = 1000;
-config.simulation.scenario = '3GPP_38.901_UMa'; % '3GPP_3D_UMi', 'Freespace', '3GPP_38.901_UMa', '3GPP_3D_UMa'
-config.simulation.no_tx = 4;
+config.simulation.scenario = 'Freespace'; % '3GPP_3D_UMi', 'Freespace', '3GPP_38.901_UMa', '3GPP_3D_UMa'
+config.simulation.no_tx = 3;
 config.simulation.isd = 290; % intersite distance
 config.simulation.BS_drop = 'hex'; % Choose 'hex', 'rnd', 'csv' for built in layouts
 config.simulation.batch_tilts = [5];
@@ -110,7 +110,7 @@ if numel(config.simulation.carrier_frequency_Mhz) > 1
 end
 
 jsonStr = jsonencode(config);
-fid = fopen(append(output_file_path, 'config.json'), 'w');
+fid = fopen(append(output_file_path, 'quadriga_config.json'), 'w');
 if fid == -1, error('Cannot create JSON file'); end
 fwrite(fid, jsonStr, 'char');
 fclose(fid);

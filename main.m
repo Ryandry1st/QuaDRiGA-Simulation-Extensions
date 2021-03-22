@@ -42,7 +42,7 @@ if exist('output_dir', 'var')
 end
 
 
-copyfile('config.json', [params.save_folder_r, '/config.json']);
+copyfile(params.config_file, [params.save_folder_r, '/quadriga_config.json']);
 
 if params.batch == 1 % MRO or CCO multiple tilts
     fprintf("Pre-creating layout");
