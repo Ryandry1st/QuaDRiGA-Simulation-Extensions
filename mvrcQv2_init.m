@@ -10,6 +10,7 @@ end
 
 addpath(genpath([pwd, '/funcs']));
 addpath(genpath([pwd, '/QuaDriGa_2020.11.03_v2.4.0']));
+addpath(genpath([pwd, '/MVRCfuncs']));
 
 
 if ismac
