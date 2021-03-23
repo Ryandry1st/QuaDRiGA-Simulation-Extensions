@@ -2,6 +2,7 @@
 % Create a config file for running the MRO data generation
 output_file_path = '';
 config = {};
+addpath(genpath([pwd, '/MVRCfuncs']));
 
 config.simulation.run_i = 'hex_tx7_rx20164_3gpp3duma_seed0';
 
