@@ -22,6 +22,8 @@ close all;
 big_tic = tic;
 fprintf('SIMULATION STARTED ON: %s\n\n',datetime('now'))
 
+addpath(genpath([pwd, '/MVRCfuncs']));
+
 if exist('input_config', 'var')
     if ~isempty(input_config) 
         fprintf("Using the given config file\n");

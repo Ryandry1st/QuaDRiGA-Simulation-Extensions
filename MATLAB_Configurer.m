@@ -3,7 +3,7 @@
 % See this quip for parameter selection https://quip.com/kfyrAv0ZhdEK/FBQuadriga-User-Guide
 output_file_path = '';
 config = {};
-addpath(genpath([pwd, '/MVRCfuncs']));
+% addpath(genpath([pwd, '/MVRCfuncs']));
 
 config.simulation.run_i = 'hex_tx7_rx20164_3gpp3duma_seed0';
 
