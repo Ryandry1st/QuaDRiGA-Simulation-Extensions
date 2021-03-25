@@ -16,12 +16,14 @@ else
     load([params.save_folder_r, 'ue_mobility.mat']);
     for i=1:l.no_rx
         config.UE(i).name = append('UE_', int2str(i));
+        config.UE(i).initial_attachment = 1;
         config.UE(i).turn_times = turn_times(i, :);
         config.UE(i).speed = round(speed_set(i), 2);
         config.UE(i).turn_positions = struct;
         for j=1:numel(config.UE(i).turn_times)
             config.UE(i).turn_positions.(append('t', num2str(j-1))) = round(turn_positions(i, j, :), 2);
         end
+        config.UE(i).initial_attachment = 1;
 %         for j=1:numel(config.UE(i).turn_times)
 %             config.UE(i).turn_positions(j, :) = round(turn_positions(i, j, :), 2);
 %         end
@@ -81,3 +83,10 @@ fid = fopen(append(params.save_folder_r,'rf_config.json'), 'w');
 if fid == -1, error('Cannot create JSON file'); end
 fwrite(fid, jsonStr, 'char');
 fclose(fid);
+
+commandStr = sprintf('%s pyScripts/bootstrap_protocol_config.py --output_file="%sprotocol_config.json" --input_file="%s"', params.python_path, params.save_folder_r, [params.save_folder_r, 'rf_config.json']);
+status = system(commandStr);
+
+if status
+   warning("Generating random protocol_config.json failed, you should check on this"); 
+end
