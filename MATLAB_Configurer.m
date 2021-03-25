@@ -7,7 +7,7 @@ config = {};
 
 config.simulation.run_i = 'hex_tx7_rx20164_3gpp3duma_seed0';
 
-config.simulation.sim_num = '0.8.1'; % should be a string
+config.simulation.sim_num = '0.8'; % should be a string
 config.simulation.parallel = 0; % Set to 1 to enable parallel operation
 config.simulation.seed = 1;
 config.simulation.carrier_frequency_Mhz = [2000.0];
@@ -19,13 +19,13 @@ config.simulation.BS_drop = 'hex'; % Choose 'hex', 'rnd', 'csv' for built in lay
 config.simulation.batch_tilts = [5];
 config.simulation.type = 'MRO'; % choose from 'MRO', 'CCO', or any other. Will run MRO mode for any other value
 % MRO specific options
-config.simulation.bandwidth_Mhz = 10;
+config.simulation.bandwidth_Mhz = 5;
 config.simulation.ue_seed = 0;
 config.simulation.simulation_duration_s = 10;
 config.simulation.random_UEs = 2;  % number of random UEs to lay, set to 0 to use specific defined UEs
 config.simulation.P_local = 0.8; % Probability for locally distributed random UEs
 config.simulation.local_radius = 150;  % Distance for a UE to be within as a local UE
-config.simulation.P_turn = 0.0; % Probability of turning every second
+config.simulation.P_turn = 0.3; % Probability of turning every second
 config.simulation.max_xy = 600;  % How far in any direction the range goes
 config.simulation.output_rsrp = 1; % Boolean for outputing rsrp or full channel values
 % CCO specific options

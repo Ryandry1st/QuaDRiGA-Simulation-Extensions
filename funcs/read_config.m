@@ -125,7 +125,7 @@ else
         end
         directories = dir(save_folder_r);
         num_dir = numel(directories([directories(:).isdir]))-2;
-        save_folder_r = [save_folder_r, 'trial ', num2str(num_dir+1), '/'];
+        save_folder_r = [save_folder_r, 'trial ', num2str(num_dir), '/'];
         mkdir(save_folder_r);
      else
          save_folder_r = [pwd, sprintf('/savedResults/%s/', run_i)];

@@ -17,8 +17,14 @@ else
     for i=1:l.no_rx
         config.UE(i).name = append('UE_', int2str(i));
         config.UE(i).turn_times = turn_times(i, :);
-        config.UE(i).turn_positions = round(turn_positions(i, :, :), 2);
         config.UE(i).speed = round(speed_set(i), 2);
+        config.UE(i).turn_positions = struct;
+        for j=1:numel(config.UE(i).turn_times)
+            config.UE(i).turn_positions.(append('t', num2str(j-1))) = round(turn_positions(i, j, :), 2);
+        end
+%         for j=1:numel(config.UE(i).turn_times)
+%             config.UE(i).turn_positions(j, :) = round(turn_positions(i, j, :), 2);
+%         end
     end
     config.simulation.mobility_type='random_turns';
 end
