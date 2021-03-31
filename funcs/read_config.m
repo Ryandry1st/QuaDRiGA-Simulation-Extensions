@@ -22,6 +22,8 @@ if ~sim_style
             distance(i) = speed(i) * total_time;
         end
         no_rx_min = no_rx;
+        P_local = 1.9;
+        P_turn = 0;
     else
         P_local = info.simulation.P_local;
         local_radius = info.simulation.local_radius;

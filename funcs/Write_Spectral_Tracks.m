@@ -169,5 +169,4 @@ for iff = 1:numel(params.fc)
     end
 end
 BSmetadata;
-save('Channels.mat', 'c', '-v7.3');
 toc

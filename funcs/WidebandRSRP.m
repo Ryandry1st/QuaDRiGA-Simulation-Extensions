@@ -22,7 +22,7 @@ for iff = 1:numel(params.fc)
     for ir = 1:l.no_rx
         for it = 1:l.no_tx * params.no_sectors
             for is = 1:params.total_time*params.fs
-                tmp = c(ir, it, iff).coeff(1, 1, :, is); % Coefficients from first Tx antenna
+                tmp = c(ir, it, iff).coeff(1, :, :, is); % Coefficients from ~all~ Tx antennas
                 pathgain_dB(ir, it, is, iff) = 10*log10(sum(abs(tmp(:)).^2/no_mimo_links));
                 rsrp_p0(ir, it, is, iff) = 10*log10((sector_pwr(it)) * sum(abs(tmp(:)).^2) / l.rx_array(1, 1).no_elements); % Divide by num Rx antennas
             end

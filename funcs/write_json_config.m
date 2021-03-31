@@ -29,8 +29,9 @@ else
 %         end
     end
     config.simulation.mobility_type='random_turns';
+    delete([params.save_folder_r, 'ue_mobility.mat']);
 end
-delete([params.save_folder_r, 'ue_mobility.mat']);
+
 
 
 for i=1:l.no_tx
