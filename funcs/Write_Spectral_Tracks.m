@@ -114,7 +114,7 @@ for iff = 1:numel(params.fc)
                         else
                             name = strcat(params.save_folder_r, 'ULDL_', 'TX_', num2str(tx_k), '_Sector_', num2str(sector), '_UE_', num2str(rx_k), '_Channel_Response');
                         end
-                        writematrix(squeeze(Y_save(:, rx_k, tx_sec_index, iff, :)), strcat(name, '.csv'));
+                        writematrix(squeeze(Y_save(:, rx_k, tx_sec_index, :, iff)), strcat(name, '.csv'));
 
                     else % provide channels in .mat format
                         
