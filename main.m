@@ -20,7 +20,12 @@ function main(input_config, output_dir)
 clearvars -except input_config output_dir
 close all;
 big_tic = tic;
-fprintf('SIMULATION STARTED ON: %s\n\n',datetime('now'))
+
+if exist('OCTAVE_VERSION', 'builtin')
+    fprintf(['SIMULATION STARTED ON: ', strftime('%Y-%m-%d %H:%M:%S', localtime(time ())), '\n']);
+else
+    fprintf('SIMULATION STARTED ON: %s\n\n',datetime('now')); 
+end
 
 addpath(genpath([pwd, '/MVRCfuncs']));
 
@@ -69,6 +74,10 @@ else
 end
 
 fprintf('==========================================\n');
-fprintf('SIMULATION ENDED ON: %s\n',datetime('now'))
+if exist('OCTAVE_VERSION', 'builtin')
+    fprintf('SIMULATION ENDED ON:', strftime ("%Y-%m-%d %H:%M:%S", localtime (time ())));
+else
+    fprintf('SIMULATION ENDED ON: %s\n\n',datetime('now')); 
+end
 fprintf('SIMULATION RUNTIME = %0.0f sec (%0.1f h)\n', toc(big_tic), toc(big_tic)/3600);
 

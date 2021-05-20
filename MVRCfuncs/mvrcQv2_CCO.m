@@ -11,7 +11,7 @@ if params.save_layout
 
     [l, max_xy, x_min, x_max, y_min, y_max, x_coords, y_coords, n_x_coords, n_y_coords, params.orientations] = load_layout(params);
 else
-    [l, max_xy, x_min, x_max, y_min, y_max, x_coords, y_coords, n_x_coords, n_y_coords, params.orientations] = mvrcQv2_layout(params);
+    [l, max_xy, params.orientations, x_min, x_max, y_min, y_max, x_coords, y_coords, n_x_coords, n_y_coords, ] = mvrcQv2_layout(params);
     params.save_load_channels = 0;
 end
 
@@ -143,19 +143,19 @@ if params.save_results == 1
     if ~exist([params.save_folder_r, 'config'], 'dir')
         mkdir([params.save_folder_r, 'config']); 
     end
-    copyfile([pwd, '/config.json'], [params.save_folder_r, '/config/config.json']);
+%     copyfile([pwd, '/config.json'], [params.save_folder_r, '/config/config.json']);
     
     if ~exist([params.save_folder_r, 'json'], 'dir')
         mkdir([params.save_folder_r, 'json']);
-        copyfile([pwd, '/config.json'], [params.save_folder_r, '/json/config.json']);
+%         copyfile([pwd, '/config.json'], [params.save_folder_r, '/json/config.json']);
     end
     if ~exist([params.save_folder_r, 'npz'], 'dir')
         mkdir([params.save_folder_r, 'npz']);
-        copyfile([pwd, '/config.json'], [params.save_folder_r, '/npz/config.json']);
+%         copyfile([pwd, '/config.json'], [params.save_folder_r, '/npz/config.json']);
     end
     if ~exist([params.save_folder_r, 'mat'], 'dir')
         mkdir([params.save_folder_r, 'mat']);
-        copyfile([pwd, '/config.json'], [params.save_folder_r, '/mat/config.json']);
+%         copyfile([pwd, '/config.json'], [params.save_folder_r, '/mat/config.json']);
     end
 
     if all(params.orientations(:, 2) == params.orientations(1, 2))

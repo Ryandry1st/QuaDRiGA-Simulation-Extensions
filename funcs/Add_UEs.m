@@ -4,14 +4,32 @@
 % All UE are 1.5m tall and do not change height
 
 l.no_rx = params.no_rx;
-[assignments, edges] = discretize(1:l.no_rx, l.no_tx);
-per_BS_UE = histcounts(assignments);
+
+isOctave = exist('OCTAVE_VERSION', 'builtin') ~= 0;
+
+if ~isOctave
+    [assignments, edges] = discretize(1:l.no_rx, l.no_tx);
+    per_BS_UE = histcounts(assignments);
+else
+    per_BS_UE = ones(1, l.no_tx) * floor(l.no_rx / l.no_tx);
+    unaccounted = l.no_rx - sum(per_BS_UE);
+    center = floor(l.no_tx/2);
+    while unaccounted > 0
+       per_BS_UE(center) = per_BS_UE(center) + 1;
+       unaccounted = unaccounted - 1;
+       center = center + 1;
+    end
+end
 
 % Overwrite to place all UE in center point
 % per_BS_UE = zeros(size(per_BS_UE));
 % per_BS_UE(1) = l.no_rx;
 
-rng(params.ue_seed);
+if ~isOctave
+    rng(params.ue_seed);
+else
+    rand('state',params.ue_seed); % TODO unsure if this is the same as MATLAB
+end
 
 turn_positions = zeros(l.no_rx, params.total_time, 3);
 turn_times = zeros(l.no_rx, params.total_time);
@@ -68,6 +86,11 @@ for k=1:l.no_tx
     end
 end
 
-rng(params.seed);
-save(append(params.save_folder_r,'ue_mobility.mat'), 'turn_times', 'turn_positions', 'speed_set');
+if ~isOctave
+    rng(params.seed);
+else
+    rand('state',params.seed); % TODO unsure if this is the same as MATLAB
+end
+
+save([params.save_folder_r,'ue_mobility.mat'], 'turn_times', 'turn_positions', 'speed_set');
 % l.visualize;

@@ -175,6 +175,7 @@ end
         else
             save('savedLayouts/layout.mat', '-v7.3', 'l', 'max_xy', 'old_orientations');
             fprintf('success.\n');
+        end
     end
 
     if nargout > 0

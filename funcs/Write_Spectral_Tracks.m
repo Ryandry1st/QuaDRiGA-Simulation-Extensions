@@ -4,6 +4,9 @@
 % should be ready to be loaded in right away.
 show_plot = 0;
 
+
+isOctave = exist('OCTAVE_VERSION', 'builtin') ~= 0;
+
 % See
 % https://home.zhaw.ch/kunr/NTM1/literatur/LTE%20in%20a%20Nutshell%20-%20Physical%20Layer.pdf
 % for details of LTE PHY options
@@ -81,7 +84,13 @@ for iff = 1:numel(params.fc)
     for rx_k = 1:l.no_rx
         MRO_report(1:3, :) = l.rx_track(rx_k).positions + l.rx_track(rx_k).initial_position;
         [MRO_report(6, :), MRO_report(5, :)] = max(squeeze(rsrp_p0(rx_k, :, :, iff)), [], 1);
-        [B, I] = maxk(squeeze(rsrp_p0(rx_k, :, :, iff)), kbest+1, 1);
+        if ~isOctave
+            [B, I] = maxk(squeeze(rsrp_p0(rx_k, :, :, iff)), kbest+1, 1);
+        else
+            [Bi, Ii] = sort(squeeze(rsrp_p0(rx_k, :, :, iff)), 1, 'descend');
+            B = Bi(1:kbest+1, :);
+            I = Ii(1:kbest+1, :);
+        end
         MRO_report(rsrp_index, :) = B(2:end, :);
         MRO_report(7:rsrp_index(1)-1, :) = I(2:end, :);
 
@@ -100,7 +109,15 @@ for iff = 1:numel(params.fc)
                         % already occurs in the .fr() method. Scale by transmit power
                         X = abs(X).^2./(fft_size) .* Tx_P(1, 1) ./ subcarrier_spacing_Hz;
                         edges = 1:useful_fft_points / num_RBs:useful_fft_points + 1;
-                        bin_sets = discretize(1:useful_fft_points, edges);
+                        if ~isOctave
+                            bin_sets = discretize(1:useful_fft_points, edges);
+                        else
+                            bin_sets = zeros(1, useful_fft_points);
+                            for point_i=1:numel(edges)-1
+                                bin_sets(edges(point_i):edges(point_i+1)) = point_i;
+                            end
+                            bin_sets = bin_sets(1:useful_fft_points);
+                        end
                         [~, len] = size(X);
 
                         for i = 1:num_RBs
@@ -108,19 +125,25 @@ for iff = 1:numel(params.fc)
                             Y_save(i, rx_k, tx_sec_index, :, iff) = mean(X(bin_sets == i, :), 1);
                         end
 
-                        Y_save = round(Y_save, 5, 'significant');
                         if numel(params.fc) > 1
                             name = strcat(params.save_folder_r, 'ULDL_', 'TX_', num2str(tx_k), '_Sector_', num2str(sector), '_UE_', num2str(rx_k), '_fc_', num2str(params.fc(iff)), '_Channel_Response');
                         else
                             name = strcat(params.save_folder_r, 'ULDL_', 'TX_', num2str(tx_k), '_Sector_', num2str(sector), '_UE_', num2str(rx_k), '_Channel_Response');
                         end
-                        writematrix(squeeze(Y_save(:, rx_k, tx_sec_index, :, iff)), strcat(name, '.csv'));
+                        
+                        if ~isOctave
+                            Y_save = round(Y_save, 5, 'significant');
+                            writematrix(squeeze(Y_save(:, rx_k, tx_sec_index, :, iff)), strcat(name, '.csv'));
+                        else
+                            csvwrite([name, '.csv'], squeeze(Y_save(:, rx_k, tx_sec_index, :, iff)), 'precision',5);
+                        end
 
                     else % provide channels in .mat format
+                        % Construct the virtual beamspace channel
                         
                         channel = {};
-                        channel.H = c(rx_k, tx_sec_index, iff).coeff;
-                        channel.D = c(rx_k, tx_sec_index, iff).delay;
+                        channel.H = sum(c(rx_k, tx_sec_index, iff).coeff, 3);
+%                         channel.D = c(rx_k, tx_sec_index, iff).delay;
                         channel.AoA = c(rx_k, tx_sec_index, iff).par.AoA_cb;
                         channel.AoD = c(rx_k, tx_sec_index, iff).par.AoD_cb;
                         channel.EoA = c(rx_k, tx_sec_index, iff).par.EoA_cb;
@@ -140,15 +163,32 @@ for iff = 1:numel(params.fc)
             % Performs PSD RSRP calculation, not 3gpp version
             %             MRO_report(4, :) = 10*log10(squeeze(mean(Y_save(:, :, sector), 1)))+30; % +30 to get dBm
             % Performs 3gpp RSRP calculation (wideband)
-            T = array2table(round(MRO_report', 4, 'significant'));
-            T.Properties.VariableNames(1:6) = {'x','y','z','t','serving pci', 'serving rsrp'};
-            for i=7:rsrp_index(1)-1
-                T.Properties.VariableNames(i) = {['neigh ', num2str(i-6), ' pci']};
+            if ~isOctave
+                T = array2table(round(MRO_report', 4, 'significant'));
+                T.Properties.VariableNames(1:6) = {'x','y','z','t','serving pci', 'serving rsrp'};
+                for i=7:rsrp_index(1)-1
+                    T.Properties.VariableNames(i) = {['neigh ', num2str(i-6), ' pci']};
+                end
+                for i=rsrp_index
+                    T.Properties.VariableNames(i) = {['neigh ', num2str(i-rsrp_index(1)+1), ' rsrp']};
+                end
+                writetable(T, strcat(name, '.csv'));
+            else
+                T = MRO_report';
+                headers = {'x','y','z','t','serving pci', 'serving rsrp'};
+                for i=7:rsrp_index(1)-1
+                    headers{i} = char(['neigh ', num2str(i-6), ' pci']);
+                end
+                for i=rsrp_index
+                    headers{i} = char(['neigh ', num2str(i-rsrp_index(1)+1), ' rsrp']);
+                end
+                header = strjoin(cellstr(headers), ',');
+                fid = fopen([name, '.csv'], 'w');
+                fprintf(fid, '%s\n', header);
+                fclose(fid);
+                csvwrite([name, '.csv'], T,'-append', 'precision',5);
+                
             end
-            for i=rsrp_index
-                T.Properties.VariableNames(i) = {['neigh ', num2str(i-rsrp_index(1)+1), ' rsrp']};
-            end
-            writetable(T, strcat(name, '.csv'));
 
 
             if show_plot % Show a 3D plot of the time-frequency response

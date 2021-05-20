@@ -56,7 +56,8 @@ no_segments = floor(tot_time / t_unit);
 
 total_turns = zeros(N, 1);
 for i=1:N
-    total_turns(i) = sum(rand(no_segments, 1) < P_turn, 'all');
+    tmp = rand(no_segments, 1) < P_turn;
+    total_turns(i) = sum(tmp(:));
 end
 turns = rand(N, no_segments) < P_turn;
 

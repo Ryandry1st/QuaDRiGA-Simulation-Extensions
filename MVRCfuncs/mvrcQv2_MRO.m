@@ -18,7 +18,7 @@ else
     [c_store, p_builder] = l.get_channels;
     cn = merge ( c_store);
 end
-cn = reshape(cn, l.no_rx, l.no_tx, []);
+cn = qf.reshapeo(cn, [l.no_rx, l.no_tx, numel(params.fc)]);
 nEl = l.tx_array(1, 1).no_elements / 3; % Number of elements per sector
 nEl = {1:nEl, nEl + 1:2 * nEl, 2 * nEl + 1:3 * nEl}; % Element indices per sector
 fprintf('Spliting channels between sectors...');
@@ -46,7 +46,10 @@ fprintf("Total time = %3.1f s", toc);
 % height; type can be 'quick', 'sf', 'detailed', 'phase'
 
 % P = 10*log10(sum( abs( cat(3,map{:}) ).^2 ,3));         % Total received power
-P = 10*log10(sum(abs(cat(3, map{:})), 3:4));        % Simplified Total received power; Assumed W and converted to dBm
+P = double(10*log10(sum(abs(cat(3, map{:})), 3:4)));        % Simplified Total received power; Assumed W and converted to dBm
+if exist('OCTAVE_VERSION', 'builtin') ~= 0
+    P = squeeze(sum(P, 3));
+end
 
 l.visualize([],[],0);
 hold on;
@@ -57,7 +60,9 @@ caxis( max(P(:)) + [-50 -5] )
 % caxis([-75, -30]);
 colmap = colormap;
 colbar = colorbar;
-colbar.Label.String = "Receive Power [dBm]";
+if exist('OCTAVE_VERSION', 'builtin') = 0
+    colbar.Label.String = "Receive Power [dBm]";
+end
 % colormap( colmap*0.5 + 0.5 );                           % Adjust colors to be "lighter"
 set(gca,'layer','top')                                    % Show grid on top of the map
 hold on;

@@ -10,8 +10,10 @@ end
 
 addpath(genpath([pwd, '/funcs']));
 addpath(genpath([pwd, '/QuaDriGa_2020.11.03_v2.4.0']));
+addpath('jsonlab/');
 % addpath(genpath([pwd, '/MVRCfuncs']));
 
+isOctave = exist('OCTAVE_VERSION', 'builtin') ~= 0;
 
 if ismac
     python_path = '/Users/ayp/opt/anaconda3/bin/python';
@@ -35,7 +37,7 @@ s.use_absolute_delays = 0;
 
 % flags
 save_results = 1;
-save_layout = 1;
+save_layout = 0;
 save_load_channels = 0;
 random_ori_azi = 0;
 clean_code = 0;

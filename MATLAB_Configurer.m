@@ -111,8 +111,15 @@ if numel(config.simulation.carrier_frequency_Mhz) > 1
     fprintf('... Using multiple carrier frequencies');
 end
 
-jsonStr = jsonencode(config);
-fid = fopen(append(output_file_path, 'quadriga_config.json'), 'w');
-if fid == -1, error('Cannot create JSON file'); end
-fwrite(fid, jsonStr, 'char');
-fclose(fid);
+isOctave = exist('OCTAVE_VERSION', 'builtin') ~= 0;
+
+if ~isOctave
+    jsonStr = jsonencode(config);
+    fid = fopen(append(output_file_path, 'quadriga_config.json'), 'w');
+    if fid == -1, error('Cannot create JSON file'); end
+    fwrite(fid, jsonStr, 'char');
+    fclose(fid);
+else
+    addpath('jsonlab/'); % ensures jsonlab is added
+    savejson('', config, 'FileName', [output_file_path, 'quadriga_config.json']);
+end
