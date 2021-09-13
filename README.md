@@ -1,4 +1,4 @@
-# FB_Quadriga
+# QuaDRiGA Simulation Extensions
   This is a code repository for working on Quadriga simulations. The repository includes a download of Quadriga, so the necessary steps are simply to define your configuration within the configurer. *See FB_Quadriga User Guide.pdf*
   
   
