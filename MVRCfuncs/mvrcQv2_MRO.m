@@ -60,7 +60,7 @@ caxis( max(P(:)) + [-50 -5] )
 % caxis([-75, -30]);
 colmap = colormap;
 colbar = colorbar;
-if exist('OCTAVE_VERSION', 'builtin') = 0
+if exist('OCTAVE_VERSION', 'builtin') == 0
     colbar.Label.String = "Receive Power [dBm]";
 end
 % colormap( colmap*0.5 + 0.5 );                           % Adjust colors to be "lighter"
